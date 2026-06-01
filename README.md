@@ -3,6 +3,9 @@
 ## 📋 Overview
 A project focused on maximizing the performance of Traffic Sign Recognition (GTSRB)—a core vision technology for autonomous driving and robotics—while executing **model compression** tailored for resource-constrained robotic environments. By implementing a **Knowledge Distillation (KD)** pipeline, the project successfully transferred knowledge from a high-capacity Teacher model to a lightweight Student model, exploring the optimal trade-off between computational efficiency and predictive accuracy.
 
+## 💻 Jupyter Notebook Source Code
+👉 [Click here to view the full interactive notebook via nbviewer](https://nbviewer.org/github/Dongmyung378/Robotics/blob/main/gtsrb.ipynb)
+
 ## 🛠 Tech Stack
 - **Language:** Python
 - **Frameworks & Libraries:** PyTorch, Torchvision
