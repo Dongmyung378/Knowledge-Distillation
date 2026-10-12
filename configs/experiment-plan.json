@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "protocol": "gtsrb-track-disjoint-kaggle-v1",
+  "training_location": "kaggle_gpu_only",
+  "dataset_source": "meowmeowmeowmeowmeow/gtsrb-german-traffic-sign/versions/1",
+  "split_seed": 378,
+  "split_track_ratios": [0.7, 0.15, 0.15],
+  "historical_exposure": "All original training images and official test labels were used by the historical notebook. Current locked holdout is excluded from new training and selection; it is not claimed to be historically unseen.",
+  "pilot_seed": 378,
+  "confirmation_seeds": [378, 379, 380],
+  "deployment_seed": 378,
+  "teacher_variants": [
+    {
+      "variant": "frozen_bn",
+      "head_epochs": 5,
+      "fine_tune_epochs": 15,
+      "head_learning_rate": 0.001,
+      "fine_tune_learning_rate": 0.00001,
+      "unfreeze_last": 60,
+      "batch_size": 64,
+      "patience": 5,
+      "deterministic": true,
+      "verbose": 2
+    }
+  ],
+  "student_training": {
+    "max_epochs": 30,
+    "patience": 5,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "augmentation": true,
+    "deterministic": true,
+    "verbose": 2
+  },
+  "kd_candidates": [
+    {"id": "T3-a03", "temperature": 3.0, "alpha": 0.3},
+    {"id": "T5-a03", "temperature": 5.0, "alpha": 0.3},
+    {"id": "T10-a03", "temperature": 10.0, "alpha": 0.3},
+    {"id": "T5-a05", "temperature": 5.0, "alpha": 0.5}
+  ],
+  "selection": {
+    "metric": "unweighted_validation_accuracy",
+    "minimum_absolute_accuracy_gain": 0.002,
+    "confirmation_required_positive_pairs": 2,
+    "tie_break": "higher validation accuracy, then lower validation CE, then earlier declared candidate",
+    "non_improvement_policy": "Reject KD candidates without at least 0.2 percentage-point validation gain. No extra temperatures, architectures or final-driven retuning.",
+    "confirmation_policy": "Reuse pilot seed 378 paired runs. Train only the selected fixed KD recipe and matched baseline for seeds 379 and 380. Require mean validation gain >=0.2 percentage points and at least two positive seed pairs. Preserve unsuccessful results.",
+    "final_policy": "Freeze model and configuration hashes before locked holdout and historically exposed official-test audit. No reselection or new experiments after final metrics are accessed. Deployment seed 378 is declared in advance."
+  },
+  "deployment": {
+    "representative_split": "train",
+    "representative_max_images": 256,
+    "int8_validation_max_accuracy_drop": 0.01,
+    "int8_minimum_speedup": 1.05,
+    "final_does_not_select_quantization": true
+  }
+}

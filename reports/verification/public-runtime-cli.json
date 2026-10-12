@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "scope": "public_HTTPS_bundle_download_then_local_inventory_check_and_single_image_CPU_inference",
+  "python": "3.12.15",
+  "installed_clean_environment": true,
+  "destination_initially_absent": true,
+  "source_changed": false,
+  "gpu_used": false,
+  "training_or_export_performed": false,
+  "full_dataset_quality_evaluation": false,
+  "KAGGLE_auth_environment_removed": true,
+  "descriptor_sha256": "367e9e173164286f94ae9a568b0180f2314c71febf94d79a9aceb1d85cd941fb",
+  "public_url": "https://park-dongmyung.com/downloads/knowledge-distillation-models-v2.zip",
+  "expected_bundle_bytes": 11353209,
+  "expected_bundle_sha256": "d1b7de4bc7fa67fb0a7ccabfaf32d7b5cd3b84b4686c0d714427fc73aae50e5b",
+  "commands": [
+    {
+      "stage": "download",
+      "argv": [
+        "D:\\Projects\\outputs\\knowledge-distillation\\verification\\windows-clean\\.venv\\Scripts\\python.exe",
+        "-I",
+        "-m",
+        "knowledge_distillation",
+        "download",
+        "--manifest",
+        "D:\\Projects\\outputs\\knowledge-distillation\\release-delivery-v1\\artifact-download.json",
+        "--output",
+        "D:\\Projects\\outputs\\knowledge-distillation\\verification\\public-runtime-download"
+      ],
+      "exit_code": 0,
+      "seconds": 4.433,
+      "result": {
+        "verified": true,
+        "files": 10,
+        "bytes": 11352053
+      }
+    },
+    {
+      "stage": "verify-only",
+      "argv": [
+        "D:\\Projects\\outputs\\knowledge-distillation\\verification\\windows-clean\\.venv\\Scripts\\python.exe",
+        "-I",
+        "-m",
+        "knowledge_distillation",
+        "download",
+        "--manifest",
+        "D:\\Projects\\outputs\\knowledge-distillation\\release-delivery-v1\\artifact-download.json",
+        "--output",
+        "D:\\Projects\\outputs\\knowledge-distillation\\verification\\public-runtime-download",
+        "--verify-only"
+      ],
+      "exit_code": 0,
+      "seconds": 0.21,
+      "result": {
+        "verified": true,
+        "files": 10,
+        "bytes": 11352053
+      }
+    },
+    {
+      "stage": "predict",
+      "argv": [
+        "D:\\Projects\\outputs\\knowledge-distillation\\verification\\windows-clean\\.venv\\Scripts\\python.exe",
+        "-I",
+        "-m",
+        "knowledge_distillation",
+        "predict",
+        "--model",
+        "D:\\Projects\\outputs\\knowledge-distillation\\verification\\public-runtime-download\\models\\student-fp32.tflite",
+        "--image",
+        "D:\\Projects\\Knowledge-Distillation\\.local\\data\\gtsrb-v1\\Train\\20\\00020_00000_00000.png",
+        "--sha256",
+        "346fb1881132ef6fd385babebbaec6f970d0fb0cef14e7da9dbb084845f3a98f"
+      ],
+      "exit_code": 0,
+      "seconds": 4.903,
+      "result": {
+        "schema_version": 1,
+        "model_sha256": "346fb1881132ef6fd385babebbaec6f970d0fb0cef14e7da9dbb084845f3a98f",
+        "image_sha256": "a101585b4d196d7ec8f8c7f4d77e9e47f3d0a64974c0e89d807c5d47f2b6e7cf",
+        "predicted_class_id": 20,
+        "class_name": "20",
+        "class_names": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+          "25",
+          "26",
+          "27",
+          "28",
+          "29",
+          "30",
+          "31",
+          "32",
+          "33",
+          "34",
+          "35",
+          "36",
+          "37",
+          "38",
+          "39",
+          "40",
+          "41",
+          "42"
+        ],
+        "top_predictions": [
+          {
+            "class_id": 20,
+            "class_name": "20",
+            "probability": 0.9825664467653145
+          },
+          {
+            "class_id": 23,
+            "class_name": "23",
+            "probability": 0.0069264395540159125
+          },
+          {
+            "class_id": 11,
+            "class_name": "11",
+            "probability": 0.0022964586709871373
+          },
+          {
+            "class_id": 38,
+            "class_name": "38",
+            "probability": 0.0017338200277988369
+          },
+          {
+            "class_id": 25,
+            "class_name": "25",
+            "probability": 0.0017230332206263556
+          }
+        ],
+        "probability_note": "Softmax scores are not calibrated reliability estimates.",
+        "preprocessing": {
+          "image_size": [
+            96,
+            96
+          ],
+          "channels": "RGB",
+          "external_range": [
+            0,
+            1
+          ],
+          "resize": "bilinear",
+          "teacher_scaling": "Saved inside the teacher model graph."
+        }
+      }
+    }
+  ],
+  "status": "passed",
+  "actual_file_count": 10,
+  "installed_inventory": {
+    "models/baseline-seed-379.keras": {
+      "bytes": 187164,
+      "sha256": "4d5be19544ea0130137b72752231884aeeb8a4c1bcf53d6d228efd82764361f7"
+    },
+    "models/baseline-seed-380.keras": {
+      "bytes": 187164,
+      "sha256": "da36f330c23f4b9d641b0e60cd0c67cccdb184522263bcde52feed53e25febd3"
+    },
+    "models/baseline.keras": {
+      "bytes": 187164,
+      "sha256": "509a44fd5a8929ad6e50403a6c110da4b5beb5aae804ea7ad489e4a668dc5f95"
+    },
+    "models/distilled-seed-379.keras": {
+      "bytes": 187164,
+      "sha256": "a49fc6d8f96b7e9c6f976651da3e370d87a48bfe0b12701acd73230019ea4e47"
+    },
+    "models/distilled-seed-380.keras": {
+      "bytes": 187164,
+      "sha256": "83f5de84beb28846c60c7ba5e6a568dee2910fc1e045d3168bf2eec8ed8a4520"
+    },
+    "models/distilled.keras": {
+      "bytes": 187164,
+      "sha256": "9c4b099c5515678b74f91c67e723e8f1568c47cdb6dd290c1b2e0d0abbcd6273"
+    },
+    "models/student-fp32.tflite": {
+      "bytes": 143316,
+      "sha256": "346fb1881132ef6fd385babebbaec6f970d0fb0cef14e7da9dbb084845f3a98f"
+    },
+    "models/student-int8.tflite": {
+      "bytes": 55472,
+      "sha256": "35c2045fca7879890e87d7101fab86c5d8c7e0a200a2d91326e48b1d329de24a"
+    },
+    "models/student.keras": {
+      "bytes": 187164,
+      "sha256": "9c4b099c5515678b74f91c67e723e8f1568c47cdb6dd290c1b2e0d0abbcd6273"
+    },
+    "models/teacher.keras": {
+      "bytes": 9843117,
+      "sha256": "2acb67a505aa922193482307b2bbdc3680dab1cf9d5cd442a111adbb09a1f73b"
+    }
+  },
+  "completed_utc": "2026-10-12T03:44:22.557441+00:00"
+}

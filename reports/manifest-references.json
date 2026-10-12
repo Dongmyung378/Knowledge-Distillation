@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "training": {
+    "public_path": "reports/split-manifest.json",
+    "bytes": 13479093,
+    "file_sha256": "27db630486c917fafe5ffe998abf2f8b0eea24544f0b83b88f81e28362ec5a26",
+    "content_sha256": "adf978947af03876338282d798bf9c179267752e8c36f71b21865031cbe7a546",
+    "canonical_document_sha256": "2320e12a01d9d35f58fc41793d29d129d8f58d2af93b40fdc70185fcee9a4da7"
+  },
+  "official_audit": {
+    "generated_after_freeze": true,
+    "source_file_sha256": "57fe47e744d4e9d4ee67eb6250233286570771d49ff69a5dfe399ae1e397c27a",
+    "canonical_content_sha256": "328e5245513d673a2df650681996c613ec615f019b06129261143ce4f110473f",
+    "freeze_sha256": "f833aa3b35baf9be1bae39f112ffd3a5157aae2a9d111f9753bf668332b853ba"
+  },
+  "full_manifests_are_not_duplicated_in_this_staging_folder": true
+}

@@ -1,0 +1,16 @@
+{
+  "manifest_sha256": "adf978947af03876338282d798bf9c179267752e8c36f71b21865031cbe7a546",
+  "inventory_sha256": "f9674d7568ada40dd62e57cf6a18b4efca17a805a9d532fda40db21d4a6281b0",
+  "counts": {
+    "train": 27509,
+    "validation": 5850,
+    "locked_holdout": 5850
+  },
+  "track_counts": {
+    "train": 917,
+    "validation": 195,
+    "locked_holdout": 195
+  },
+  "exact_image_sha_cross_split_duplicates": 0,
+  "preparation_seconds": 389.1481770490001
+}

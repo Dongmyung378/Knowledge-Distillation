@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "scope": "isolated_CPU_setup_and_synthetic_correctness_tests",
+  "original_private_report_sha256": "d3333e92e522fdc87461a0d99e00a04c33f4c8d099e9dee60224f8723db53dc8",
+  "source_sha256": {
+    "knowledge_distillation/__init__.py": "4ab0a16a4ed763b1eb2f63719265e29406f5bed0695ed78bdacb0622e9021235",
+    "knowledge_distillation/__main__.py": "dcc5afdcbb430092e23a93429e5ef12689196ea3f0f8b1e0fec5a5472ab171ee",
+    "knowledge_distillation/benchmark.py": "793bd9f87c410f80ebb322abb763312f6e9f4b842c2cea4b9b5a38d5e458f8e3",
+    "knowledge_distillation/data.py": "dd49c3526fb4c8af803a58533dcf893db5ce06ecd38d7050ea287586f932c010",
+    "knowledge_distillation/evaluation.py": "f0aacf7bdc112181eac982b9b498822d3f7c3a3c8ff713987f9226eaad60133d",
+    "knowledge_distillation/experiments.py": "87c3ca01841c999dfca692cc217d53c63794295280b229058026e19f786e0610",
+    "knowledge_distillation/export.py": "62157bd034f84a38ca2c114c11d2bde654ebb146aab0932d1fa2bc98aa9c78b8",
+    "knowledge_distillation/losses.py": "dfbaa4ee1441110e25c5c9970aa720c2c6493d3d831a5b2dc130a0fafebff01e",
+    "knowledge_distillation/models.py": "4583f8f0d8a810d02b373ce1ceeb33a33c973b16fdce66bbc67102b6be052fa5",
+    "knowledge_distillation/runtime.py": "ab3757410e8b08f2bf88cb5a5259b098b00f5d5e0a288aaf08ee5dbc15d03fad",
+    "knowledge_distillation/training.py": "a7c66fdb0c962997efe6601d6d0b35cfedb303cebe5f5f18c03c3137d0f614a5",
+    "pyproject.toml": "671d3b5c6eb3d58533cace4937cebcceac7cea4785414b55070340372737db78",
+    "requirements-runtime.txt": "2355c3e9e9275ae31537cac002e57662ce114b5963b4700d72a391134a8c41a0",
+    "requirements.txt": "274f900af344786e88d07896a64bf72284cf315d704cd63a71d5283001015ce1"
+  },
+  "bootstrap": {
+    "exit_code": 0,
+    "managed_python_forced": true,
+    "doctor": {
+      "healthy": true,
+      "python": "3.12.15",
+      "isolated": true,
+      "device": "cpu",
+      "versions": {
+        "tensorflow": "2.19.0",
+        "keras": "3.9.2",
+        "numpy": "1.26.4",
+        "h5py": "3.13.0",
+        "pandas": "2.2.3",
+        "Pillow": "11.1.0",
+        "scikit-learn": "1.6.1",
+        "matplotlib": "3.10.1",
+        "kagglehub": "0.3.10",
+        "setuptools": "75.8.0",
+        "wheel": "0.45.1"
+      },
+      "tensorflow": {
+        "cpu_tensor_result": 3.0,
+        "visible_gpus": 0
+      }
+    }
+  },
+  "unit_tests": {
+    "exit_code": 0,
+    "count": 63,
+    "passed": 62,
+    "skipped": 1,
+    "cpu_threads": 1,
+    "visible_gpu_setting": "-1"
+  },
+  "skip_details": [
+    "test_symlink_cannot_redirect_local_runtime (test_environment.EnvironmentIsolationTests.test_symlink_cannot_redirect_local_runtime) ... skipped 'Creating symbolic links is unavailable for this account'"
+  ],
+  "actual_saved_model_evaluation_is_reported_separately": true,
+  "same_physical_host_as_windows": false
+}

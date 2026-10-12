@@ -1,0 +1,17 @@
+* text=auto
+*.py text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.toml text eol=lf
+*.sh text eol=lf
+*.ps1 text eol=lf
+*.bat text eol=crlf
+*.ipynb text eol=lf
+*.png binary
+*.pdf binary
+/reports/** -text whitespace=cr-at-eol
+*.keras binary
+*.tflite binary
+*.zip binary

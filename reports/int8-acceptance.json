@@ -1,0 +1,16 @@
+{
+  "accepted": false,
+  "checks": {
+    "accuracy_drop_within_limit": false,
+    "file_size_improved": true,
+    "same_cpu_p50_speedup_within_limit": false
+  },
+  "accuracy_drop_pp": 61.863247863247864,
+  "max_accuracy_drop_pp": 1.0,
+  "same_cpu_p50_speedup": 0.7714285728294104,
+  "minimum_speedup": 1.05,
+  "file_size_ratio_int8_over_fp32": 0.3870607608361941,
+  "latency_ratio_int8_over_fp32": 1.2962962939423488,
+  "selected_format": "FP32",
+  "limitation": "One host and fixed thread count; repeat measurements on the target device."
+}

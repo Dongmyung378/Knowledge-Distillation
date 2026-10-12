@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "predictions": [
+    {
+      "scope": "locked_holdout",
+      "model": "teacher",
+      "bytes": 618810,
+      "sha256": "fab89224861eb2a2cd5b71797570d563fbf3cbb568dce7ba2dde225d2d05ae73",
+      "count": 5850,
+      "included": false,
+      "reason": "Other models/populations use hashes; selected/baseline files above the configured limit also use hashes."
+    },
+    {
+      "scope": "locked_holdout",
+      "model": "baseline",
+      "bytes": 619029,
+      "sha256": "bf8f1f528c210aa42df2c9e695d4e0ca0b3ed37b7d0d049d88a28e6b1b82f883",
+      "count": 5850,
+      "public_path": "evaluations/locked_holdout/baseline/predictions.jsonl",
+      "included": true
+    },
+    {
+      "scope": "locked_holdout",
+      "model": "distilled",
+      "bytes": 618856,
+      "sha256": "109b0bb4c2d5ccacc3b7ae55114402d6df54d5d3ae8f024b1b6be546b959b4b6",
+      "count": 5850,
+      "included": false,
+      "reason": "Other models/populations use hashes; selected/baseline files above the configured limit also use hashes."
+    },
+    {
+      "scope": "locked_holdout",
+      "model": "baseline_seed_379",
+      "bytes": 619014,
+      "sha256": "676ee4315625280595e6e313339cb8dd3280146c4c8926bcdb2b721201408446",
+      "count": 5850,
+      "included": false,
+      "reason": "Other models/populations use hashes; selected/baseline files above the configured limit also use hashes."
+    },
+    {
+      "scope": "locked_holdout",
+      "model": "distilled_seed_379",
+      "bytes": 618848,
+      "sha256": "ad06118b3d68f1a2f79cd625bbd0669d4a0adcc1ce1f67927e637bf77ea6fb49",
+      "count": 5850,
+      "included": false,
+      "reason": "Other models/populations use hashes; selected/baseline files above the configured limit also use hashes."
+    },
+    {
+      "scope": "locked_holdout",
+      "model": "baseline_seed_380",
+      "bytes": 619014,
+      "sha256": "78b7cb35f6ff86dd4d9266f55b2e4ce3ab739c826fe02256f64263e5a19b7947",
+      "count": 5850,
+      "included": false,
+      "reason": "Other models/populations use hashes; selected/baseline files above the configured limit also use hashes."
+    },
+    {
+      "scope": "locked_holdout",
+      "model": "distilled_seed_380",
+      "bytes": 618785,
+      "sha256": "0c0deebf65d819308d774bbd4c6551187d3996064bdfd204f63f71491c0bdddb",
+      "count": 5850,
+      "included": false,
+      "reason": "Other models/populations use hashes; selected/baseline files above the configured limit also use hashes."
+    },
+    {
+      "scope": "locked_holdout",
+      "model": "fp32",
+      "bytes": 618886,
+      "sha256": "e4f74be242a32af8e53a916384ce5d0013fc663dd1483fee5aaf48100ed53edd",
+      "count": 5850,
+      "public_path": "evaluations/locked_holdout/fp32/predictions.jsonl",
+      "included": true
+    },
+    {
+      "scope": "locked_holdout",
+      "model": "int8",
+      "bytes": 616801,
+      "sha256": "e0987062357158f4c53d52164d4afb1856352ced5723c11b30367aae364e1e0b",
+      "count": 5850,
+      "included": false,
+      "reason": "Other models/populations use hashes; selected/baseline files above the configured limit also use hashes."
+    },
+    {
+      "scope": "official_test",
+      "model": "teacher",
+      "bytes": 1315181,
+      "sha256": "93d83801e96768f4b39cd2b14ec20dd0ca461b0970bffce1d6ddc587f1b02c7f",
+      "count": 12630,
+      "included": false,
+      "reason": "Other models/populations use hashes; selected/baseline files above the configured limit also use hashes."
+    },
+    {
+      "scope": "official_test",
+      "model": "baseline",
+      "bytes": 1315673,
+      "sha256": "18eb27efb577ed351c6abdd569d3711520c503e06926f7d2abe37b559c0316c8",
+      "count": 12630,
+      "included": false,
+      "reason": "Other models/populations use hashes; selected/baseline files above the configured limit also use hashes."
+    },
+    {
+      "scope": "official_test",
+      "model": "distilled",
+      "bytes": 1315192,
+      "sha256": "c20fc8a242964044c629e8e76c05d617dd7dfa5fd332fa31fe38f30f64368fa9",
+      "count": 12630,
+      "included": false,
+      "reason": "Other models/populations use hashes; selected/baseline files above the configured limit also use hashes."
+    },
+    {
+      "scope": "official_test",
+      "model": "fp32",
+      "bytes": 1315243,
+      "sha256": "606f43aed9869769ac2e5d1e0ad9fe56b04f90fd4adc64af05b0103e49036874",
+      "count": 12630,
+      "included": false,
+      "reason": "Other models/populations use hashes; selected/baseline files above the configured limit also use hashes."
+    },
+    {
+      "scope": "official_test",
+      "model": "int8",
+      "bytes": 1311265,
+      "sha256": "fa7837ab735a08f0e8b36828ee24b56c160b29bc1c484a96529a7ddc87612495",
+      "count": 12630,
+      "included": false,
+      "reason": "Other models/populations use hashes; selected/baseline files above the configured limit also use hashes."
+    },
+    {
+      "scope": "validation",
+      "model": "fp32",
+      "included": false,
+      "bytes": 618826,
+      "sha256": "39c6888ff9d36a5a50a2a6a27133f86b3abdc50736489ff56099735f28e7bfb9",
+      "count": 5850
+    },
+    {
+      "scope": "validation",
+      "model": "int8",
+      "included": false,
+      "bytes": 616933,
+      "sha256": "fe0b555f9eec6e1f12fcc6a5e890d3026e571d3eecb3a3fc9c9c6230f39bb865",
+      "count": 5850
+    }
+  ]
+}

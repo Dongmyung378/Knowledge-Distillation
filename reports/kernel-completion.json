@@ -1,0 +1,10 @@
+{
+  "status": "completed",
+  "stages": [
+    "pilot",
+    "confirmation",
+    "freeze"
+  ],
+  "locked_holdout_evaluated": false,
+  "official_test_evaluated": false
+}

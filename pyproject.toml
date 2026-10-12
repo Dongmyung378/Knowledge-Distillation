@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools==75.8.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gtsrb-knowledge-distillation"
+version = "2.0.0"
+description = "Track-disjoint traffic-sign knowledge distillation with reproducible CPU evaluation"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "tensorflow==2.19.0",
+  "keras==3.9.2",
+  "numpy==1.26.4",
+  "h5py==3.13.0",
+  "pandas==2.2.3",
+  "Pillow==11.1.0",
+  "scikit-learn==1.6.1",
+  "matplotlib==3.10.1",
+  "kagglehub==0.3.10",
+]
+
+[project.scripts]
+traffic-sign-kd = "knowledge_distillation.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["knowledge_distillation*", "scripts*"]

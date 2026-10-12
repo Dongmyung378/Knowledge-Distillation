@@ -1,0 +1,18 @@
+{
+  "candidate_id": "T5-a05",
+  "configuration": {
+    "max_epochs": 30,
+    "patience": 5,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "augmentation": true,
+    "deterministic": true,
+    "verbose": 2,
+    "alpha": 0.5,
+    "temperature": 5.0
+  },
+  "plan_sha256": "51f5fe79cfbcaeea12fb78ce059085bc26367813209c4ab61f02de4f5aeaf969",
+  "manifest_sha256": "adf978947af03876338282d798bf9c179267752e8c36f71b21865031cbe7a546",
+  "selection_split": "validation",
+  "deployment_seed": 378
+}

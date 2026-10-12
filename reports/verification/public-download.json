@@ -1,0 +1,15 @@
+{
+  "status": "verified",
+  "anonymous_download": true,
+  "full_download": true,
+  "url": "https://park-dongmyung.com/downloads/knowledge-distillation-models-v2.zip",
+  "final_url": "https://park-dongmyung.com/downloads/knowledge-distillation-models-v2.zip",
+  "http_status": 200,
+  "bytes": 11353209,
+  "sha256": "d1b7de4bc7fa67fb0a7ccabfaf32d7b5cd3b84b4686c0d714427fc73aae50e5b",
+  "content_type": "application/zip",
+  "request_had_authentication": false,
+  "request_had_cookies": false,
+  "elapsed_seconds": 5.522,
+  "verified_utc": "2026-10-12T03:41:14.531166+00:00"
+}

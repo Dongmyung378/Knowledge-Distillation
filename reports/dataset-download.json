@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "source": "Kaggle GTSRB mirror, version 1",
+  "dataset_handle": "meowmeowmeowmeowmeow/gtsrb-german-traffic-sign/versions/1",
+  "archive": {
+    "url": "https://www.kaggle.com/api/v1/datasets/download/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign?datasetVersionNumber=1",
+    "bytes": 641568792,
+    "sha256": "32d8d84a4862f3a5c4b3a231f15e6a35dd6a671903339a0c41306ae0105a8e05"
+  },
+  "expected_counts": {
+    "Train": 39209,
+    "Test": 12630,
+    "Meta": 43
+  },
+  "canonical_inventory_sha256": "ab57f6141acc612669464202638d64c80fce45922bd33b0745242ec0c252cdb4",
+  "extraction_policy": "Extract exact-case root CSVs and their referenced Train/Test/Meta images. Ignore duplicate lowercase folders; reject traversal, symlinks, duplicate member names and mismatched sizes or hashes.",
+  "license_declared_by_mirror": "CC0-1.0",
+  "upstream": "https://benchmark.ini.rub.de/gtsrb_dataset.html",
+  "public_access_check": "Complete credential-free HTTPS download returned HTTP 200 and matched the pinned 641568792-byte archive SHA-256; see dataset-access-verification.json."
+}

@@ -1,7 +1,1 @@
-tensorflow==2.19.0
-kagglehub
-matplotlib
-numpy
-pandas
-scikit-learn
-jupyterlab
+-r requirements-runtime.txt

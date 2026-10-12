@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "source_model_sha256": "9c4b099c5515678b74f91c67e723e8f1568c47cdb6dd290c1b2e0d0abbcd6273",
+  "source_model_parameters": 34406,
+  "tensorflow_version": "2.19.0",
+  "calibration_count": 256,
+  "calibration_manifest_sha256": "0edfa12c9c37831faedfe26656c8e95f0fdd4a9114c7b1960d8323c54d39f229",
+  "calibration_split": "train",
+  "fp32_forward_checked_count": 16,
+  "fp32_max_absolute_logit_difference": 0.0001239776611328125,
+  "fp32_argmax_agreement_count": 16,
+  "int8_argmax_agreement_on_training_smoke_count": 6,
+  "smoke_scope": "Training calibration subset only, not held-out accuracy.",
+  "exports": {
+    "fp32": {
+      "filename": "student-fp32.tflite",
+      "bytes": 143316,
+      "sha256": "346fb1881132ef6fd385babebbaec6f970d0fb0cef14e7da9dbb084845f3a98f",
+      "input_dtype": "float32"
+    },
+    "int8": {
+      "filename": "student-int8.tflite",
+      "bytes": 55472,
+      "sha256": "35c2045fca7879890e87d7101fab86c5d8c7e0a200a2d91326e48b1d329de24a",
+      "input_dtype": "int8",
+      "output_dtype": "int8",
+      "floating_tensor_count": 0
+    }
+  },
+  "acceptance_policy": {
+    "max_accuracy_drop_pp": 1.0,
+    "requires_smaller_file_than_fp32": true,
+    "minimum_same_cpu_p50_speedup": 1.05,
+    "selection_split": "validation"
+  },
+  "deployment_selection": "pending validation accuracy and same-CPU latency measurements; final evaluation does not select quantization"
+}

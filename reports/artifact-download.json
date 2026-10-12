@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "release_freeze_sha256": "f833aa3b35baf9be1bae39f112ffd3a5157aae2a9d111f9753bf668332b853ba",
+  "artifacts": [
+    {
+      "name": "frozen-runtime-models",
+      "kind": "zip",
+      "path": "models",
+      "url": "https://park-dongmyung.com/downloads/knowledge-distillation-models-v2.zip",
+      "bytes": 11353209,
+      "sha256": "d1b7de4bc7fa67fb0a7ccabfaf32d7b5cd3b84b4686c0d714427fc73aae50e5b",
+      "inventory": [
+        {
+          "path": "baseline-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "4d5be19544ea0130137b72752231884aeeb8a4c1bcf53d6d228efd82764361f7"
+        },
+        {
+          "path": "baseline-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "da36f330c23f4b9d641b0e60cd0c67cccdb184522263bcde52feed53e25febd3"
+        },
+        {
+          "path": "baseline.keras",
+          "bytes": 187164,
+          "sha256": "509a44fd5a8929ad6e50403a6c110da4b5beb5aae804ea7ad489e4a668dc5f95"
+        },
+        {
+          "path": "distilled-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "a49fc6d8f96b7e9c6f976651da3e370d87a48bfe0b12701acd73230019ea4e47"
+        },
+        {
+          "path": "distilled-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "83f5de84beb28846c60c7ba5e6a568dee2910fc1e045d3168bf2eec8ed8a4520"
+        },
+        {
+          "path": "distilled.keras",
+          "bytes": 187164,
+          "sha256": "9c4b099c5515678b74f91c67e723e8f1568c47cdb6dd290c1b2e0d0abbcd6273"
+        },
+        {
+          "path": "student-fp32.tflite",
+          "bytes": 143316,
+          "sha256": "346fb1881132ef6fd385babebbaec6f970d0fb0cef14e7da9dbb084845f3a98f"
+        },
+        {
+          "path": "student-int8.tflite",
+          "bytes": 55472,
+          "sha256": "35c2045fca7879890e87d7101fab86c5d8c7e0a200a2d91326e48b1d329de24a"
+        },
+        {
+          "path": "student.keras",
+          "bytes": 187164,
+          "sha256": "9c4b099c5515678b74f91c67e723e8f1568c47cdb6dd290c1b2e0d0abbcd6273"
+        },
+        {
+          "path": "teacher.keras",
+          "bytes": 9843117,
+          "sha256": "2acb67a505aa922193482307b2bbdc3680dab1cf9d5cd442a111adbb09a1f73b"
+        }
+      ]
+    }
+  ]
+}

@@ -1,8 +1,21 @@
 .venv/
+.venv-*/
+.local/
+artifacts/
+data/
+outputs/
 __pycache__/
 .ipynb_checkpoints/
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+.env
+kaggle.json
+*.log
 
 *.h5
 *.keras
+*.tflite
 kd_*.png
 confusion_matrix_*.png
