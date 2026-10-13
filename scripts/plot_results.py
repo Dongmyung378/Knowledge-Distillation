@@ -25,8 +25,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 PALETTE = {
-    "teacher": "#66758a", "baseline": "#3275a5", "distilled": "#148b79",
-    "fp32": "#8a62b0", "int8": "#d29526",
+    "teacher": "#694483", "baseline": "#939099", "distilled": "#88994A",
+    "fp32": "#657A35", "int8": "#ACAFA2",
 }
 SEED_MARKERS = {378: "o", 379: "D", 380: "^"}
 
@@ -175,8 +175,11 @@ def byte_label(size: float) -> str:
 
 def clean_axis(axis) -> None:
     axis.spines[["top", "right"]].set_visible(False)
-    axis.spines[["left", "bottom"]].set_color("#aeb8c2")
-    axis.tick_params(colors="#3b4653", labelsize=9)
+    axis.spines[["left", "bottom"]].set_color("#B6ADBF")
+    axis.tick_params(colors="#554B5F", labelsize=9.5)
+    axis.set_title(axis.get_title(loc="left"), loc="left", color="#694483")
+    axis.xaxis.label.set_color("#403846")
+    axis.yaxis.label.set_color("#403846")
     axis.set_axisbelow(True)
 
 
@@ -189,10 +192,10 @@ def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixtu
         prefix = "SYNTHETIC-PRIVATE-" + prefix
     output.mkdir(parents=True, exist_ok=True)
     plt.rcParams.update({
-        "font.family": "DejaVu Sans", "font.size": 10, "axes.titlesize": 12,
+        "font.family": "DejaVu Sans", "font.size": 10.5, "axes.titlesize": 12.5,
         "axes.titleweight": "bold", "axes.labelsize": 10,
-        "figure.facecolor": "white", "axes.facecolor": "white",
-        "savefig.facecolor": "white", "svg.fonttype": "none",
+        "figure.facecolor": "#FBFAFC", "axes.facecolor": "white",
+        "savefig.facecolor": "#FBFAFC", "svg.fonttype": "none",
     })
     figure = plt.figure(figsize=(17.2, 10.2))
     grid = figure.add_gridspec(2, 3, left=0.065, right=0.98, top=0.84, bottom=0.155, hspace=0.43, wspace=0.65, height_ratios=[1.0, 0.85])
@@ -203,26 +206,26 @@ def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixtu
     names = ["teacher", "baseline"] + (["distilled"] if "distilled" in held else [])
     for index, name in enumerate(names):
         metric = held[name]
-        accuracy_axis.bar(index, 100 * metric["accuracy"], width=0.61, color=PALETTE[name], alpha=0.88, zorder=2)
+        accuracy_axis.bar(index, 100 * metric["accuracy"], width=0.61, color=PALETTE[name], alpha=0.95, zorder=2)
         accuracy_axis.text(index, 102, f"{100 * metric['accuracy']:.2f}%\nF1 {100 * metric['macro_f1']:.2f}%", ha="center", va="bottom", fontsize=9.5)
         if name != "teacher":
             for offset, seed in zip(np.linspace(-0.14, 0.14, len(seeds)), seeds):
                 key = name if seed == 378 else f"{name}_seed_{seed}"
-                accuracy_axis.scatter(index + offset, 100 * held[key]["accuracy"], marker=SEED_MARKERS[seed], s=39, facecolor="white", edgecolor="#263443", linewidth=1.0, zorder=4)
+                accuracy_axis.scatter(index + offset, 100 * held[key]["accuracy"], marker=SEED_MARKERS[seed], s=39, facecolor="white", edgecolor="#403846", linewidth=1.0, zorder=4)
     if "distilled" in held:
         baseline_index, distilled_index = names.index("baseline"), names.index("distilled")
         for offset, seed in zip(np.linspace(-0.14, 0.14, len(seeds)), seeds):
             baseline_key = "baseline" if seed == 378 else f"baseline_seed_{seed}"
             distilled_key = "distilled" if seed == 378 else f"distilled_seed_{seed}"
-            accuracy_axis.plot([baseline_index + offset, distilled_index + offset], [100 * held[baseline_key]["accuracy"], 100 * held[distilled_key]["accuracy"]], color="#374151", alpha=0.30, linewidth=0.8, zorder=3)
+            accuracy_axis.plot([baseline_index + offset, distilled_index + offset], [100 * held[baseline_key]["accuracy"], 100 * held[distilled_key]["accuracy"]], color="#6E627B", alpha=0.35, linewidth=0.8, zorder=3)
     accuracy_axis.set_xticks(range(len(names)), [f"{name.title()}\n{held[name]['correct']:,}/{held[name]['count']:,}" for name in names])
     accuracy_axis.set_ylim(0, 116)
     accuracy_axis.set_yticks([0, 20, 40, 60, 80, 100])
     accuracy_axis.set_ylabel("Accuracy (%)")
     accuracy_axis.set_title("Locked-holdout classification", loc="left", pad=20)
-    accuracy_axis.grid(axis="y", color="#e6ebef", linewidth=0.8)
-    handles = [plt.Line2D([0], [0], marker=SEED_MARKERS[seed], linestyle="none", markerfacecolor="white", markeredgecolor="#263443", label=str(seed)) for seed in seeds]
-    accuracy_axis.legend(handles=handles, title="Training seed", loc="lower left", fontsize=8, title_fontsize=8, frameon=True, facecolor="white", edgecolor="#e6ebef", ncols=len(seeds))
+    accuracy_axis.grid(axis="y", color="#EAE5EE", linewidth=0.8)
+    handles = [plt.Line2D([0], [0], marker=SEED_MARKERS[seed], linestyle="none", markerfacecolor="white", markeredgecolor="#403846", label=str(seed)) for seed in seeds]
+    accuracy_axis.legend(handles=handles, title="Training seed", loc="lower left", fontsize=8.5, title_fontsize=8.5, frameon=True, facecolor="white", edgecolor="#DDD4E4", ncols=len(seeds))
     labels = [artifact_label(name, result) for name, result in rows]
     y = np.arange(len(rows))
     p50s = [result["pure_model"]["p50_ms"] for _, result in rows]
@@ -243,14 +246,14 @@ def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixtu
     latency_axis.set_ylim(len(rows) - 0.5, -0.5)
     latency_axis.set_xlabel("p50 / p95 milliseconds (log scale)")
     latency_axis.set_title("Warmed CPU inference", loc="left", pad=20)
-    latency_axis.grid(axis="x", which="major", color="#e6ebef", linewidth=0.8)
+    latency_axis.grid(axis="x", which="major", color="#EAE5EE", linewidth=0.8)
     size_axis.set_xscale("log")
     size_axis.set_xlim(min(sizes) / 2**20 / 1.6, max(sizes) / 2**20 * 4)
     size_axis.set_yticks(y, labels)
     size_axis.set_ylim(len(rows) - 0.5, -0.5)
     size_axis.set_xlabel("Inference artifact MiB (log scale)")
     size_axis.set_title("Actual model file sizes", loc="left", pad=20)
-    size_axis.grid(axis="x", which="major", color="#e6ebef", linewidth=0.8)
+    size_axis.grid(axis="x", which="major", color="#EAE5EE", linewidth=0.8)
     class_ids = np.arange(43)
     baseline_recall = [100 * item["recall"] for item in sorted(held["baseline"]["per_class"], key=lambda item: item["class_id"])]
     recall_axis.plot(class_ids, baseline_recall, color=PALETTE["baseline"], marker="o", markersize=4, linewidth=1.4, label="Baseline, seed 378")
@@ -265,8 +268,8 @@ def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixtu
     recall_axis.set_yticks([0, 20, 40, 60, 80, 100])
     recall_axis.set_ylabel("Recall (%)")
     recall_axis.set_xlabel("GTSRB class ID (all 43 classes)")
-    recall_axis.grid(axis="y", color="#e6ebef", linewidth=0.8)
-    recall_axis.legend(loc="lower left", fontsize=9, frameon=True, facecolor="white", edgecolor="#e6ebef")
+    recall_axis.grid(axis="y", color="#EAE5EE", linewidth=0.8)
+    recall_axis.legend(loc="lower left", fontsize=9, frameon=True, facecolor="white", edgecolor="#DDD4E4")
     for axis in (accuracy_axis, latency_axis, size_axis, recall_axis):
         clean_axis(axis)
     benchmark_reference = rows[0][1]
@@ -275,9 +278,9 @@ def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixtu
     title = "Traffic sign recognition: measured release evidence"
     if fixture:
         title = "PRIVATE SYNTHETIC FIXTURE - NOT PROJECT RESULTS"
-    figure.suptitle(title, x=0.065, y=0.971, ha="left", fontsize=20, fontweight="bold", color="#203046" if not fixture else "#a32929")
+    figure.suptitle(title, x=0.065, y=0.971, ha="left", fontsize=20, fontweight="bold", color="#694483" if not fixture else "#a32929")
     subtitle = f"{held['baseline']['count']:,} locked-holdout images  |  {held['baseline']['model_parameters']:,}-parameter baseline  |  {host_name}, {benchmark_reference['threads']} CPU thread(s)"
-    figure.text(0.065, 0.926, subtitle, ha="left", va="top", fontsize=11, color="#566474")
+    figure.text(0.065, 0.926, subtitle, ha="left", va="top", fontsize=11, color="#665D70")
     pairing = "; lines pair baseline and KD" if "distilled" in held else "; no distilled model in this release"
     note1 = f"Quality bars: seed 378; F1 labels: macro F1. Points: {', '.join(str(seed) for seed in seeds)}{pairing}. No confidence intervals."
     note2 = f"CPU: batch 1, {benchmark_reference['sample_count']} identical validation images, {benchmark_reference['warmup']} warmups, {benchmark_reference['repetitions']} repetitions; synchronized inference, excluding load and image decoding."
@@ -285,7 +288,7 @@ def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixtu
     gate_status = "accepted" if acceptance and acceptance.get("accepted") is True else "rejected" if acceptance and acceptance.get("accepted") is False else "not measured"
     note3 = f"Declared deployment: {selected_kind} / {deployment['format']}. INT8 validation/CPU gate: {gate_status}. Holdout excluded from current selection; the public data were historically exposed."
     for ypos, note in zip((0.101, 0.075, 0.049), (note1, note2, note3)):
-        figure.text(0.065, ypos, note, fontsize=9.0, ha="left", color="#566474")
+        figure.text(0.065, ypos, note, fontsize=9.0, ha="left", color="#665D70")
     png = output / f"{prefix}.png"
     svg = output / f"{prefix}.svg"
     figure.savefig(png, dpi=180, bbox_inches="tight", pad_inches=0.2)
