@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1050" viewBox="0 0 1200 1050" role="img" aria-labelledby="title desc">
+<title id="title">대표 모델의 구조와 파일 크기 및 CPU 비용</title>
+<desc id="desc">기존 대표 T5-a05 모델의 파라미터, 파일 바이트와 동일CPU의 추론 지연 중앙값을 비교합니다. 새T5-a01의 측정값을 대신 사용하지 않습니다.</desc>
+<style>text{font-family:'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;font-variant-numeric:tabular-nums} .axis{fill:#64696B}</style>
+<rect x="0" y="0" width="1200" height="1050" fill="#F6F3F6" rx="0" stroke-width="1"/>
+<text x="48" y="64" fill="#382D3D" font-size="36" font-weight="750" text-anchor="start">대표 모델의 경량화 효과와 CPU 실행 비용</text>
+<text x="48" y="104" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">기존 대표 T5-a05의 측정. CPU 스레드 1개, 배치 1, 검증 이미지 128장과 반복 3회입니다.</text>
+<rect x="48" y="154" width="1104" height="237" fill="#FFFFFF" rx="20" stroke="#DDDDE0" stroke-width="1"/>
+<text x="74" y="195" fill="#382D3D" font-size="28" font-weight="700" text-anchor="start">파라미터 수</text>
+<text x="1117" y="195" fill="#526D35" font-size="28" font-weight="750" text-anchor="end">98.5% 감소</text>
+<text x="74" y="251" fill="#382D3D" font-size="23" font-weight="400" text-anchor="start">교사</text>
+<rect x="329" y="224" width="573" height="29" fill="#ECE8EC" rx="5" stroke-width="1"/>
+<rect x="329" y="224" width="573.0" height="29" fill="#74506E" rx="5" stroke-width="1"/>
+<text x="1117" y="249" fill="#382D3D" font-size="23" font-weight="700" text-anchor="end">2,313,067 개</text>
+<text x="74" y="305" fill="#382D3D" font-size="23" font-weight="400" text-anchor="start">대표 학생</text>
+<rect x="329" y="278" width="573" height="29" fill="#ECE8EC" rx="5" stroke-width="1"/>
+<rect x="329" y="278" width="8.523159078401102" height="29" fill="#526D35" rx="5" stroke-width="1"/>
+<text x="1117" y="303" fill="#382D3D" font-size="23" font-weight="700" text-anchor="end">34,406 개</text>
+<rect x="48" y="415" width="1104" height="237" fill="#FFFFFF" rx="20" stroke="#DDDDE0" stroke-width="1"/>
+<text x="74" y="456" fill="#382D3D" font-size="28" font-weight="700" text-anchor="start">파일 크기</text>
+<text x="1117" y="456" fill="#526D35" font-size="28" font-weight="750" text-anchor="end">98.1% 감소</text>
+<text x="74" y="512" fill="#382D3D" font-size="23" font-weight="400" text-anchor="start">교사 Keras</text>
+<rect x="329" y="485" width="573" height="29" fill="#ECE8EC" rx="5" stroke-width="1"/>
+<rect x="329" y="485" width="573.0" height="29" fill="#74506E" rx="5" stroke-width="1"/>
+<text x="1117" y="510" fill="#382D3D" font-size="23" font-weight="700" text-anchor="end">9,612.4 KiB</text>
+<text x="74" y="566" fill="#382D3D" font-size="23" font-weight="400" text-anchor="start">학생 Keras</text>
+<rect x="329" y="539" width="573" height="29" fill="#ECE8EC" rx="5" stroke-width="1"/>
+<rect x="329" y="539" width="10.895427942185387" height="29" fill="#526D35" rx="5" stroke-width="1"/>
+<text x="1117" y="564" fill="#382D3D" font-size="23" font-weight="700" text-anchor="end">182.8 KiB</text>
+<text x="74" y="620" fill="#382D3D" font-size="23" font-weight="400" text-anchor="start">학생 FP32 TFLite</text>
+<rect x="329" y="593" width="573" height="29" fill="#ECE8EC" rx="5" stroke-width="1"/>
+<rect x="329" y="593" width="8.342892602008083" height="29" fill="#BF9556" rx="5" stroke-width="1"/>
+<text x="1117" y="618" fill="#382D3D" font-size="23" font-weight="700" text-anchor="end">140.0 KiB</text>
+<rect x="48" y="676" width="1104" height="237" fill="#FFFFFF" rx="20" stroke="#DDDDE0" stroke-width="1"/>
+<text x="74" y="717" fill="#382D3D" font-size="28" font-weight="700" text-anchor="start">CPU 추론 지연 중앙값</text>
+<text x="1117" y="717" fill="#526D35" font-size="28" font-weight="750" text-anchor="end">Keras 3.68배</text>
+<text x="74" y="773" fill="#382D3D" font-size="23" font-weight="400" text-anchor="start">교사 Keras</text>
+<rect x="329" y="746" width="573" height="29" fill="#ECE8EC" rx="5" stroke-width="1"/>
+<rect x="329" y="746" width="573.0" height="29" fill="#74506E" rx="5" stroke-width="1"/>
+<text x="1117" y="771" fill="#382D3D" font-size="23" font-weight="700" text-anchor="end">3.8235 ms</text>
+<text x="74" y="827" fill="#382D3D" font-size="23" font-weight="400" text-anchor="start">학생 Keras</text>
+<rect x="329" y="800" width="573" height="29" fill="#ECE8EC" rx="5" stroke-width="1"/>
+<rect x="329" y="800" width="155.9021578237662" height="29" fill="#526D35" rx="5" stroke-width="1"/>
+<text x="1117" y="825" fill="#382D3D" font-size="23" font-weight="700" text-anchor="end">1.0403 ms</text>
+<text x="74" y="881" fill="#382D3D" font-size="23" font-weight="400" text-anchor="start">학생 FP32 TFLite</text>
+<rect x="329" y="854" width="573" height="29" fill="#ECE8EC" rx="5" stroke-width="1"/>
+<rect x="329" y="854" width="64.33605339320535" height="29" fill="#BF9556" rx="5" stroke-width="1"/>
+<text x="1117" y="879" fill="#382D3D" font-size="23" font-weight="700" text-anchor="end">0.4293 ms</text>
+<text x="48" y="990" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">파일 감소율은 같은 Keras 형식끼리 비교했습니다. FP32 TFLite는 별도 배포 형식입니다.</text>
+<text x="48" y="1019" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">한 Windows CPU 호스트의 순수 추론 측정이며 모델 로딩과 이미지 디코딩은 제외합니다. 다른 기기의 속도는 다릅니다.</text>
+<metadata>{"project_id": "project-02", "visual_data_sha256": "c897dbe3fbcd453d1f2ad93f960aa9e6269991f04af71ef6f46d9e292ff3ec17", "generated_from_published_measurements": true}</metadata>
+</svg>

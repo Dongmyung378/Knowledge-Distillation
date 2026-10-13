@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1050" viewBox="0 0 1200 1050" role="img" aria-labelledby="title desc">
+<title id="title">대표 학생의 교사 오류 수정과 순수 증류 대조</title>
+<desc id="desc">대표 T5-a05 학생은 교사 오답 473개를 수정하고 교사 정답 267개를 놓쳐 정답이 206개 늘었습니다. 순수 증류 대조도 교사를 넘었지만 각 원인의 인과 기여는 확정하지 않았습니다.</desc>
+<style>text{font-family:'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;font-variant-numeric:tabular-nums} .axis{fill:#64696B}</style>
+<rect x="0" y="0" width="1200" height="1050" fill="#F6F3F6" rx="0" stroke-width="1"/>
+<text x="48" y="64" fill="#382D3D" font-size="36" font-weight="750" text-anchor="start">대표 학생의 오류 수정과 학습 목적 비교</text>
+<text x="48" y="104" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">대표 T5-a05의 같은 참조 이미지 5,850장. 오류 수정과 새 오류를 함께 계산했습니다.</text>
+<rect x="48" y="152" width="352" height="197" fill="#FFFFFF" rx="20" stroke="#DDDDE0" stroke-width="1"/>
+<text x="72" y="197" fill="#382D3D" font-size="27" font-weight="700" text-anchor="start">교사 오답을 수정</text>
+<text x="72" y="285" fill="#526D35" font-size="65" font-weight="750" text-anchor="start">473</text>
+<text x="364" y="285" fill="#64696B" font-size="25" font-weight="400" text-anchor="end">개</text>
+<rect x="424" y="152" width="352" height="197" fill="#FFFFFF" rx="20" stroke="#DDDDE0" stroke-width="1"/>
+<text x="448" y="197" fill="#382D3D" font-size="27" font-weight="700" text-anchor="start">교사 정답을 놓침</text>
+<text x="448" y="285" fill="#A15C49" font-size="65" font-weight="750" text-anchor="start">267</text>
+<text x="740" y="285" fill="#64696B" font-size="25" font-weight="400" text-anchor="end">개</text>
+<rect x="800" y="152" width="352" height="197" fill="#FFFFFF" rx="20" stroke="#DDDDE0" stroke-width="1"/>
+<text x="824" y="197" fill="#382D3D" font-size="27" font-weight="700" text-anchor="start">정답의 순수 증가</text>
+<text x="824" y="285" fill="#74506E" font-size="65" font-weight="750" text-anchor="start">+206</text>
+<text x="1116" y="285" fill="#64696B" font-size="25" font-weight="400" text-anchor="end">개</text>
+<text x="48" y="408" fill="#526D35" font-size="32" font-weight="750" text-anchor="start">정확도 차이: +3.52%p</text>
+<line x1="48" y1="441" x2="1152" y2="441" stroke="#DDDDE0" stroke-width="2"/>
+<text x="48" y="494" fill="#382D3D" font-size="31" font-weight="750" text-anchor="start">같은 학생 구조의 학습 목적 비교</text>
+<text x="48" y="535" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">각 목적의 3회 학습 평균과 표본 표준편차. 교사 정확도 83.54%는 고정 모델 한 개의 결과입니다.</text>
+<line x1="380.0" y1="567" x2="380.0" y2="811" stroke="#DDDDE0" stroke-width="1"/>
+<text x="380.0" y="844" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">0</text>
+<line x1="496.6" y1="567" x2="496.6" y2="811" stroke="#DDDDE0" stroke-width="1"/>
+<text x="496.6" y="844" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">20</text>
+<line x1="613.2" y1="567" x2="613.2" y2="811" stroke="#DDDDE0" stroke-width="1"/>
+<text x="613.2" y="844" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">40</text>
+<line x1="729.8" y1="567" x2="729.8" y2="811" stroke="#DDDDE0" stroke-width="1"/>
+<text x="729.8" y="844" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">60</text>
+<line x1="846.4000000000001" y1="567" x2="846.4000000000001" y2="811" stroke="#DDDDE0" stroke-width="1"/>
+<text x="846.4000000000001" y="844" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">80</text>
+<line x1="963.0" y1="567" x2="963.0" y2="811" stroke="#DDDDE0" stroke-width="1"/>
+<text x="963.0" y="844" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">100</text>
+<text x="48" y="606" fill="#382D3D" font-size="25" font-weight="700" text-anchor="start">정답만 학습</text>
+<rect x="380" y="579" width="455.2050712250712" height="40" fill="#AAA1A8" rx="7" stroke-width="1"/>
+<text x="990" y="607" fill="#382D3D" font-size="28" font-weight="750" text-anchor="start">78.08%</text>
+<text x="990" y="638" fill="#64696B" font-size="21" font-weight="400" text-anchor="start">± 3.94%p</text>
+<text x="48" y="683" fill="#382D3D" font-size="25" font-weight="700" text-anchor="start">순수 증류</text>
+<rect x="380" y="656" width="510.5153276353277" height="40" fill="#BF9556" rx="7" stroke-width="1"/>
+<text x="990" y="684" fill="#382D3D" font-size="28" font-weight="750" text-anchor="start">87.57%</text>
+<text x="990" y="715" fill="#64696B" font-size="21" font-weight="400" text-anchor="start">± 2.32%p</text>
+<text x="48" y="760" fill="#382D3D" font-size="25" font-weight="700" text-anchor="start">대표 설정의 혼합 증류</text>
+<rect x="380" y="733" width="510.183133903134" height="40" fill="#526D35" rx="7" stroke-width="1"/>
+<text x="990" y="761" fill="#382D3D" font-size="28" font-weight="750" text-anchor="start">87.51%</text>
+<text x="990" y="792" fill="#64696B" font-size="21" font-weight="400" text-anchor="start">± 2.18%p</text>
+<text x="1138" y="850" fill="#64696B" font-size="21" font-weight="400" text-anchor="end">정확도 (%)</text>
+<text x="48" y="889" fill="#64696B" font-size="21" font-weight="400" text-anchor="start">순수 증류도 3회 모두 교사를 넘었습니다. 정답 손실을 추가한 것만으로 현상을 설명할 수 없습니다.</text>
+<text x="48" y="923" fill="#64696B" font-size="21" font-weight="400" text-anchor="start">교사의 부분 미세 조정과 고정 BN, 학생 전체 학습과 BN 갱신, 최적화 경로 차이는 설명 후보입니다.</text>
+<text x="48" y="1019" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">각 요인의 인과 기여는 확정하지 않았습니다. 압축이 정확도를 높이거나 학생이 항상 교사보다 낫다는 결론은 아닙니다.</text>
+<metadata>{"project_id": "project-02", "visual_data_sha256": "c897dbe3fbcd453d1f2ad93f960aa9e6269991f04af71ef6f46d9e292ff3ec17", "generated_from_published_measurements": true}</metadata>
+</svg>

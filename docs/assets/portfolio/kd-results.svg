@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="765" viewBox="0 0 1200 765" role="img" aria-labelledby="title desc">
+<title id="title">대표 배포와 보존한 실험 결과</title>
+<desc id="desc">같은5850개 참조 이미지에서 교사83.54%, 정답만 학습한 학생73.56%, 대표 증류 학생87.06%와 새 실험의 고정 학생85.69%를 비교합니다. 대표 배포와 연구 선택의 역할을 구분합니다.</desc>
+<style>text{font-family:'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;font-variant-numeric:tabular-nums} .axis{fill:#64696B}</style>
+<rect x="0" y="0" width="1200" height="765" fill="#F6F3F6" rx="0" stroke-width="1"/>
+<text x="48" y="64" fill="#382D3D" font-size="36" font-weight="750" text-anchor="start">대표 배포 모델과 확장 실험의 결과</text>
+<text x="48" y="104" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">같은 참조 이미지 5,850장. 대표 배포는 T5-a05이며 9개 조건의 검증 선택은 T5-a01입니다.</text>
+<line x1="390.0" y1="171" x2="390.0" y2="625" stroke="#DDDDE0" stroke-width="1"/>
+<text x="390.0" y="658" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">0</text>
+<line x1="502.2" y1="171" x2="502.2" y2="625" stroke="#DDDDE0" stroke-width="1"/>
+<text x="502.2" y="658" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">20</text>
+<line x1="614.4" y1="171" x2="614.4" y2="625" stroke="#DDDDE0" stroke-width="1"/>
+<text x="614.4" y="658" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">40</text>
+<line x1="726.5999999999999" y1="171" x2="726.5999999999999" y2="625" stroke="#DDDDE0" stroke-width="1"/>
+<text x="726.5999999999999" y="658" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">60</text>
+<line x1="838.8" y1="171" x2="838.8" y2="625" stroke="#DDDDE0" stroke-width="1"/>
+<text x="838.8" y="658" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">80</text>
+<line x1="951.0" y1="171" x2="951.0" y2="625" stroke="#DDDDE0" stroke-width="1"/>
+<text x="951.0" y="658" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">100</text>
+<text x="48" y="212" fill="#382D3D" font-size="27" font-weight="700" text-anchor="start">교사 모델</text>
+<text x="48" y="249" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">MobileNetV2</text>
+<rect x="390" y="184" width="468.6507692307692" height="46" fill="#74506E" rx="8" stroke-width="1"/>
+<text x="982" y="216" fill="#74506E" font-size="31" font-weight="750" text-anchor="start">83.54%</text>
+<text x="982" y="256" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">4,887 / 5,850</text>
+<text x="48" y="325" fill="#382D3D" font-size="27" font-weight="700" text-anchor="start">정답만 학습한 학생</text>
+<text x="48" y="362" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">같은 학생 구조 / 정답만 학습</text>
+<rect x="390" y="297" width="412.64666666666665" height="46" fill="#AAA1A8" rx="8" stroke-width="1"/>
+<text x="982" y="329" fill="#AAA1A8" font-size="31" font-weight="750" text-anchor="start">73.56%</text>
+<text x="982" y="369" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">4,303 / 5,850</text>
+<text x="48" y="438" fill="#382D3D" font-size="27" font-weight="700" text-anchor="start">대표 증류 학생</text>
+<text x="48" y="475" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">T5-a05 / 대표 배포 유지</text>
+<rect x="390" y="410" width="488.4056410256411" height="46" fill="#526D35" rx="8" stroke-width="1"/>
+<text x="982" y="442" fill="#526D35" font-size="31" font-weight="750" text-anchor="start">87.06%</text>
+<text x="982" y="482" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">5,093 / 5,850</text>
+<text x="48" y="551" fill="#382D3D" font-size="27" font-weight="700" text-anchor="start">새 실험의 고정 학생</text>
+<text x="48" y="588" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">T5-a01 / 실험 선택 보존</text>
+<rect x="390" y="523" width="480.7338461538461" height="46" fill="#BF9556" rx="8" stroke-width="1"/>
+<text x="982" y="555" fill="#BF9556" font-size="31" font-weight="750" text-anchor="start">85.69%</text>
+<text x="982" y="595" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">5,013 / 5,850</text>
+<text x="1138" y="660" fill="#64696B" font-size="22" font-weight="400" text-anchor="end">정확도 (%)</text>
+<text x="48" y="734" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">참조 결과는 이미 관측됐습니다. 기존 배포 유지는 후속 운영 결정이며 실험의 선택 기록은 바꾸지 않았습니다.</text>
+<metadata>{"project_id": "project-02", "visual_data_sha256": "c897dbe3fbcd453d1f2ad93f960aa9e6269991f04af71ef6f46d9e292ff3ec17", "generated_from_published_measurements": true}</metadata>
+</svg>

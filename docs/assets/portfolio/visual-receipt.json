@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "status": "generated_from_published_measurements",
+  "visual_data_sha256": "c897dbe3fbcd453d1f2ad93f960aa9e6269991f04af71ef6f46d9e292ff3ec17",
+  "project_ids": [
+    "project-02"
+  ],
+  "files": [
+    {
+      "filename": "kd-thumbnail.svg",
+      "project_id": "project-02",
+      "bytes": 3957,
+      "sha256": "8e78ef87ce704567551a6ee0ec39631a259e9ca4e4ed014423881ab77e7377cf"
+    },
+    {
+      "filename": "kd-results.svg",
+      "project_id": "project-02",
+      "bytes": 4971,
+      "sha256": "05bb06c4d4bd0ff5bd95cc3d85aafd547eb70bd39d34d30bda01568b8b570a88"
+    },
+    {
+      "filename": "kd-costs.svg",
+      "project_id": "project-02",
+      "bytes": 5865,
+      "sha256": "147a1164c454104e149e50cf8be3111d986e33d71f9bc52db634e47d034ab287"
+    },
+    {
+      "filename": "kd-grid.svg",
+      "project_id": "project-02",
+      "bytes": 9895,
+      "sha256": "5f846d3804f7ce288071d19e9f41d09b6929caec193a208414573ecd47c36a1b"
+    },
+    {
+      "filename": "kd-errors.svg",
+      "project_id": "project-02",
+      "bytes": 6365,
+      "sha256": "2eef90e13c289fca8bc75f2c55b58f74fd83f5706447a4ffc6dbab4ddb359522"
+    }
+  ],
+  "network_or_model_execution_performed": false,
+  "source_paths_read": false
+}
