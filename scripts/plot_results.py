@@ -183,8 +183,21 @@ def clean_axis(axis) -> None:
     axis.set_axisbelow(True)
 
 
-def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixture: bool = False) -> dict:
+def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixture: bool = False,
+              deployment_policy: dict | None = None) -> dict:
     held, rows, deployment, seeds = validate_summary(summary)
+    retained = deployment_policy is not None
+    if retained:
+        require(deployment_policy.get("decision") == "retain_previous_representative_deployment",
+                "The representative figure requires an explicit deployment retention policy")
+        representative = deployment_policy["representative_deployment"]
+        require(representative["candidate_id"] == "T5-a05" and representative["seed"] == 378
+                and representative["format"] == "FP32", "Unexpected representative deployment")
+        require(held["distilled"]["model_sha256"] == representative["models"]["student"]["sha256"],
+                "Representative accuracy and policy refer to different checkpoints")
+        fp32_rows = [result for name, result in rows if artifact_category(name, result) == "fp32"]
+        require(len(fp32_rows) == 1 and fp32_rows[0]["model_sha256"] == representative["models"]["fp32"]["sha256"],
+                "Representative runtime and policy refer to different FP32 artifacts")
     fixture = summary.get("_synthetic_fixture") is True
     require(not fixture or allow_synthetic_fixture, "Synthetic fixture requires --allow-synthetic-fixture and must remain in private output")
     require(prefix and all(c.isalnum() or c in "-_" for c in prefix), "Output prefix must contain only letters, numbers, hyphens or underscores")
@@ -222,7 +235,7 @@ def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixtu
     accuracy_axis.set_ylim(0, 116)
     accuracy_axis.set_yticks([0, 20, 40, 60, 80, 100])
     accuracy_axis.set_ylabel("Accuracy (%)")
-    accuracy_axis.set_title("Locked-holdout classification", loc="left", pad=20)
+    accuracy_axis.set_title("Observed reference accuracy" if retained else "Locked-holdout classification", loc="left", pad=20)
     accuracy_axis.grid(axis="y", color="#EAE5EE", linewidth=0.8)
     handles = [plt.Line2D([0], [0], marker=SEED_MARKERS[seed], linestyle="none", markerfacecolor="white", markeredgecolor="#403846", label=str(seed)) for seed in seeds]
     accuracy_axis.legend(handles=handles, title="Training seed", loc="lower left", fontsize=8.5, title_fontsize=8.5, frameon=True, facecolor="white", edgecolor="#DDD4E4", ncols=len(seeds))
@@ -260,8 +273,9 @@ def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixtu
     selected_kind = deployment["kind"]
     if selected_kind == "distilled":
         selected_recall = [100 * item["recall"] for item in sorted(held["distilled"]["per_class"], key=lambda item: item["class_id"])]
-        recall_axis.plot(class_ids, selected_recall, color=PALETTE["distilled"], marker="s", markersize=3.5, linewidth=1.4, label="Selected distilled float checkpoint, seed 378")
-    recall_axis.set_title("Per-class recall on the locked holdout (float checkpoints)", loc="left", pad=13)
+        recall_axis.plot(class_ids, selected_recall, color=PALETTE["distilled"], marker="s", markersize=3.5, linewidth=1.4,
+                         label="Representative T5-a05 checkpoint, seed 378" if retained else "Selected distilled float checkpoint, seed 378")
+    recall_axis.set_title("Per-class recall on the observed reference set (float checkpoints)" if retained else "Per-class recall on the locked holdout (float checkpoints)", loc="left", pad=13)
     recall_axis.set_xticks(class_ids)
     recall_axis.set_xlim(-0.7, 42.7)
     recall_axis.set_ylim(0, 106)
@@ -275,11 +289,12 @@ def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixtu
     benchmark_reference = rows[0][1]
     host = benchmark_reference.get("host", {})
     host_name = " ".join(str(host.get(key, "")) for key in ("system", "machine")).strip() or "Recorded host"
-    title = "Traffic sign recognition: measured release evidence"
+    title = "Traffic sign recognition: retained T5-a05 deployment" if retained else "Traffic sign recognition: measured release evidence"
     if fixture:
         title = "PRIVATE SYNTHETIC FIXTURE - NOT PROJECT RESULTS"
     figure.suptitle(title, x=0.065, y=0.971, ha="left", fontsize=20, fontweight="bold", color="#694483" if not fixture else "#a32929")
-    subtitle = f"{held['baseline']['count']:,} locked-holdout images  |  {held['baseline']['model_parameters']:,}-parameter baseline  |  {host_name}, {benchmark_reference['threads']} CPU thread(s)"
+    collection_label = "previously observed reference images" if retained else "locked-holdout images"
+    subtitle = f"{held['baseline']['count']:,} {collection_label}  |  {held['baseline']['model_parameters']:,}-parameter baseline  |  {host_name}, {benchmark_reference['threads']} CPU thread(s)"
     figure.text(0.065, 0.926, subtitle, ha="left", va="top", fontsize=11, color="#665D70")
     pairing = "; lines pair baseline and KD" if "distilled" in held else "; no distilled model in this release"
     note1 = f"Quality bars: seed 378; F1 labels: macro F1. Points: {', '.join(str(seed) for seed in seeds)}{pairing}. No confidence intervals."
@@ -287,6 +302,8 @@ def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixtu
     acceptance = deployment.get("int8_acceptance")
     gate_status = "accepted" if acceptance and acceptance.get("accepted") is True else "rejected" if acceptance and acceptance.get("accepted") is False else "not measured"
     note3 = f"Declared deployment: {selected_kind} / {deployment['format']}. INT8 validation/CPU gate: {gate_status}. Holdout excluded from current selection; the public data were historically exposed."
+    if retained:
+        note3 = "Retained representative: T5-a05 / seed 378 / FP32. Previously observed outcomes informed retention; the nine-condition T5-a01 study is preserved separately."
     for ypos, note in zip((0.101, 0.075, 0.049), (note1, note2, note3)):
         figure.text(0.065, ypos, note, fontsize=9.0, ha="left", color="#665D70")
     png = output / f"{prefix}.png"
@@ -294,7 +311,8 @@ def make_plot(summary: dict, output: Path, prefix: str, *, allow_synthetic_fixtu
     figure.savefig(png, dpi=180, bbox_inches="tight", pad_inches=0.2)
     figure.savefig(svg, bbox_inches="tight", pad_inches=0.2)
     plt.close(figure)
-    return {"png": str(png.resolve()), "svg": str(svg.resolve()), "locked_holdout_count": held["baseline"]["count"], "plotted_training_seeds": seeds, "synthetic_fixture": fixture, "historical_results_on_axes": False}
+    return {"png": str(png.resolve()), "svg": str(svg.resolve()), "locked_holdout_count": held["baseline"]["count"], "plotted_training_seeds": seeds, "synthetic_fixture": fixture, "historical_results_on_axes": False,
+            "representative_deployment_retained": retained}
 
 
 def main() -> int:
@@ -303,11 +321,15 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--prefix", default="knowledge-distillation-release")
     parser.add_argument("--allow-synthetic-fixture", action="store_true")
+    parser.add_argument("--deployment-policy", type=Path,
+                        help="Label a retained deployment separately from the frozen experimental selection")
     args = parser.parse_args()
     try:
         content = args.summary.read_bytes()
         summary = json.loads(content)
-        result = make_plot(summary, args.output, args.prefix, allow_synthetic_fixture=args.allow_synthetic_fixture)
+        policy = json.loads(args.deployment_policy.read_text(encoding="utf-8")) if args.deployment_policy else None
+        result = make_plot(summary, args.output, args.prefix, allow_synthetic_fixture=args.allow_synthetic_fixture,
+                           deployment_policy=policy)
         result["summary_sha256"] = hashlib.sha256(content).hexdigest()
         print(json.dumps(result, indent=2))
         return 0

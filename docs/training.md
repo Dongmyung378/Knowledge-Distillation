@@ -1,4 +1,4 @@
-> **Preserved documentation for the earlier four-candidate study.** Results, default download descriptors and training commands below belong to that study. For the current nine-cell extension use the [full-grid results and explicit reproduction commands](./full-grid.md) and [teacher/student analysis](./teacher-student-analysis.md). The launcher's original default descriptor must not be read as the new full-grid release. Original measurements and prose remain below.
+> **Two separate roles.** The representative deployment retains the released **T5-a05, seed 378, FP32 model (87.06%)**; see the [deployment policy and project outcome](./deployment.md). The complete nine-recipe experiment still selects **T5-a01** on validation; use the [full-grid guide](./full-grid.md) for its separate frozen artifacts and replay commands. The earlier four-candidate documentation below is preserved, including the original descriptor and freeze now used for representative-model replay.
 
 <div align="right"><strong>English</strong> | <a href="./training.ko.md">한국어</a></div>
 

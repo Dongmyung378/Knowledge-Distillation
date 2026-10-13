@@ -2,6 +2,24 @@
 
 # Teacher/student error differences and fixed-T5 controls
 
+## Current deployment and supported conclusion
+
+The representative deployment retains **T5-a05, seed 378**: **87.06% (5,093/5,850)** accuracy, **0.7903** macro F1 and **0.7817** balanced accuracy. The complete nine-recipe experiment still selects **T5-a01** by mean validation accuracy. Neither the study's frozen reports nor its selection has been rewritten. The detailed T5-a01 error analysis below remains labelled as the study-selected model.
+
+| Seed-378 comparison with the same teacher | Teacher wrong, student correct | Teacher correct, student wrong | Net correct | Accuracy gain |
+| --- | --- | --- | --- | --- |
+| **Retained deployment, T5-a05** | **473** | **267** | **206** | **+3.52 pp** |
+| Study-selected T5-a01 | 465 | 339 | 126 | +2.15 pp |
+| Pure-soft control, T5-a00 | 455 | 345 | 110 | +1.88 pp |
+
+The T5-a05 track-resampling interval is **[+1.15, +5.79] pp** on the already observed reference collection. This is a descriptive interval over observed physical-sign tracks, not evidence of independent confirmation. Counts come from the saved prediction comparison in [`summary.json`](../reports/full-grid/teacher-student-analysis/summary.json), including `grid_T5-a05_seed_378-vs-teacher`; the compact [deployment comparison](../reports/deployment/teacher-student-comparison.json) records the representative model's role.
+
+**Conclusion:** the distilled students have higher observed reference accuracy in these runs. Their objective fits softened class probabilities rather than enforcing the teacher's top-class decision, so different decisions and teacher-surpassing accuracy are possible. All three pure-soft T5-a00 controls exceeded the teacher, so the extra hard-label CE term cannot be the sole explanation. The teacher and mixed student both have ground-truth training supervision; this is not a case in which only the student receives labels.
+
+Teacher partial fine-tuning with frozen BN differs from the student's full compact-model adaptation and updating BN. Architecture, pretraining, dropout, training budgets, learning-rate histories and validation checkpoint choice also differ. These verified differences are plausible explanations for different predictions, but their causal contributions have not been isolated. The supported finding is higher observed reference accuracy in these runs, not proof that compression itself raises accuracy or that a student is always better than its teacher. The [deployment and project outcome guide](./deployment.md) combines these findings with cost, reproducibility and scope limits.
+
+## Preserved study-selected T5-a01 analysis
+
 The validation-selected recipe is **T5-a01**. This diagnostic reads saved predictions and training histories from the new joint freeze. It performs no model calls, retraining or reselection. Results describe 5,850 images and 195 observed physical-sign tracks on a previously observed reference set.
 
 | Model | Correct / count | Accuracy | macro F1 | Balanced accuracy |

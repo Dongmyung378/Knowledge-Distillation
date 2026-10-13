@@ -4,57 +4,70 @@
 
 # Knowledge Distillation for Traffic Sign Recognition
 
-A TensorFlow model-compression project for GTSRB's 43 traffic-sign classes. A MobileNetV2 teacher guides a compact CNN with **34,406 parameters**, while a matched independently trained CNN measures the benefit of distillation without changing the student's inference architecture.
+A TensorFlow model-compression project for GTSRB's 43 traffic-sign classes. A MobileNetV2 teacher guides a compact CNN with **34,406 parameters**. Matched supervised baselines, a complete nine-recipe study and pure-soft controls distinguish measured training effects from deployment decisions.
 
-**Original development period: February-April 2026.** The later engineering improvements retain that period and add a separate, controlled evaluation protocol.
+**Original development period: February-April 2026.** Later engineering improvements retain this period and add controlled experiments, CPU deployment measurements and reproducible saved-model evaluation.
 
-[Architecture](./docs/architecture.md) | [Evaluation](./docs/evaluation.md) | [CPU runtime](./docs/runtime.md) | [Kaggle training](./docs/training.md) | [Historical notebook](./notebooks/knowledge_distillation_gtsrb.ipynb)
+[Deployment and project outcome](./docs/deployment.md) | [Complete nine-recipe study](./docs/full-grid.md) | [Why students outperform the teacher](./docs/teacher-student-analysis.md) | [Architecture](./docs/architecture.md) | [Historical notebook](./notebooks/knowledge_distillation_gtsrb.ipynb)
 
-## Complete nine-recipe extension
+## Representative deployment: retain the released 87.06% model
 
-All combinations of temperature 3, 5 and 10 with alpha 0.1, 0.3 and 0.5 were compared across three seeds. The 27 KD results comprise six imported and 21 additional runs, plus three pure-soft diagnostic controls excluded from selection. Validation selects **T5-a01**; deployment seed stays **378**.
+The representative model remains **T5-a05, seed 378, FP32 TFLite**. This is the previously released checkpoint, without retraining or a change to its weights. The complete nine-recipe study remains intact: its validation-selected recipe is **T5-a01**. The experiment winner and the representative deployment have different roles.
 
-| Model | Correct / count | Accuracy | macro F1 | Balanced accuracy |
+| Seed-378 model, same 5,850 reference images | Correct / count | Accuracy | macro F1 | Balanced accuracy |
 | --- | --- | --- | --- | --- |
 | Teacher | 4,887 / 5,850 | 83.54% | 0.7465 | 0.7548 |
-| Supervised baseline | 4,303 / 5,850 | 73.56% | 0.6253 | 0.6329 |
-| Selected student, Keras | 5,013 / 5,850 | 85.69% | 0.7719 | 0.7620 |
-| Deployment student, FP32 | 5,013 / 5,850 | 85.69% | 0.7719 | 0.7620 |
+| Matched supervised baseline | 4,303 / 5,850 | 73.56% | 0.6253 | 0.6329 |
+| **Retained deployment, T5-a05 FP32** | **5,093 / 5,850** | **87.06%** | **0.7903** | **0.7817** |
+| Nine-recipe study winner, T5-a01 | 5,013 / 5,850 | 85.69% | 0.7719 | 0.7620 |
 
-The three-seed mean reference accuracy gain is **+9.73 ± 2.16 pp** over matched baselines. Sample SD is not a confidence interval. All three seeds participate in development selection; the 5,850 reference images already had published outcomes. This is not an untouched independent final benchmark.
+| Selection or evaluation scope | Retained T5-a05 recipe | Study-selected T5-a01 recipe |
+| --- | --- | --- |
+| Three-seed validation accuracy mean | 86.65% | 87.08% |
+| Three-seed reference accuracy mean ± sample SD | 87.51% ± 2.18 pp | 87.81% ± 2.08 pp |
+| Seed-378 reference accuracy | 87.06% | 85.69% |
 
-![Selected model reference quality and measured CPU deployment costs](./assets/figures/knowledge-distillation-release.png)
+The study selects a recipe by mean validation accuracy, with seed 378 fixed beforehand. Its 0.30 pp higher mean reference accuracy does not establish a reliable deployment improvement, while the fixed seed-378 checkpoint scores 1.37 pp lower. Retaining the prior release prioritizes continuity and its observed reference performance. This is an explicit, later deployment decision informed by already observed outcomes; it does not rewrite the study selection or create an untouched benchmark. The policy is recorded in [`reports/deployment/deployment-policy.json`](./reports/deployment/deployment-policy.json).
 
-![Full validation and reference grid](./assets/figures/full-grid-comparison.png)
+![Retained T5-a05 model quality and its measured CPU deployment costs](./assets/figures/knowledge-distillation-release.png)
 
-[Full grid and reproduction](./docs/full-grid.md) | [Teacher/student and fixed-T5 controls](./docs/teacher-student-analysis.md)
+## Overall result and teacher/student conclusion
 
-## Run the current saved models
+The retained student improves reference accuracy by **13.50 pp** over the same-seed supervised baseline and by **3.52 pp** over the teacher. Across three seeds, T5-a05 has a descriptive paired baseline gain of **+9.43 ± 3.93 pp**. Its **34,406 parameters** are approximately **98.5% fewer** than the teacher's 2,313,067. In the earlier matched CPU benchmark, Keras p50 falls from **3.823 ms** for the teacher to **1.040 ms** for this student; the retained FP32 TFLite artifact measures **0.429 ms p50**, **0.456 ms p95**, and **140.0 KiB**. These are one-host measurements, not timing guarantees for another device.
+
+The retained student corrects **473** teacher errors but introduces **267** errors on images the teacher classified correctly, for **206** additional correct predictions. Pure-soft students also exceed the teacher in all three seeds, so adding ground-truth CE to the student's objective cannot be the sole explanation. Distillation fits a probability distribution rather than copying the teacher's argmax; different architecture, full student adaptation, BN policies and optimization paths can produce different decisions. Their individual causal contributions have not been isolated. Both the teacher and mixed students use training labels. [Read the saved-prediction analysis and controls](./docs/teacher-student-analysis.md).
+
+The project demonstrates matched experiment design, model compression, error analysis, CPU benchmarking and artifact verification. **INT8 was rejected** because both studied exports lost substantial validation accuracy and failed the measured speedup gate. The original nine-condition notebook, both controlled studies, failed conversions and their frozen evidence remain available.
+
+![All nine recipes across three development seeds; selection remains T5-a01](./assets/figures/full-grid-comparison.png)
+
+All three grid seeds participate in development selection. Reference outcomes were already public, and the official test was historically used for selection. Results support this bounded traffic-sign classification comparison; they do not establish production road-scene reliability.
+
+## Run the representative saved model
 
 Windows PowerShell:
 
 ```powershell
 .\launch-kd.bat doctor
-.\launch-kd.bat download --manifest reports/full-grid/artifact-download.json --output artifacts/full-grid
-.\launch-kd.bat download --manifest reports/full-grid/artifact-download.json --output artifacts/full-grid --verify-only
+.\launch-kd.bat download --manifest reports/artifact-download.json --output artifacts/runtime
+.\launch-kd.bat download --manifest reports/artifact-download.json --output artifacts/runtime --verify-only
 .\launch-kd.bat fetch-data
-.\launch-kd.bat evaluate --model artifacts/full-grid/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/full-grid/evaluation-freeze.json --output .local/reproduced-full-grid-student
+.\launch-kd.bat evaluate --model artifacts/runtime/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/evaluation-freeze.json --output .local/reproduced-representative-student
 ```
 
 Linux:
 
 ```bash
 bash launch-kd.sh doctor
-bash launch-kd.sh download --manifest reports/full-grid/artifact-download.json --output artifacts/full-grid
-bash launch-kd.sh download --manifest reports/full-grid/artifact-download.json --output artifacts/full-grid --verify-only
+bash launch-kd.sh download --manifest reports/artifact-download.json --output artifacts/runtime
+bash launch-kd.sh download --manifest reports/artifact-download.json --output artifacts/runtime --verify-only
 bash launch-kd.sh fetch-data
-bash launch-kd.sh evaluate --model artifacts/full-grid/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/full-grid/evaluation-freeze.json --output .local/reproduced-full-grid-student
+bash launch-kd.sh evaluate --model artifacts/runtime/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/evaluation-freeze.json --output .local/reproduced-representative-student
 ```
 
+The [representative model bundle](https://park-dongmyung.com/downloads/knowledge-distillation-models-v2.zip) is **10.83 MiB (11,353,209 bytes)** and installs under `artifacts/runtime/models/`. Its original frozen descriptor and model hashes are retained. Saved-model CPU evaluation needs no Docker, GPU or API key. First setup and downloads need internet access; use a writable Windows or Linux x86-64 source folder.
 
-The new descriptor installs models under `artifacts/full-grid/models/` and starting evidence under `artifacts/full-grid/original-base-run/`. Download the [12.71 MiB (13,326,858 bytes) model bundle](https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-models.zip) and [11.91 MiB (12,485,913 bytes) original-evidence bundle](https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-base-evidence.zip). URLs, sizes and SHA hashes are declared in the descriptor; actual anonymous transfer verification remains a separate receipt.
-
-The default training entry point retains the four-candidate protocol. The nine-cell study uses separate `scripts/full_grid_study.py` and `configs/full-grid-plan.json`. The [extension guide](./docs/full-grid.md) prepares retraining on your own Kaggle account from the public starting evidence.
+The separate [nine-recipe model bundle](https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-models.zip) and [starting-evidence bundle](https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-base-evidence.zip) preserve all study checkpoints and the T5-a01 export. Use the explicit descriptor and commands in the [full-grid guide](./docs/full-grid.md) to install or reproduce that experiment. Download ZIPs do not silently replace the retained deployment with the study winner.
 
 <details>
 <summary>Preserved four-candidate study and historical notebook results</summary>

@@ -10,7 +10,7 @@ The original development period remains **February-April 2026**. The historical 
 
 ## Selection and evaluation scope
 
-An eligible recipe needs mean validation gain of at least **0.2 percentage points** over the matched baseline and positive gains in at least **two of three** seeds. Selection ranks mean validation accuracy, then lower mean validation CE, then declared recipe order. The selected recipe is **T5-a01**, with mean validation gain **+9.58 pp**. Deployment seed **378** is fixed.
+An eligible recipe needs mean validation gain of at least **0.2 percentage points** over the matched baseline and positive gains in at least **two of three** seeds. Selection ranks mean validation accuracy, then lower mean validation CE, then declared recipe order. The selected recipe is **T5-a01**, with mean validation gain **+9.58 pp**. Study evaluation seed **378** is fixed. The representative deployment separately retains the prior T5-a05 seed-378 release; see the [deployment policy](./deployment.md). This later continuity decision does not alter this study's validation selection or frozen exports.
 
 All three seeds participate in development selection; they are not independent confirmation seeds. The 5,850 reference images already had published outcomes from the earlier study. Their outcomes do not enter this extension's training or selection, but earlier human exposure is acknowledged. This is a follow-up comparison on the same reference collection, not an untouched final benchmark.
 
@@ -32,16 +32,16 @@ The bold recipe was chosen on validation. Entries are mean and sample standard d
 
 ![Validation and reference comparison for all nine recipes](../assets/figures/full-grid-comparison.png)
 
-## Selected checkpoints and paired outcomes
+## Study-selected checkpoints and paired outcomes
 
-![Selected model reference quality and measured CPU deployment costs](../assets/figures/knowledge-distillation-release.png)
+![Selected model reference quality and measured CPU deployment costs](../assets/figures/full-grid-release.png)
 
 | Model | Correct / count | Accuracy | macro F1 | Balanced accuracy |
 | --- | --- | --- | --- | --- |
 | Teacher | 4,887 / 5,850 | 83.54% | 0.7465 | 0.7548 |
 | Supervised baseline | 4,303 / 5,850 | 73.56% | 0.6253 | 0.6329 |
 | Selected student, Keras | 5,013 / 5,850 | 85.69% | 0.7719 | 0.7620 |
-| Deployment student, FP32 | 5,013 / 5,850 | 85.69% | 0.7719 | 0.7620 |
+| Study export, T5-a01 FP32 | 5,013 / 5,850 | 85.69% | 0.7719 | 0.7620 |
 
 | Seed | Baseline accuracy | Selected-recipe accuracy | Paired gain |
 | --- | --- | --- | --- |
@@ -63,9 +63,9 @@ The selected recipe's mean reference gain over the baseline is **+9.73 pp**, wit
 
 Measured host: `Windows`, `AMD64`, Python `3.12.15`. Costs use the same 128 validation images, batch one, one CPU thread, ten warmup calls and three repetitions. Keras and TFLite entries are distinct measured artifact formats. Parameter or file-size reduction is not substituted for measured speedup.
 
-The selected format is **FP32**. INT8 validation accuracy loss is **+46.410 pp**, with FP32-to-INT8 CPU p50 speed ratio **0.786x**. Acceptance requires at most **1.0 pp** loss, at least **1.05x** speedup and a smaller file. Calibration uses training images only; validation chooses the format. INT8 remains in the reproduction bundle whether accepted or rejected.
+The selected format for this study's T5-a01 export is **FP32**. Its files and measurements remain study artifacts; the representative deployment uses the earlier T5-a05 FP32 file and its original benchmark. INT8 validation accuracy loss is **+46.410 pp**, with FP32-to-INT8 CPU p50 speed ratio **0.786x**. Acceptance requires at most **1.0 pp** loss, at least **1.05x** speedup and a smaller file. Calibration uses training images only; validation chooses the format. INT8 remains in the reproduction bundle whether accepted or rejected.
 
-## Public artifacts and reproduction
+## Public study artifacts and reproduction
 
 Install the models and starting evidence with [`reports/full-grid/artifact-download.json`](../reports/full-grid/artifact-download.json). Models reside under `artifacts/full-grid/models/`; all 47 base artifacts reside under `artifacts/full-grid/original-base-run/`. The descriptor declares public URLs, byte counts and SHA hashes. Actual remote transfer verification is a separate evidence scope.
 

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-13T11:21:36.716017+00:00",
+  "decision": "retain_previous_representative_deployment",
+  "authorization": "The portfolio owner requested retention of the existing 87.06% model while preserving the nine-condition experiment.",
+  "reference_results_previously_observed": true,
+  "decision_made_after_reference_evaluation": true,
+  "new_unseen_validation_claim": false,
+  "training_or_export_performed": false,
+  "representative_deployment": {
+    "candidate_id": "T5-a05",
+    "temperature": 5.0,
+    "alpha": 0.5,
+    "seed": 378,
+    "kind": "distilled",
+    "format": "FP32",
+    "models": {
+      "student": {
+        "filename": "student.keras",
+        "sha256": "9c4b099c5515678b74f91c67e723e8f1568c47cdb6dd290c1b2e0d0abbcd6273",
+        "bytes": 187164
+      },
+      "fp32": {
+        "filename": "student-fp32.tflite",
+        "sha256": "346fb1881132ef6fd385babebbaec6f970d0fb0cef14e7da9dbb084845f3a98f",
+        "bytes": 143316
+      }
+    },
+    "reference_evaluation": {
+      "count": 5850,
+      "correct": 5093,
+      "accuracy": 0.8705982905982906,
+      "macro_f1": 0.7902799847828059,
+      "balanced_accuracy": 0.7816705817868609
+    },
+    "artifact_descriptor": "reports/artifact-download.json",
+    "evaluation_freeze": "reports/evaluation-freeze.json",
+    "freeze_sha256": "f833aa3b35baf9be1bae39f112ffd3a5157aae2a9d111f9753bf668332b853ba",
+    "release_summary": "reports/release-summary.json",
+    "release_summary_file_sha256": "b6cd53e20fec11edb3c5684a24524850c182500f07e0a0d46428db5e9437c07d",
+    "model_download_url": "https://park-dongmyung.com/downloads/knowledge-distillation-models-v2.zip",
+    "default_artifact_root": "artifacts/runtime"
+  },
+  "preserved_nine_condition_experiment": {
+    "validation_selected_candidate_id": "T5-a01",
+    "frozen_experimental_deployment_seed": 378,
+    "frozen_experimental_reference_accuracy": 0.8569230769230769,
+    "selection_report": "reports/full-grid/selection-report.json",
+    "selection_report_file_sha256": "a6481ca9b72272b3ad7db4d3be4b193068bb0ef739d253929735f948422793e1",
+    "release_summary": "reports/full-grid/release-summary.json",
+    "release_summary_file_sha256": "2aa286dacab5520758f8bd6380dcd8b76cba2af7cbf9234aedccd86f6dc02bfb",
+    "evaluation_freeze": "reports/full-grid/evaluation-freeze.json",
+    "freeze_sha256": "67db9589db3cd6c812176ed9a61489d9e6cfd552a7355c4f416acbe8e252672a",
+    "artifact_descriptor": "reports/full-grid/artifact-download.json",
+    "model_download_url": "https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-models.zip",
+    "scientific_selection_or_results_rewritten": false
+  },
+  "rationale": [
+    "The existing published checkpoint retains 5093 correct reference decisions; the frozen experimental seed-378 checkpoint has 5013.",
+    "The three-development-seed validation rule still selects T5-a01. That experiment result is retained without retroactive reselection.",
+    "A roughly 0.30-percentage-point reference mean advantage does not establish a clear reason to replace the prior individual deployment.",
+    "Retention is a transparent continuity decision informed by previously observed outcomes, not a new untouched benchmark selection."
+  ],
+  "teacher_student_analysis": "reports/deployment/teacher-student-comparison.json"
+}

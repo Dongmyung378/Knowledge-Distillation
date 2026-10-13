@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "status": "projection_of_existing_saved_prediction_analysis",
+  "candidate_id": "T5-a05",
+  "seed": 378,
+  "source_report": "reports/full-grid/teacher-student-analysis/summary.json",
+  "source_report_file_sha256": "7f9f308e945251faa02e3328e66672d1c3dfb5e71ed2b7a9ab2a792d1137fba2",
+  "source_comparison_key": "grid_T5-a05_seed_378-vs-teacher",
+  "reference_results_previously_observed": true,
+  "model_execution_performed": false,
+  "training_or_export_performed": false,
+  "count": 5850,
+  "physical_track_count": 195,
+  "teacher": {
+    "count": 5850,
+    "correct": 4887,
+    "accuracy": 0.8353846153846154,
+    "macro_f1": 0.7464661207581985,
+    "balanced_accuracy": 0.7548453247871852
+  },
+  "representative_student": {
+    "count": 5850,
+    "correct": 5093,
+    "accuracy": 0.8705982905982906,
+    "macro_f1": 0.7902799847828058,
+    "balanced_accuracy": 0.7816705817868609
+  },
+  "comparison": {
+    "count": 5850,
+    "reference_wrong_candidate_correct": 473,
+    "reference_correct_candidate_wrong": 267,
+    "net_correct": 206,
+    "accuracy_gain_pp": 3.5213675213675213,
+    "reference_accuracy": 0.8353846153846154,
+    "candidate_accuracy": 0.8705982905982906,
+    "reference_macro_f1": 0.7464661207581985,
+    "candidate_macro_f1": 0.7902799847828058,
+    "macro_f1_gain": 0.043813864024607296,
+    "prediction_disagreement": 1022,
+    "same_wrong_prediction": 208,
+    "correctness_states": {
+      "reference_0_candidate_0": 490,
+      "reference_0_candidate_1": 473,
+      "reference_1_candidate_0": 267,
+      "reference_1_candidate_1": 4620,
+      "teacher_0_hard_only_0_candidate_0": 449,
+      "teacher_0_hard_only_0_candidate_1": 198,
+      "teacher_0_hard_only_1_candidate_0": 41,
+      "teacher_0_hard_only_1_candidate_1": 275,
+      "teacher_1_hard_only_0_candidate_0": 189,
+      "teacher_1_hard_only_0_candidate_1": 711,
+      "teacher_1_hard_only_1_candidate_0": 78,
+      "teacher_1_hard_only_1_candidate_1": 3909
+    },
+    "classes_candidate_higher_recall": 22,
+    "classes_reference_higher_recall": 12,
+    "classes_equal_recall": 9,
+    "conditional_top_probability": {
+      "reference_correct_candidate_wrong_reference_top_probability": {
+        "count": 267,
+        "mean": 0.8391380360344098,
+        "at_least_0_9": 144,
+        "at_least_0_95": 113,
+        "at_least_0_99": 64
+      },
+      "all_reference_errors_top_probability": {
+        "count": 963,
+        "mean": 0.7302309715026072,
+        "at_least_0_9": 265,
+        "at_least_0_95": 184,
+        "at_least_0_99": 67
+      },
+      "reference_wrong_candidate_correct_reference_top_probability": {
+        "count": 473,
+        "mean": 0.7196270608278121,
+        "at_least_0_9": 115,
+        "at_least_0_95": 81,
+        "at_least_0_99": 25
+      },
+      "reference_wrong_candidate_correct_candidate_top_probability": {
+        "count": 473,
+        "mean": 0.8586827191354132,
+        "at_least_0_9": 276,
+        "at_least_0_95": 226,
+        "at_least_0_99": 137
+      }
+    },
+    "top_probability_is_not_true_class_probability": true,
+    "track_cluster_bootstrap": {
+      "resampling_unit": "whole observed physical-sign track, with replacement",
+      "stratified_by_class": false,
+      "draws": 1000,
+      "seed": 378,
+      "track_count": 195,
+      "percentile_interval_95_pp": [
+        1.1452991452991452,
+        5.794871794871795
+      ],
+      "scope": "Descriptive cluster resampling of the already observed evaluation collection; not causal evidence, a teacher-seed interval, or untouched confirmatory inference."
+    },
+    "reference_model": "teacher",
+    "candidate_model": "grid_T5-a05_seed_378",
+    "role": "mixed_T5_a05",
+    "training_seed": 378
+  },
+  "interpretation": [
+    "The representative student repairs more teacher errors than it introduces on this observed collection.",
+    "Pure-soft controls also exceed the same fixed teacher in all three seeds; student hard-label CE alone does not explain that result.",
+    "Teacher and student architecture, adaptation scope, batch normalization, budget and optimization paths differ. Their causal contributions were not isolated.",
+    "Compression alone, a unique cause and general superiority across unseen environments are not established."
+  ]
+}

@@ -4,57 +4,70 @@
 
 # 지식 증류 기반 교통 표지판 인식 모델 경량화
 
-GTSRB의 43개 교통 표지판 클래스를 분류하는 TensorFlow 모델 경량화 프로젝트입니다. MobileNetV2 교사 모델의 예측 분포를 **34,406개 파라미터**의 경량 CNN에 전달하고, 동일한 조건에서 독립적으로 학습한 CNN과 비교해 학생 모델의 추론 구조를 유지하면서 증류가 주는 효과를 평가합니다.
+GTSRB의 43개 교통 표지판 클래스를 분류하는 TensorFlow 모델 경량화 프로젝트입니다. MobileNetV2 교사의 예측 분포를 **34,406개 파라미터**의 경량 CNN에 전달합니다. 동일 조건의 독립 학습 기준 모델, 전체 9개 설정과 순수 증류 대조를 비교하며 실험 결과와 실제 배포 결정을 구분합니다.
 
-**최초 개발 기간은 2026년 2월부터 4월입니다.** 이후의 개선 작업은 이 기간을 유지하고 별도의 통제된 평가 절차를 추가합니다.
+**최초 개발 기간은 2026년 2월부터 4월입니다.** 이후의 개선은 이 기간을 유지하고 통제된 실험, CPU 배포 비용 측정과 저장 모델 재현 절차를 추가합니다.
 
-[구조 설명](./docs/architecture.ko.md) | [평가 방법](./docs/evaluation.ko.md) | [CPU 실행](./docs/runtime.ko.md) | [Kaggle 학습](./docs/training.ko.md) | [최초 실험 노트북](./notebooks/knowledge_distillation_gtsrb.ipynb)
+[대표 배포와 프로젝트 전체 결과](./docs/deployment.ko.md) | [전체 9개 조합 연구](./docs/full-grid.ko.md) | [학생이 교사를 넘는 이유 분석](./docs/teacher-student-analysis.ko.md) | [구조 설명](./docs/architecture.ko.md) | [최초 실험 노트북](./notebooks/knowledge_distillation_gtsrb.ipynb)
 
-## 전체 9개 조합의 최신 확장 결과
+## 대표 배포: 기존 87.06% 모델 유지
 
-온도 3, 5, 10과 alpha 0.1, 0.3, 0.5의 전체 9개 조합을 세 시드에서 비교했습니다. 27개 증류 결과 중 기존 6개를 재사용하고 21개를 추가했으며, 모델 선택에서 제외한 순수 증류 대조 실험 3개도 완료했습니다. 검증으로 선택한 설정은 **T5-a01**, 배포 시드는 **378**입니다.
+대표 모델은 **T5-a05, 시드 378, FP32 TFLite**를 유지합니다. 이전에 공개한 체크포인트이며 재학습하거나 가중치를 변경하지 않았습니다. 전체 9개 조합 연구는 그대로 남겼으며 검증으로 선택된 설정은 **T5-a01**입니다. 실험에서 선택한 설정과 대표 배포 모델은 역할이 다릅니다.
 
-| 모델 | 정답 / 평가 | 정확도 | macro F1 | Balanced accuracy |
+| 시드 378 모델, 동일 참고 평가 5,850장 | 정답 / 평가 | 정확도 | macro F1 | Balanced accuracy |
 | --- | --- | --- | --- | --- |
 | 교사 | 4,887 / 5,850 | 83.54% | 0.7465 | 0.7548 |
-| 독립 학습 기준 | 4,303 / 5,850 | 73.56% | 0.6253 | 0.6329 |
-| 선택 학생, Keras | 5,013 / 5,850 | 85.69% | 0.7719 | 0.7620 |
-| 배포 학생, FP32 | 5,013 / 5,850 | 85.69% | 0.7719 | 0.7620 |
+| 동일 조건의 독립 학습 기준 | 4,303 / 5,850 | 73.56% | 0.6253 | 0.6329 |
+| **유지한 대표 배포, T5-a05 FP32** | **5,093 / 5,850** | **87.06%** | **0.7903** | **0.7817** |
+| 9개 조합의 검증 선택, T5-a01 | 5,013 / 5,850 | 85.69% | 0.7719 | 0.7620 |
 
-참고 평가에서 세 시드의 기준 모델 대비 정확도 차이는 평균 **+9.73%p ± 2.16%p**입니다. 표준편차는 신뢰구간이 아닙니다. 세 시드는 모두 개발 모델 선택에 사용됐고, 평가 집합은 앞선 연구에서 이미 결과가 공개된 5,850장입니다. 미사용 독립 최종 평가로 설명하지 않습니다.
+| 선택 또는 평가 범위 | 유지한 T5-a05 설정 | 연구에서 선택한 T5-a01 설정 |
+| --- | --- | --- |
+| 세 시드의 검증 정확도 평균 | 86.65% | 87.08% |
+| 세 시드의 참고 정확도 평균 ± 표본 SD | 87.51% ± 2.18%p | 87.81% ± 2.08%p |
+| 시드 378의 참고 정확도 | 87.06% | 85.69% |
 
-![선택 모델의 참고 평가와 실제 CPU 배포 비용](./assets/figures/knowledge-distillation-release.png)
+연구는 세 시드의 검증 정확도 평균으로 설정을 선택하고 시드 378은 사전에 고정했습니다. 새 설정의 참고 정확도 평균이 0.30%p 높다는 사실만으로 확실한 배포 개선을 입증하지는 않으며, 고정된 시드 378의 체크포인트는 기존보다 1.37%p 낮습니다. 기존 모델 유지는 배포의 연속성과 관찰된 참고 성능을 고려한 결정입니다. 이미 확인한 결과를 고려한 후속 배포 결정이라는 점을 공개하며, 연구의 선택 결과를 바꾸거나 미사용 평가로 표현하지 않습니다. 정책은 [`reports/deployment/deployment-policy.json`](./reports/deployment/deployment-policy.json)에 기록합니다.
 
-![9개 조합의 검증 및 참고 평가 비교](./assets/figures/full-grid-comparison.png)
+![유지한 T5-a05 대표 모델의 성능과 해당 모델의 CPU 배포 비용](./assets/figures/knowledge-distillation-release.png)
 
-[전체 조합 결과와 재현](./docs/full-grid.ko.md) | [교사와 학생 및 고정 T5 대조 분석](./docs/teacher-student-analysis.ko.md)
+## 프로젝트 전체 결과와 교사 및 학생 분석 결론
 
-## 최신 저장 모델 실행
+대표 학생은 같은 시드의 독립 학습 기준보다 참고 정확도가 **13.50%p**, 교사보다 **3.52%p** 높습니다. T5-a05의 세 시드에서 기준 모델 대비 정확도 차이는 평균 **+9.43%p ± 3.93%p**입니다. 파라미터는 교사의 2,313,067개에서 **34,406개로 약 98.5% 감소**했습니다. 앞선 동일 CPU 벤치마크의 Keras p50은 교사 **3.823ms**, 해당 학생 **1.040ms**입니다. 대표 FP32 TFLite는 **p50 0.429ms**, **p95 0.456ms**, **140.0KiB**를 기록했습니다. 한 컴퓨터의 실측값이며 다른 기기의 속도를 보장하지 않습니다.
+
+대표 학생은 **교사의 오답 473개를 수정하고, 교사가 맞힌 267개를 틀려 정답이 206개 증가**했습니다. 순수 증류 학생도 세 시드 모두에서 교사 정확도를 넘었으므로 학생의 정답 CE 추가만으로 이 결과를 설명할 수 없습니다. 증류는 교사의 최댓값 클래스를 그대로 복제하는 대신 확률 분포를 학습합니다. 서로 다른 구조, 학생 전체 가중치의 적응, BN 정책과 최적화 경로는 서로 다른 판단을 만들 수 있는 설명 후보입니다. 각 요인의 인과 기여는 분리해서 입증하지 않았으며 교사와 혼합 증류 학생 모두 정답 레이블을 사용합니다. [저장 예측과 대조 실험의 상세 분석](./docs/teacher-student-analysis.ko.md)을 제공합니다.
+
+이 프로젝트는 동일 조건의 실험 설계, 모델 경량화, 오류 분석, CPU 벤치마크와 파일 검증 역량을 보여줍니다. **INT8은 두 연구의 변환 모두에서 큰 검증 정확도 감소와 속도 기준 미달을 확인해 배포에서 제외**했습니다. 최초 9개 조합 노트북, 두 통제 실험, 실패한 변환과 동결된 근거도 보존합니다.
+
+![개발 시드 3개에서 비교한 전체 9개 설정, 검증 선택은 T5-a01 유지](./assets/figures/full-grid-comparison.png)
+
+전체 조합의 세 시드는 모두 개발 선택에 참여했습니다. 참고 평가 결과는 이미 공개됐고 공식 테스트는 과거에 모델 선택에 사용됐습니다. 이 결과는 제한된 교통 표지판 분류 비교를 뒷받침하며 실제 도로 환경의 신뢰성을 입증하지 않습니다.
+
+## 대표 저장 모델 실행
 
 Windows PowerShell:
 
 ```powershell
 .\launch-kd.bat doctor
-.\launch-kd.bat download --manifest reports/full-grid/artifact-download.json --output artifacts/full-grid
-.\launch-kd.bat download --manifest reports/full-grid/artifact-download.json --output artifacts/full-grid --verify-only
+.\launch-kd.bat download --manifest reports/artifact-download.json --output artifacts/runtime
+.\launch-kd.bat download --manifest reports/artifact-download.json --output artifacts/runtime --verify-only
 .\launch-kd.bat fetch-data
-.\launch-kd.bat evaluate --model artifacts/full-grid/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/full-grid/evaluation-freeze.json --output .local/reproduced-full-grid-student
+.\launch-kd.bat evaluate --model artifacts/runtime/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/evaluation-freeze.json --output .local/reproduced-representative-student
 ```
 
 Linux:
 
 ```bash
 bash launch-kd.sh doctor
-bash launch-kd.sh download --manifest reports/full-grid/artifact-download.json --output artifacts/full-grid
-bash launch-kd.sh download --manifest reports/full-grid/artifact-download.json --output artifacts/full-grid --verify-only
+bash launch-kd.sh download --manifest reports/artifact-download.json --output artifacts/runtime
+bash launch-kd.sh download --manifest reports/artifact-download.json --output artifacts/runtime --verify-only
 bash launch-kd.sh fetch-data
-bash launch-kd.sh evaluate --model artifacts/full-grid/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/full-grid/evaluation-freeze.json --output .local/reproduced-full-grid-student
+bash launch-kd.sh evaluate --model artifacts/runtime/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/evaluation-freeze.json --output .local/reproduced-representative-student
 ```
 
+[대표 모델 번들](https://park-dongmyung.com/downloads/knowledge-distillation-models-v2.zip)은 **10.83MiB, 11,353,209바이트**이며 `artifacts/runtime/models/`에 설치됩니다. 기존에 동결한 명세와 모델 체크섬을 유지합니다. 저장 모델의 CPU 평가에는 Docker, GPU와 API 키가 필요하지 않습니다. 첫 설치와 다운로드에는 인터넷이 필요하며 쓰기 가능한 Windows 또는 Linux x86-64 폴더를 사용합니다.
 
-새 명세는 모델과 원본 실험 근거를 각각 `artifacts/full-grid/models/`와 `artifacts/full-grid/original-base-run/`에 설치합니다. 전체 모델 번들은 [12.71 MiB (13,326,858 bytes)](https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-models.zip), 원본 근거 번들은 [11.91 MiB (12,485,913 bytes)](https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-base-evidence.zip)입니다. URL, 바이트 수와 SHA를 명세로 확인하며, 실제 익명 다운로드 검증은 별도 기록으로 구분합니다.
-
-기존 기본 학습 명령의 4개 후보 절차는 그대로 유지합니다. 9개 조합 학습에는 별도의 `scripts/full_grid_study.py`와 `configs/full-grid-plan.json`을 사용합니다. 공개 초기 근거를 이용한 자신의 Kaggle 재학습 준비 명령은 [확장 안내](./docs/full-grid.ko.md)에 있습니다.
+별도의 [9개 조합 모델 번들](https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-models.zip)과 [초기 실험 근거 번들](https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-base-evidence.zip)은 전체 연구 체크포인트와 T5-a01 변환 파일을 보존합니다. 해당 실험을 설치하거나 재현할 때는 [전체 조합 안내](./docs/full-grid.ko.md)의 명시적 다운로드 명세와 명령을 사용합니다. 다운로드 ZIP에서 대표 모델과 연구 선택 모델을 구분합니다.
 
 <details>
 <summary>앞선 4개 후보 연구와 최초 노트북 결과의 보존 기록</summary>
