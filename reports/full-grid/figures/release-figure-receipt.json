@@ -1,0 +1,26 @@
+{
+  "png": "knowledge-distillation-release.png",
+  "svg": "knowledge-distillation-release.svg",
+  "locked_holdout_count": 5850,
+  "plotted_training_seeds": [
+    378,
+    379,
+    380
+  ],
+  "synthetic_fixture": false,
+  "historical_results_on_axes": false,
+  "parent_summary_sha256": "2aa286dacab5520758f8bd6380dcd8b76cba2af7cbf9234aedccd86f6dc02bfb",
+  "freeze_sha256": "67db9589db3cd6c812176ed9a61489d9e6cfd552a7355c4f416acbe8e252672a",
+  "aliases": {
+    "teacher": "teacher",
+    "baseline": "baseline_seed_378",
+    "distilled": "deployment_student",
+    "fp32": "deployment_fp32",
+    "int8": "deployment_int8",
+    "baseline_seed_379": "baseline_seed_379",
+    "distilled_seed_379": "grid_T5-a01_seed_379",
+    "baseline_seed_380": "baseline_seed_380",
+    "distilled_seed_380": "grid_T5-a01_seed_380"
+  },
+  "development_seeds_not_independent_confirmation": true
+}

@@ -1,0 +1,803 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-13T09:47:17.638690+00:00",
+  "selection_split": "validation",
+  "models": {
+    "baseline_seed_378": {
+      "filename": "student.keras",
+      "sha256": "509a44fd5a8929ad6e50403a6c110da4b5beb5aae804ea7ad489e4a668dc5f95",
+      "bytes": 187164
+    },
+    "baseline_seed_379": {
+      "filename": "student.keras",
+      "sha256": "4d5be19544ea0130137b72752231884aeeb8a4c1bcf53d6d228efd82764361f7",
+      "bytes": 187164
+    },
+    "baseline_seed_380": {
+      "filename": "student.keras",
+      "sha256": "da36f330c23f4b9d641b0e60cd0c67cccdb184522263bcde52feed53e25febd3",
+      "bytes": 187164
+    },
+    "control_T5-a00_seed_378": {
+      "filename": "student.keras",
+      "sha256": "159044387ea7dce34d24d46ab6f1beece561c5d03abb524ad353d772d1d14a95",
+      "bytes": 187164
+    },
+    "control_T5-a00_seed_379": {
+      "filename": "student.keras",
+      "sha256": "660cfdd1df508c5504f28634f51ce8bd2058b902d9deef6b68609b3d01af34e7",
+      "bytes": 187164
+    },
+    "control_T5-a00_seed_380": {
+      "filename": "student.keras",
+      "sha256": "3fe98efee3890ead7095d903ca65e1ce864417be60fb007acc6679b1d4e670fc",
+      "bytes": 187164
+    },
+    "deployment_fp32": {
+      "filename": "student-fp32.tflite",
+      "sha256": "59d72eb13bf7829362d7626f9a8907ec2e1eeb9812a986e214a7977802b2fce6",
+      "bytes": 143316
+    },
+    "deployment_int8": {
+      "filename": "student-int8.tflite",
+      "sha256": "c01d70932c4bf031a4ce672214f420170d35ed1b3e16a208d788690ea900e659",
+      "bytes": 55472
+    },
+    "deployment_student": {
+      "filename": "student.keras",
+      "sha256": "e16f93e97b0481f4a691ba61d6b5f6ca6be9e1ab5decb953e05b9bb7b3a069fb",
+      "bytes": 187164
+    },
+    "grid_T10-a01_seed_378": {
+      "filename": "student.keras",
+      "sha256": "2a61ccd1dc9d08abb71d316cc61818c49436a17ec1e8047fded83efacc796af9",
+      "bytes": 187164
+    },
+    "grid_T10-a01_seed_379": {
+      "filename": "student.keras",
+      "sha256": "4c0e51fd6b9852799697021a86e4c115ff040a17596c47ec70fa40cab544bf8b",
+      "bytes": 187164
+    },
+    "grid_T10-a01_seed_380": {
+      "filename": "student.keras",
+      "sha256": "4074147cbf673d73e8dbaff76beab0ab50453058462940797213ce2ffe3bf5ff",
+      "bytes": 187164
+    },
+    "grid_T10-a03_seed_378": {
+      "filename": "student.keras",
+      "sha256": "42c4986d11eb2ca6cfcd95a6377ddcc1bcee7a6aa8baed28938d62c9e851a926",
+      "bytes": 187164
+    },
+    "grid_T10-a03_seed_379": {
+      "filename": "student.keras",
+      "sha256": "923a5a1423b99072ac30a39f5a204a29edbef4fdc4f9a4d12cb3c56e573db997",
+      "bytes": 187164
+    },
+    "grid_T10-a03_seed_380": {
+      "filename": "student.keras",
+      "sha256": "b2138160c146e76f84253fd17292b8aabda4d7157d4cd9a97107e5b68504b256",
+      "bytes": 187164
+    },
+    "grid_T10-a05_seed_378": {
+      "filename": "student.keras",
+      "sha256": "3520233c15a2bf41102e85a629d486b74bcc6592e911382583d626a9cc474580",
+      "bytes": 187164
+    },
+    "grid_T10-a05_seed_379": {
+      "filename": "student.keras",
+      "sha256": "e92661a4012277d57ff4b6810d60af481190fff0596297ce54052345941bf40d",
+      "bytes": 187164
+    },
+    "grid_T10-a05_seed_380": {
+      "filename": "student.keras",
+      "sha256": "b20b821ac31956f9570c0e5d000bac9b1407aa761c43e5abb01128305e96ccf0",
+      "bytes": 187164
+    },
+    "grid_T3-a01_seed_378": {
+      "filename": "student.keras",
+      "sha256": "df69af9301764e3f8ac6a2d241612b5e7267b0e78114f55b29e796f7a0918ab6",
+      "bytes": 187164
+    },
+    "grid_T3-a01_seed_379": {
+      "filename": "student.keras",
+      "sha256": "aa8f350cebdd12a434b54e2d2007a2b2a7135854fd9dc427c75dd750bf29b12d",
+      "bytes": 187164
+    },
+    "grid_T3-a01_seed_380": {
+      "filename": "student.keras",
+      "sha256": "8e4e829a1fc299d2849cfad1537ddf84baa2b9ca15daaac2737b6d24614f07ba",
+      "bytes": 187164
+    },
+    "grid_T3-a03_seed_378": {
+      "filename": "student.keras",
+      "sha256": "44dd73ea7dba8ba6b2bf331c892ba62cd1e5c2c9b877e08e7c8597bc084bc787",
+      "bytes": 187164
+    },
+    "grid_T3-a03_seed_379": {
+      "filename": "student.keras",
+      "sha256": "10f8ce83de64e568a5723c085177bfc4caa71dc60598ba4978a50dd4b3957088",
+      "bytes": 187164
+    },
+    "grid_T3-a03_seed_380": {
+      "filename": "student.keras",
+      "sha256": "eaf0d75b2d2d69a938314f2068758330010e8be2c29b068af70ae0a1b26c98e2",
+      "bytes": 187164
+    },
+    "grid_T3-a05_seed_378": {
+      "filename": "student.keras",
+      "sha256": "0cbd5d4963ee4b0055c2b3a1c961256101d86b7a9c80f44cd0e9ceb367d181c2",
+      "bytes": 187164
+    },
+    "grid_T3-a05_seed_379": {
+      "filename": "student.keras",
+      "sha256": "1e780c1e80eb811161ef29aa237437728587f9461097db1029d02fa863b75ce7",
+      "bytes": 187164
+    },
+    "grid_T3-a05_seed_380": {
+      "filename": "student.keras",
+      "sha256": "2e950976e4b14f56c20390d4c456f2edf8267dc5bb2e9df03f4218d3146895a4",
+      "bytes": 187164
+    },
+    "grid_T5-a01_seed_378": {
+      "filename": "student.keras",
+      "sha256": "e16f93e97b0481f4a691ba61d6b5f6ca6be9e1ab5decb953e05b9bb7b3a069fb",
+      "bytes": 187164
+    },
+    "grid_T5-a01_seed_379": {
+      "filename": "student.keras",
+      "sha256": "e64c6f1f1253cd2dc3c2879482b682f94316881f8cf383ed661b39981f1bd778",
+      "bytes": 187164
+    },
+    "grid_T5-a01_seed_380": {
+      "filename": "student.keras",
+      "sha256": "2116cd245517693bdda6828b6e181afe737f4a837c5f74795cabab480a3edac0",
+      "bytes": 187164
+    },
+    "grid_T5-a03_seed_378": {
+      "filename": "student.keras",
+      "sha256": "bc304c644ced2b2f038736b4c292fafc5cb335334847497744d940a62aa696bc",
+      "bytes": 187164
+    },
+    "grid_T5-a03_seed_379": {
+      "filename": "student.keras",
+      "sha256": "6edb3f1604201ecbecf57e3c781865f84c14c79e6fea0e0dd460e59aac22bc9e",
+      "bytes": 187164
+    },
+    "grid_T5-a03_seed_380": {
+      "filename": "student.keras",
+      "sha256": "bfd82b9f67b2cdf5952f94f792ef8f1e7a796c45867321e7a2ca8ce8eb58472f",
+      "bytes": 187164
+    },
+    "grid_T5-a05_seed_378": {
+      "filename": "student.keras",
+      "sha256": "9c4b099c5515678b74f91c67e723e8f1568c47cdb6dd290c1b2e0d0abbcd6273",
+      "bytes": 187164
+    },
+    "grid_T5-a05_seed_379": {
+      "filename": "student.keras",
+      "sha256": "a49fc6d8f96b7e9c6f976651da3e370d87a48bfe0b12701acd73230019ea4e47",
+      "bytes": 187164
+    },
+    "grid_T5-a05_seed_380": {
+      "filename": "student.keras",
+      "sha256": "83f5de84beb28846c60c7ba5e6a568dee2910fc1e045d3168bf2eec8ed8a4520",
+      "bytes": 187164
+    },
+    "teacher": {
+      "filename": "teacher.keras",
+      "sha256": "2acb67a505aa922193482307b2bbdc3680dab1cf9d5cd442a111adbb09a1f73b",
+      "bytes": 9843117
+    }
+  },
+  "manifest_sha256": "2320e12a01d9d35f58fc41793d29d129d8f58d2af93b40fdc70185fcee9a4da7",
+  "inventory_sha256": "f9674d7568ada40dd62e57cf6a18b4efca17a805a9d532fda40db21d4a6281b0",
+  "class_names": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20",
+    "21",
+    "22",
+    "23",
+    "24",
+    "25",
+    "26",
+    "27",
+    "28",
+    "29",
+    "30",
+    "31",
+    "32",
+    "33",
+    "34",
+    "35",
+    "36",
+    "37",
+    "38",
+    "39",
+    "40",
+    "41",
+    "42"
+  ],
+  "split_counts": {
+    "locked_holdout": 5850,
+    "train": 27509,
+    "validation": 5850
+  },
+  "config": {
+    "study": "full-temperature-alpha-grid-three-seed-extension",
+    "training_freeze_sha256": "51f12ba11e3434c1f77943f05dd5d7fd9b1b9e66c0de753a10a485bd853412c9",
+    "selection": {
+      "status": "completed",
+      "selection_split": "validation",
+      "candidates": [
+        {
+          "id": "T3-a01",
+          "temperature": 3.0,
+          "alpha": 0.1,
+          "seeds": [
+            378,
+            379,
+            380
+          ],
+          "validation_accuracy_by_seed": [
+            0.8376068472862244,
+            0.8700854778289795,
+            0.8579487204551697
+          ],
+          "mean_validation_accuracy": 0.8552136818567911,
+          "sample_std_validation_accuracy": 0.016411145224638095,
+          "mean_validation_ce": 0.6267328461011251,
+          "paired_validation_gains": [
+            0.10752135515213013,
+            0.050427377223968506,
+            0.08290600776672363
+          ],
+          "mean_validation_accuracy_gain": 0.08028491338094075,
+          "sample_std_paired_gain": 0.028637094488612815,
+          "positive_pairs": 3,
+          "eligible": true
+        },
+        {
+          "id": "T3-a03",
+          "temperature": 3.0,
+          "alpha": 0.3,
+          "seeds": [
+            378,
+            379,
+            380
+          ],
+          "validation_accuracy_by_seed": [
+            0.843589723110199,
+            0.8820512890815735,
+            0.8617094159126282
+          ],
+          "mean_validation_accuracy": 0.8624501427014669,
+          "sample_std_validation_accuracy": 0.019241479188835144,
+          "mean_validation_ce": 0.5774820347627004,
+          "paired_validation_gains": [
+            0.11350423097610474,
+            0.0623931884765625,
+            0.08666670322418213
+          ],
+          "mean_validation_accuracy_gain": 0.08752137422561646,
+          "sample_std_paired_gain": 0.025566237760726994,
+          "positive_pairs": 3,
+          "eligible": true
+        },
+        {
+          "id": "T3-a05",
+          "temperature": 3.0,
+          "alpha": 0.5,
+          "seeds": [
+            378,
+            379,
+            380
+          ],
+          "validation_accuracy_by_seed": [
+            0.8264957070350647,
+            0.8683760762214661,
+            0.8668376207351685
+          ],
+          "mean_validation_accuracy": 0.8539031346638998,
+          "sample_std_validation_accuracy": 0.023747989983221793,
+          "mean_validation_ce": 0.6418678561846415,
+          "paired_validation_gains": [
+            0.09641021490097046,
+            0.04871797561645508,
+            0.09179490804672241
+          ],
+          "mean_validation_accuracy_gain": 0.07897436618804932,
+          "sample_std_paired_gain": 0.026304222895865214,
+          "positive_pairs": 3,
+          "eligible": true
+        },
+        {
+          "id": "T5-a01",
+          "temperature": 5.0,
+          "alpha": 0.1,
+          "seeds": [
+            378,
+            379,
+            380
+          ],
+          "validation_accuracy_by_seed": [
+            0.8579487204551697,
+            0.8912820219993591,
+            0.86307692527771
+          ],
+          "mean_validation_accuracy": 0.870769222577413,
+          "sample_std_validation_accuracy": 0.017948699848992652,
+          "mean_validation_ce": 0.5103897849718729,
+          "paired_validation_gains": [
+            0.12786322832107544,
+            0.07162392139434814,
+            0.08803421258926392
+          ],
+          "mean_validation_accuracy_gain": 0.0958404541015625,
+          "sample_std_paired_gain": 0.028920891511343656,
+          "positive_pairs": 3,
+          "eligible": true
+        },
+        {
+          "id": "T5-a03",
+          "temperature": 5.0,
+          "alpha": 0.3,
+          "seeds": [
+            378,
+            379,
+            380
+          ],
+          "validation_accuracy_by_seed": [
+            0.8509401679039001,
+            0.854358971118927,
+            0.8724786043167114
+          ],
+          "mean_validation_accuracy": 0.8592592477798462,
+          "sample_std_validation_accuracy": 0.011575214654266273,
+          "mean_validation_ce": 0.5722166299819946,
+          "paired_validation_gains": [
+            0.12085467576980591,
+            0.034700870513916016,
+            0.09743589162826538
+          ],
+          "mean_validation_accuracy_gain": 0.08433047930399577,
+          "sample_std_paired_gain": 0.04454697985452312,
+          "positive_pairs": 3,
+          "eligible": true
+        },
+        {
+          "id": "T5-a05",
+          "temperature": 5.0,
+          "alpha": 0.5,
+          "seeds": [
+            378,
+            379,
+            380
+          ],
+          "validation_accuracy_by_seed": [
+            0.8709401488304138,
+            0.8846153616905212,
+            0.8439316153526306
+          ],
+          "mean_validation_accuracy": 0.8664957086245219,
+          "sample_std_validation_accuracy": 0.020702816006023642,
+          "mean_validation_ce": 0.5551225443681082,
+          "paired_validation_gains": [
+            0.14085465669631958,
+            0.06495726108551025,
+            0.06888890266418457
+          ],
+          "mean_validation_accuracy_gain": 0.09156694014867146,
+          "sample_std_paired_gain": 0.0427296583561906,
+          "positive_pairs": 3,
+          "eligible": true
+        },
+        {
+          "id": "T10-a01",
+          "temperature": 10.0,
+          "alpha": 0.1,
+          "seeds": [
+            378,
+            379,
+            380
+          ],
+          "validation_accuracy_by_seed": [
+            0.8160683512687683,
+            0.8596581220626831,
+            0.7919657826423645
+          ],
+          "mean_validation_accuracy": 0.8225640853246053,
+          "sample_std_validation_accuracy": 0.03431048126654631,
+          "mean_validation_ce": 0.699484129746755,
+          "paired_validation_gains": [
+            0.08598285913467407,
+            0.04000002145767212,
+            0.016923069953918457
+          ],
+          "mean_validation_accuracy_gain": 0.04763531684875488,
+          "sample_std_paired_gain": 0.03515731676627811,
+          "positive_pairs": 3,
+          "eligible": true
+        },
+        {
+          "id": "T10-a03",
+          "temperature": 10.0,
+          "alpha": 0.3,
+          "seeds": [
+            378,
+            379,
+            380
+          ],
+          "validation_accuracy_by_seed": [
+            0.8434187769889832,
+            0.8641025424003601,
+            0.8494017124176025
+          ],
+          "mean_validation_accuracy": 0.8523076772689819,
+          "sample_std_validation_accuracy": 0.010643684121877526,
+          "mean_validation_ce": 0.5488708813985189,
+          "paired_validation_gains": [
+            0.11333328485488892,
+            0.04444444179534912,
+            0.0743589997291565
+          ],
+          "mean_validation_accuracy_gain": 0.07737890879313152,
+          "sample_std_paired_gain": 0.03454356760073408,
+          "positive_pairs": 3,
+          "eligible": true
+        },
+        {
+          "id": "T10-a05",
+          "temperature": 10.0,
+          "alpha": 0.5,
+          "seeds": [
+            378,
+            379,
+            380
+          ],
+          "validation_accuracy_by_seed": [
+            0.843589723110199,
+            0.8753846287727356,
+            0.867521345615387
+          ],
+          "mean_validation_accuracy": 0.8621652324994405,
+          "sample_std_validation_accuracy": 0.016560343212189507,
+          "mean_validation_ce": 0.5166634420553843,
+          "paired_validation_gains": [
+            0.11350423097610474,
+            0.05572652816772461,
+            0.09247863292694092
+          ],
+          "mean_validation_accuracy_gain": 0.08723646402359009,
+          "sample_std_paired_gain": 0.02924339218630113,
+          "positive_pairs": 3,
+          "eligible": true
+        }
+      ],
+      "selected_candidate_id": "T5-a01",
+      "selected_configuration": {
+        "max_epochs": 30,
+        "patience": 5,
+        "batch_size": 64,
+        "learning_rate": 0.001,
+        "augmentation": true,
+        "deterministic": true,
+        "verbose": 2,
+        "alpha": 0.1,
+        "temperature": 5.0
+      },
+      "deployment_kind": "distilled",
+      "deployment_seed": 378,
+      "deployment": {
+        "candidate_id": "T5-a01",
+        "seed": 378,
+        "kind": "distilled",
+        "model_path": "students/seed-378/T5-a01/student.keras",
+        "selected_on": "validation"
+      },
+      "mean_selected_validation_gain": 0.0958404541015625,
+      "controls_eligible_for_selection": false,
+      "final_outcomes_used_for_selection": false,
+      "development_seeds_are_independent_confirmation": false,
+      "old_holdout_results_already_public": true,
+      "decision": "Choose the eligible fixed recipe by three-seed validation mean; retain baseline if none qualifies."
+    },
+    "deployment_seed": 378,
+    "deployment_candidate_id": "T5-a01",
+    "deployment_format": "FP32",
+    "int8_acceptance": {
+      "accepted": false,
+      "checks": {
+        "accuracy_drop_within_limit": false,
+        "file_size_improved": true,
+        "same_cpu_p50_speedup_within_limit": false
+      },
+      "accuracy_drop_pp": 46.41025641025641,
+      "max_accuracy_drop_pp": 1.0,
+      "same_cpu_p50_speedup": 0.7861451245392315,
+      "minimum_speedup": 1.05,
+      "file_size_ratio_int8_over_fp32": 0.3870607608361941,
+      "latency_ratio_int8_over_fp32": 1.2720297675141232,
+      "selected_format": "FP32",
+      "limitation": "One host and fixed thread count; repeat measurements on the target device."
+    },
+    "deployment_selection_uses_reference_outcomes": false,
+    "reference_evaluation_exposure": "The same holdout already had published outcomes under the previous four-candidate study. This extension is not an untouched independent test.",
+    "export_report_sha256": "a9152da2ec00efa2d97159ec6c3070841a07e6fff267d99f2ad28da7d04fa2e4",
+    "cpu_benchmark_sha256": "798ec96cc694c75b6c96d16aed69498766bbf75d6429d487d72d989a1f61e6d1",
+    "evaluator_sha256": "833f3b40c02f74863063db87be254632c814189a6cea1d6ae3a263e796f2f21c",
+    "training_config": {
+      "protocol": "gtsrb-full-grid-extension-v1",
+      "plan": {
+        "schema_version": 1,
+        "protocol": "gtsrb-full-grid-extension-v1",
+        "training_location": "kaggle_gpu_only",
+        "dataset_source": "meowmeowmeowmeowmeow/gtsrb-german-traffic-sign/versions/1",
+        "split_seed": 378,
+        "split_track_ratios": [
+          0.7,
+          0.15,
+          0.15
+        ],
+        "seeds": [
+          378,
+          379,
+          380
+        ],
+        "deployment_seed": 378,
+        "base_bindings": {
+          "plan_sha256": "51f5fe79cfbcaeea12fb78ce059085bc26367813209c4ab61f02de4f5aeaf969",
+          "training_freeze_sha256": "9784fe2ac7e678b8b1ad01b7b64575de3c81854246918d618ceaf1ad634dc95e",
+          "core_source_sha256": "f86d605a689be6e47c2db561a72ed1fb77a12cb487affd8c9d2440fa6093c608",
+          "manifest_sha256": "adf978947af03876338282d798bf9c179267752e8c36f71b21865031cbe7a546",
+          "artifact_inventory_sha256": "845b0d8d713c044a6d86ac7e372d901521d38e47552382c08ad52b8158074a93"
+        },
+        "environment_pins": {
+          "python": "3.12.15",
+          "gpu_name": "Tesla T4",
+          "packages": {
+            "tensorflow": "2.19.0",
+            "keras": "3.9.2",
+            "numpy": "1.26.4",
+            "h5py": "3.13.0",
+            "pandas": "2.2.3",
+            "Pillow": "11.1.0",
+            "scikit-learn": "1.6.1",
+            "matplotlib": "3.10.1",
+            "kagglehub": "0.3.10",
+            "setuptools": "75.8.0",
+            "wheel": "0.45.1",
+            "gtsrb-knowledge-distillation": "2.0.0",
+            "nvidia-cublas-cu12": "12.5.3.2",
+            "nvidia-cuda-cupti-cu12": "12.5.82",
+            "nvidia-cuda-nvcc-cu12": "12.5.82",
+            "nvidia-cuda-nvrtc-cu12": "12.5.82",
+            "nvidia-cuda-runtime-cu12": "12.5.82",
+            "nvidia-cudnn-cu12": "9.3.0.75",
+            "nvidia-cufft-cu12": "11.2.3.61",
+            "nvidia-curand-cu12": "10.3.6.82",
+            "nvidia-cusolver-cu12": "11.6.3.83",
+            "nvidia-cusparse-cu12": "12.5.1.3",
+            "nvidia-nccl-cu12": "2.23.4",
+            "nvidia-nvjitlink-cu12": "12.5.82"
+          }
+        },
+        "student_training": {
+          "max_epochs": 30,
+          "patience": 5,
+          "batch_size": 64,
+          "learning_rate": 0.001,
+          "augmentation": true,
+          "deterministic": true,
+          "verbose": 2
+        },
+        "kd_candidates": [
+          {
+            "id": "T3-a01",
+            "temperature": 3.0,
+            "alpha": 0.1
+          },
+          {
+            "id": "T3-a03",
+            "temperature": 3.0,
+            "alpha": 0.3
+          },
+          {
+            "id": "T3-a05",
+            "temperature": 3.0,
+            "alpha": 0.5
+          },
+          {
+            "id": "T5-a01",
+            "temperature": 5.0,
+            "alpha": 0.1
+          },
+          {
+            "id": "T5-a03",
+            "temperature": 5.0,
+            "alpha": 0.3
+          },
+          {
+            "id": "T5-a05",
+            "temperature": 5.0,
+            "alpha": 0.5
+          },
+          {
+            "id": "T10-a01",
+            "temperature": 10.0,
+            "alpha": 0.1
+          },
+          {
+            "id": "T10-a03",
+            "temperature": 10.0,
+            "alpha": 0.3
+          },
+          {
+            "id": "T10-a05",
+            "temperature": 10.0,
+            "alpha": 0.5
+          }
+        ],
+        "diagnostic_controls": [
+          {
+            "id": "T5-a00",
+            "temperature": 5.0,
+            "alpha": 0.0,
+            "eligible_for_selection": false
+          }
+        ],
+        "selection": {
+          "split": "validation",
+          "metric": "mean_unweighted_validation_accuracy_over_three_seeds",
+          "minimum_mean_accuracy_gain": 0.002,
+          "minimum_positive_pairs": 2,
+          "tie_break": "higher mean validation accuracy, then lower mean validation CE, then earlier declared candidate",
+          "all_grid_runs_required": true,
+          "controls_eligible_for_selection": false,
+          "final_outcomes_used_for_selection": false,
+          "seed_role": "All three seeds are development-selection repetitions, not independent confirmation seeds."
+        },
+        "reuse_policy": {
+          "teacher": "Reuse the improved experiment's exact selected MobileNetV2 artifact; do not reuse the historical notebook teacher.",
+          "baseline_seeds": [
+            378,
+            379,
+            380
+          ],
+          "kd_runs": [
+            {
+              "seed": 378,
+              "id": "T3-a03"
+            },
+            {
+              "seed": 378,
+              "id": "T5-a03"
+            },
+            {
+              "seed": 378,
+              "id": "T10-a03"
+            },
+            {
+              "seed": 378,
+              "id": "T5-a05"
+            },
+            {
+              "seed": 379,
+              "id": "T5-a05"
+            },
+            {
+              "seed": 380,
+              "id": "T5-a05"
+            }
+          ],
+          "required_checks": "Immutable source, split, configuration, runtime pins, teacher, initialization, completed checkpoint and history checksums. Copy files into a new study; never write to the base run."
+        },
+        "exposure": {
+          "old_locked_holdout_results_already_public": true,
+          "historical_full_train_and_official_test_exposed": true,
+          "new_study_is_registered_after_previous_results": true,
+          "holdout_interpretation": "An extended comparison on the same previously reported evaluation set, not an untouched confirmatory benchmark.",
+          "selection_access": "Only current validation metrics enter configuration selection. No new holdout or official-test inference occurs in this runner.",
+          "preservation": "The historical notebook, four-candidate plan, previous reports and previous freezes remain unchanged."
+        },
+        "worker_policy": {
+          "maximum_workers": 2,
+          "assignment": "Round-robin over declared seed-major grid tasks followed by diagnostic controls, after removing the six imported KD runs.",
+          "effective_dtype": "float32",
+          "gpu_visibility": "The parent assigns one T4 per worker through CUDA_VISIBLE_DEVICES before Python/TensorFlow starts."
+        }
+      },
+      "plan_sha256": "b5ae3e54bda06f525800c2a50dacaf85f417ffa595535aad5c59867ce4fe4957",
+      "study_snapshot_sha256": "da2efee95c81d87b6edfe72bd7c811b1fc124e08e8f61cabf1d753fb335f4604",
+      "runner_file": {
+        "sha256": "4d8cc6edc2fcb4a11517d87694511f3c805705d6fd5702f900bed0352011a44e",
+        "bytes": 41194
+      },
+      "selection_report_file": {
+        "sha256": "a6481ca9b72272b3ad7db4d3be4b193068bb0ef739d253929735f948422793e1",
+        "bytes": 7570
+      },
+      "study_report_file": {
+        "sha256": "76240878b78ab893bf179646549e18d724e57486dd8d6c7b265c1710b6ac76f5",
+        "bytes": 34132
+      },
+      "base_training_freeze_sha256": "9784fe2ac7e678b8b1ad01b7b64575de3c81854246918d618ceaf1ad634dc95e",
+      "base_inventory_sha256": "845b0d8d713c044a6d86ac7e372d901521d38e47552382c08ad52b8158074a93",
+      "selected_candidate_id": "T5-a01",
+      "selected_configuration": {
+        "max_epochs": 30,
+        "patience": 5,
+        "batch_size": 64,
+        "learning_rate": 0.001,
+        "augmentation": true,
+        "deterministic": true,
+        "verbose": 2,
+        "alpha": 0.1,
+        "temperature": 5.0
+      },
+      "deployment_kind": "distilled",
+      "deployment_seed": 378,
+      "deployment_model_name": "grid_T5-a01_seed_378",
+      "controls_eligible_for_selection": false,
+      "final_reselection_allowed": false,
+      "final_outcomes_used_for_selection": false,
+      "exposure": {
+        "old_locked_holdout_results_already_public": true,
+        "historical_full_train_and_official_test_exposed": true,
+        "new_study_is_registered_after_previous_results": true,
+        "holdout_interpretation": "An extended comparison on the same previously reported evaluation set, not an untouched confirmatory benchmark.",
+        "selection_access": "Only current validation metrics enter configuration selection. No new holdout or official-test inference occurs in this runner.",
+        "preservation": "The historical notebook, four-candidate plan, previous reports and previous freezes remain unchanged."
+      }
+    }
+  },
+  "config_sha256": "11578c646a4b94e00e6b65a51c4195eff176e43e8744d9546be4c26d49b20118",
+  "source_sha256": {
+    "knowledge_distillation/__init__.py": "4ab0a16a4ed763b1eb2f63719265e29406f5bed0695ed78bdacb0622e9021235",
+    "knowledge_distillation/__main__.py": "dcc5afdcbb430092e23a93429e5ef12689196ea3f0f8b1e0fec5a5472ab171ee",
+    "knowledge_distillation/benchmark.py": "793bd9f87c410f80ebb322abb763312f6e9f4b842c2cea4b9b5a38d5e458f8e3",
+    "knowledge_distillation/data.py": "dd49c3526fb4c8af803a58533dcf893db5ce06ecd38d7050ea287586f932c010",
+    "knowledge_distillation/evaluation.py": "f0aacf7bdc112181eac982b9b498822d3f7c3a3c8ff713987f9226eaad60133d",
+    "knowledge_distillation/experiments.py": "87c3ca01841c999dfca692cc217d53c63794295280b229058026e19f786e0610",
+    "knowledge_distillation/export.py": "62157bd034f84a38ca2c114c11d2bde654ebb146aab0932d1fa2bc98aa9c78b8",
+    "knowledge_distillation/losses.py": "dfbaa4ee1441110e25c5c9970aa720c2c6493d3d831a5b2dc130a0fafebff01e",
+    "knowledge_distillation/models.py": "4583f8f0d8a810d02b373ce1ceeb33a33c973b16fdce66bbc67102b6be052fa5",
+    "knowledge_distillation/runtime.py": "ab3757410e8b08f2bf88cb5a5259b098b00f5d5e0a288aaf08ee5dbc15d03fad",
+    "knowledge_distillation/training.py": "a7c66fdb0c962997efe6601d6d0b35cfedb303cebe5f5f18c03c3137d0f614a5",
+    "requirements.txt": "274f900af344786e88d07896a64bf72284cf315d704cd63a71d5283001015ce1",
+    "requirements-runtime.txt": "2355c3e9e9275ae31537cac002e57662ce114b5963b4700d72a391134a8c41a0",
+    "pyproject.toml": "671d3b5c6eb3d58533cace4937cebcceac7cea4785414b55070340372737db78"
+  },
+  "evaluation_policy": {
+    "outputs": "43 logits",
+    "decision": "argmax",
+    "external_input_range": [
+      0,
+      1
+    ],
+    "image_size": [
+      96,
+      96
+    ],
+    "official_test_previously_used_for_selection": true
+  },
+  "freeze_sha256": "67db9589db3cd6c812176ed9a61489d9e6cfd552a7355c4f416acbe8e252672a"
+}

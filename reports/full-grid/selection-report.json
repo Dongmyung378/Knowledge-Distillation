@@ -1,0 +1,276 @@
+{
+  "status": "completed",
+  "selection_split": "validation",
+  "candidates": [
+    {
+      "id": "T3-a01",
+      "temperature": 3.0,
+      "alpha": 0.1,
+      "seeds": [
+        378,
+        379,
+        380
+      ],
+      "validation_accuracy_by_seed": [
+        0.8376068472862244,
+        0.8700854778289795,
+        0.8579487204551697
+      ],
+      "mean_validation_accuracy": 0.8552136818567911,
+      "sample_std_validation_accuracy": 0.016411145224638095,
+      "mean_validation_ce": 0.6267328461011251,
+      "paired_validation_gains": [
+        0.10752135515213013,
+        0.050427377223968506,
+        0.08290600776672363
+      ],
+      "mean_validation_accuracy_gain": 0.08028491338094075,
+      "sample_std_paired_gain": 0.028637094488612815,
+      "positive_pairs": 3,
+      "eligible": true
+    },
+    {
+      "id": "T3-a03",
+      "temperature": 3.0,
+      "alpha": 0.3,
+      "seeds": [
+        378,
+        379,
+        380
+      ],
+      "validation_accuracy_by_seed": [
+        0.843589723110199,
+        0.8820512890815735,
+        0.8617094159126282
+      ],
+      "mean_validation_accuracy": 0.8624501427014669,
+      "sample_std_validation_accuracy": 0.019241479188835144,
+      "mean_validation_ce": 0.5774820347627004,
+      "paired_validation_gains": [
+        0.11350423097610474,
+        0.0623931884765625,
+        0.08666670322418213
+      ],
+      "mean_validation_accuracy_gain": 0.08752137422561646,
+      "sample_std_paired_gain": 0.025566237760726994,
+      "positive_pairs": 3,
+      "eligible": true
+    },
+    {
+      "id": "T3-a05",
+      "temperature": 3.0,
+      "alpha": 0.5,
+      "seeds": [
+        378,
+        379,
+        380
+      ],
+      "validation_accuracy_by_seed": [
+        0.8264957070350647,
+        0.8683760762214661,
+        0.8668376207351685
+      ],
+      "mean_validation_accuracy": 0.8539031346638998,
+      "sample_std_validation_accuracy": 0.023747989983221793,
+      "mean_validation_ce": 0.6418678561846415,
+      "paired_validation_gains": [
+        0.09641021490097046,
+        0.04871797561645508,
+        0.09179490804672241
+      ],
+      "mean_validation_accuracy_gain": 0.07897436618804932,
+      "sample_std_paired_gain": 0.026304222895865214,
+      "positive_pairs": 3,
+      "eligible": true
+    },
+    {
+      "id": "T5-a01",
+      "temperature": 5.0,
+      "alpha": 0.1,
+      "seeds": [
+        378,
+        379,
+        380
+      ],
+      "validation_accuracy_by_seed": [
+        0.8579487204551697,
+        0.8912820219993591,
+        0.86307692527771
+      ],
+      "mean_validation_accuracy": 0.870769222577413,
+      "sample_std_validation_accuracy": 0.017948699848992652,
+      "mean_validation_ce": 0.5103897849718729,
+      "paired_validation_gains": [
+        0.12786322832107544,
+        0.07162392139434814,
+        0.08803421258926392
+      ],
+      "mean_validation_accuracy_gain": 0.0958404541015625,
+      "sample_std_paired_gain": 0.028920891511343656,
+      "positive_pairs": 3,
+      "eligible": true
+    },
+    {
+      "id": "T5-a03",
+      "temperature": 5.0,
+      "alpha": 0.3,
+      "seeds": [
+        378,
+        379,
+        380
+      ],
+      "validation_accuracy_by_seed": [
+        0.8509401679039001,
+        0.854358971118927,
+        0.8724786043167114
+      ],
+      "mean_validation_accuracy": 0.8592592477798462,
+      "sample_std_validation_accuracy": 0.011575214654266273,
+      "mean_validation_ce": 0.5722166299819946,
+      "paired_validation_gains": [
+        0.12085467576980591,
+        0.034700870513916016,
+        0.09743589162826538
+      ],
+      "mean_validation_accuracy_gain": 0.08433047930399577,
+      "sample_std_paired_gain": 0.04454697985452312,
+      "positive_pairs": 3,
+      "eligible": true
+    },
+    {
+      "id": "T5-a05",
+      "temperature": 5.0,
+      "alpha": 0.5,
+      "seeds": [
+        378,
+        379,
+        380
+      ],
+      "validation_accuracy_by_seed": [
+        0.8709401488304138,
+        0.8846153616905212,
+        0.8439316153526306
+      ],
+      "mean_validation_accuracy": 0.8664957086245219,
+      "sample_std_validation_accuracy": 0.020702816006023642,
+      "mean_validation_ce": 0.5551225443681082,
+      "paired_validation_gains": [
+        0.14085465669631958,
+        0.06495726108551025,
+        0.06888890266418457
+      ],
+      "mean_validation_accuracy_gain": 0.09156694014867146,
+      "sample_std_paired_gain": 0.0427296583561906,
+      "positive_pairs": 3,
+      "eligible": true
+    },
+    {
+      "id": "T10-a01",
+      "temperature": 10.0,
+      "alpha": 0.1,
+      "seeds": [
+        378,
+        379,
+        380
+      ],
+      "validation_accuracy_by_seed": [
+        0.8160683512687683,
+        0.8596581220626831,
+        0.7919657826423645
+      ],
+      "mean_validation_accuracy": 0.8225640853246053,
+      "sample_std_validation_accuracy": 0.03431048126654631,
+      "mean_validation_ce": 0.699484129746755,
+      "paired_validation_gains": [
+        0.08598285913467407,
+        0.04000002145767212,
+        0.016923069953918457
+      ],
+      "mean_validation_accuracy_gain": 0.04763531684875488,
+      "sample_std_paired_gain": 0.03515731676627811,
+      "positive_pairs": 3,
+      "eligible": true
+    },
+    {
+      "id": "T10-a03",
+      "temperature": 10.0,
+      "alpha": 0.3,
+      "seeds": [
+        378,
+        379,
+        380
+      ],
+      "validation_accuracy_by_seed": [
+        0.8434187769889832,
+        0.8641025424003601,
+        0.8494017124176025
+      ],
+      "mean_validation_accuracy": 0.8523076772689819,
+      "sample_std_validation_accuracy": 0.010643684121877526,
+      "mean_validation_ce": 0.5488708813985189,
+      "paired_validation_gains": [
+        0.11333328485488892,
+        0.04444444179534912,
+        0.0743589997291565
+      ],
+      "mean_validation_accuracy_gain": 0.07737890879313152,
+      "sample_std_paired_gain": 0.03454356760073408,
+      "positive_pairs": 3,
+      "eligible": true
+    },
+    {
+      "id": "T10-a05",
+      "temperature": 10.0,
+      "alpha": 0.5,
+      "seeds": [
+        378,
+        379,
+        380
+      ],
+      "validation_accuracy_by_seed": [
+        0.843589723110199,
+        0.8753846287727356,
+        0.867521345615387
+      ],
+      "mean_validation_accuracy": 0.8621652324994405,
+      "sample_std_validation_accuracy": 0.016560343212189507,
+      "mean_validation_ce": 0.5166634420553843,
+      "paired_validation_gains": [
+        0.11350423097610474,
+        0.05572652816772461,
+        0.09247863292694092
+      ],
+      "mean_validation_accuracy_gain": 0.08723646402359009,
+      "sample_std_paired_gain": 0.02924339218630113,
+      "positive_pairs": 3,
+      "eligible": true
+    }
+  ],
+  "selected_candidate_id": "T5-a01",
+  "selected_configuration": {
+    "max_epochs": 30,
+    "patience": 5,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "augmentation": true,
+    "deterministic": true,
+    "verbose": 2,
+    "alpha": 0.1,
+    "temperature": 5.0
+  },
+  "deployment_kind": "distilled",
+  "deployment_seed": 378,
+  "deployment": {
+    "candidate_id": "T5-a01",
+    "seed": 378,
+    "kind": "distilled",
+    "model_path": "students/seed-378/T5-a01/student.keras",
+    "selected_on": "validation"
+  },
+  "mean_selected_validation_gain": 0.0958404541015625,
+  "controls_eligible_for_selection": false,
+  "final_outcomes_used_for_selection": false,
+  "development_seeds_are_independent_confirmation": false,
+  "old_holdout_results_already_public": true,
+  "decision": "Choose the eligible fixed recipe by three-seed validation mean; retain baseline if none qualifies."
+}

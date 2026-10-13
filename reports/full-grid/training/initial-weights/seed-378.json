@@ -1,0 +1,7 @@
+{
+  "seed": 378,
+  "file_sha256": "ea63d484ac3c4d21cda74c16270daf0113671aeead107441ae042e5e305edfe6",
+  "weights_sha256": "ddc52cd1930433079abe608b60f91b58b4545747672ba78b9c954954820878db",
+  "parameter_count": 34406,
+  "initialization": "Fresh same-seed random initialization, shared by baseline and KD"
+}

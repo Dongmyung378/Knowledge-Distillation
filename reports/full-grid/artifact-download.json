@@ -1,0 +1,486 @@
+{
+  "schema_version": 1,
+  "release_freeze_sha256": "67db9589db3cd6c812176ed9a61489d9e6cfd552a7355c4f416acbe8e252672a",
+  "base_inventory_sha256": "845b0d8d713c044a6d86ac7e372d901521d38e47552382c08ad52b8158074a93",
+  "model_roles": {
+    "baseline_seed_378": "baseline.keras",
+    "baseline_seed_379": "baseline-seed-379.keras",
+    "baseline_seed_380": "baseline-seed-380.keras",
+    "control_T5-a00_seed_378": "control/T5-a00-seed-378.keras",
+    "control_T5-a00_seed_379": "control/T5-a00-seed-379.keras",
+    "control_T5-a00_seed_380": "control/T5-a00-seed-380.keras",
+    "deployment_fp32": "student-fp32.tflite",
+    "deployment_int8": "student-int8.tflite",
+    "deployment_student": "student.keras",
+    "grid_T10-a01_seed_378": "grid/T10-a01-seed-378.keras",
+    "grid_T10-a01_seed_379": "grid/T10-a01-seed-379.keras",
+    "grid_T10-a01_seed_380": "grid/T10-a01-seed-380.keras",
+    "grid_T10-a03_seed_378": "grid/T10-a03-seed-378.keras",
+    "grid_T10-a03_seed_379": "grid/T10-a03-seed-379.keras",
+    "grid_T10-a03_seed_380": "grid/T10-a03-seed-380.keras",
+    "grid_T10-a05_seed_378": "grid/T10-a05-seed-378.keras",
+    "grid_T10-a05_seed_379": "grid/T10-a05-seed-379.keras",
+    "grid_T10-a05_seed_380": "grid/T10-a05-seed-380.keras",
+    "grid_T3-a01_seed_378": "grid/T3-a01-seed-378.keras",
+    "grid_T3-a01_seed_379": "grid/T3-a01-seed-379.keras",
+    "grid_T3-a01_seed_380": "grid/T3-a01-seed-380.keras",
+    "grid_T3-a03_seed_378": "grid/T3-a03-seed-378.keras",
+    "grid_T3-a03_seed_379": "grid/T3-a03-seed-379.keras",
+    "grid_T3-a03_seed_380": "grid/T3-a03-seed-380.keras",
+    "grid_T3-a05_seed_378": "grid/T3-a05-seed-378.keras",
+    "grid_T3-a05_seed_379": "grid/T3-a05-seed-379.keras",
+    "grid_T3-a05_seed_380": "grid/T3-a05-seed-380.keras",
+    "grid_T5-a01_seed_378": "grid/T5-a01-seed-378.keras",
+    "grid_T5-a01_seed_379": "grid/T5-a01-seed-379.keras",
+    "grid_T5-a01_seed_380": "grid/T5-a01-seed-380.keras",
+    "grid_T5-a03_seed_378": "grid/T5-a03-seed-378.keras",
+    "grid_T5-a03_seed_379": "grid/T5-a03-seed-379.keras",
+    "grid_T5-a03_seed_380": "grid/T5-a03-seed-380.keras",
+    "grid_T5-a05_seed_378": "grid/T5-a05-seed-378.keras",
+    "grid_T5-a05_seed_379": "grid/T5-a05-seed-379.keras",
+    "grid_T5-a05_seed_380": "grid/T5-a05-seed-380.keras",
+    "teacher": "teacher.keras"
+  },
+  "artifacts": [
+    {
+      "name": "full-grid-models",
+      "kind": "zip",
+      "path": "models",
+      "url": "https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-models.zip",
+      "bytes": 13326858,
+      "sha256": "8cb31a7a87c9b10ed9bf78137add7419ef4ea1f3e8f3ca5de136f037d8c3dfd5",
+      "inventory": [
+        {
+          "path": "baseline-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "4d5be19544ea0130137b72752231884aeeb8a4c1bcf53d6d228efd82764361f7"
+        },
+        {
+          "path": "baseline-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "da36f330c23f4b9d641b0e60cd0c67cccdb184522263bcde52feed53e25febd3"
+        },
+        {
+          "path": "baseline.keras",
+          "bytes": 187164,
+          "sha256": "509a44fd5a8929ad6e50403a6c110da4b5beb5aae804ea7ad489e4a668dc5f95"
+        },
+        {
+          "path": "control/T5-a00-seed-378.keras",
+          "bytes": 187164,
+          "sha256": "159044387ea7dce34d24d46ab6f1beece561c5d03abb524ad353d772d1d14a95"
+        },
+        {
+          "path": "control/T5-a00-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "660cfdd1df508c5504f28634f51ce8bd2058b902d9deef6b68609b3d01af34e7"
+        },
+        {
+          "path": "control/T5-a00-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "3fe98efee3890ead7095d903ca65e1ce864417be60fb007acc6679b1d4e670fc"
+        },
+        {
+          "path": "grid/T10-a01-seed-378.keras",
+          "bytes": 187164,
+          "sha256": "2a61ccd1dc9d08abb71d316cc61818c49436a17ec1e8047fded83efacc796af9"
+        },
+        {
+          "path": "grid/T10-a01-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "4c0e51fd6b9852799697021a86e4c115ff040a17596c47ec70fa40cab544bf8b"
+        },
+        {
+          "path": "grid/T10-a01-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "4074147cbf673d73e8dbaff76beab0ab50453058462940797213ce2ffe3bf5ff"
+        },
+        {
+          "path": "grid/T10-a03-seed-378.keras",
+          "bytes": 187164,
+          "sha256": "42c4986d11eb2ca6cfcd95a6377ddcc1bcee7a6aa8baed28938d62c9e851a926"
+        },
+        {
+          "path": "grid/T10-a03-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "923a5a1423b99072ac30a39f5a204a29edbef4fdc4f9a4d12cb3c56e573db997"
+        },
+        {
+          "path": "grid/T10-a03-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "b2138160c146e76f84253fd17292b8aabda4d7157d4cd9a97107e5b68504b256"
+        },
+        {
+          "path": "grid/T10-a05-seed-378.keras",
+          "bytes": 187164,
+          "sha256": "3520233c15a2bf41102e85a629d486b74bcc6592e911382583d626a9cc474580"
+        },
+        {
+          "path": "grid/T10-a05-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "e92661a4012277d57ff4b6810d60af481190fff0596297ce54052345941bf40d"
+        },
+        {
+          "path": "grid/T10-a05-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "b20b821ac31956f9570c0e5d000bac9b1407aa761c43e5abb01128305e96ccf0"
+        },
+        {
+          "path": "grid/T3-a01-seed-378.keras",
+          "bytes": 187164,
+          "sha256": "df69af9301764e3f8ac6a2d241612b5e7267b0e78114f55b29e796f7a0918ab6"
+        },
+        {
+          "path": "grid/T3-a01-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "aa8f350cebdd12a434b54e2d2007a2b2a7135854fd9dc427c75dd750bf29b12d"
+        },
+        {
+          "path": "grid/T3-a01-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "8e4e829a1fc299d2849cfad1537ddf84baa2b9ca15daaac2737b6d24614f07ba"
+        },
+        {
+          "path": "grid/T3-a03-seed-378.keras",
+          "bytes": 187164,
+          "sha256": "44dd73ea7dba8ba6b2bf331c892ba62cd1e5c2c9b877e08e7c8597bc084bc787"
+        },
+        {
+          "path": "grid/T3-a03-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "10f8ce83de64e568a5723c085177bfc4caa71dc60598ba4978a50dd4b3957088"
+        },
+        {
+          "path": "grid/T3-a03-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "eaf0d75b2d2d69a938314f2068758330010e8be2c29b068af70ae0a1b26c98e2"
+        },
+        {
+          "path": "grid/T3-a05-seed-378.keras",
+          "bytes": 187164,
+          "sha256": "0cbd5d4963ee4b0055c2b3a1c961256101d86b7a9c80f44cd0e9ceb367d181c2"
+        },
+        {
+          "path": "grid/T3-a05-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "1e780c1e80eb811161ef29aa237437728587f9461097db1029d02fa863b75ce7"
+        },
+        {
+          "path": "grid/T3-a05-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "2e950976e4b14f56c20390d4c456f2edf8267dc5bb2e9df03f4218d3146895a4"
+        },
+        {
+          "path": "grid/T5-a01-seed-378.keras",
+          "bytes": 187164,
+          "sha256": "e16f93e97b0481f4a691ba61d6b5f6ca6be9e1ab5decb953e05b9bb7b3a069fb"
+        },
+        {
+          "path": "grid/T5-a01-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "e64c6f1f1253cd2dc3c2879482b682f94316881f8cf383ed661b39981f1bd778"
+        },
+        {
+          "path": "grid/T5-a01-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "2116cd245517693bdda6828b6e181afe737f4a837c5f74795cabab480a3edac0"
+        },
+        {
+          "path": "grid/T5-a03-seed-378.keras",
+          "bytes": 187164,
+          "sha256": "bc304c644ced2b2f038736b4c292fafc5cb335334847497744d940a62aa696bc"
+        },
+        {
+          "path": "grid/T5-a03-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "6edb3f1604201ecbecf57e3c781865f84c14c79e6fea0e0dd460e59aac22bc9e"
+        },
+        {
+          "path": "grid/T5-a03-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "bfd82b9f67b2cdf5952f94f792ef8f1e7a796c45867321e7a2ca8ce8eb58472f"
+        },
+        {
+          "path": "grid/T5-a05-seed-378.keras",
+          "bytes": 187164,
+          "sha256": "9c4b099c5515678b74f91c67e723e8f1568c47cdb6dd290c1b2e0d0abbcd6273"
+        },
+        {
+          "path": "grid/T5-a05-seed-379.keras",
+          "bytes": 187164,
+          "sha256": "a49fc6d8f96b7e9c6f976651da3e370d87a48bfe0b12701acd73230019ea4e47"
+        },
+        {
+          "path": "grid/T5-a05-seed-380.keras",
+          "bytes": 187164,
+          "sha256": "83f5de84beb28846c60c7ba5e6a568dee2910fc1e045d3168bf2eec8ed8a4520"
+        },
+        {
+          "path": "student-fp32.tflite",
+          "bytes": 143316,
+          "sha256": "59d72eb13bf7829362d7626f9a8907ec2e1eeb9812a986e214a7977802b2fce6"
+        },
+        {
+          "path": "student-int8.tflite",
+          "bytes": 55472,
+          "sha256": "c01d70932c4bf031a4ce672214f420170d35ed1b3e16a208d788690ea900e659"
+        },
+        {
+          "path": "student.keras",
+          "bytes": 187164,
+          "sha256": "e16f93e97b0481f4a691ba61d6b5f6ca6be9e1ab5decb953e05b9bb7b3a069fb"
+        },
+        {
+          "path": "teacher.keras",
+          "bytes": 9843117,
+          "sha256": "2acb67a505aa922193482307b2bbdc3680dab1cf9d5cd442a111adbb09a1f73b"
+        }
+      ]
+    },
+    {
+      "name": "original-base-run",
+      "kind": "zip",
+      "path": "original-base-run",
+      "url": "https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-base-evidence.zip",
+      "bytes": 12485913,
+      "sha256": "f4cedad875f2a0a573fa532a9c2c84490b3a3087741919c4cbc4859824b386b8",
+      "inventory": [
+        {
+          "path": "confirmation-report.json",
+          "bytes": 29446,
+          "sha256": "2a5bd169de9fcc6a263725245e9d861c936a867f9214cf82ee2a4fd8d689c2b5"
+        },
+        {
+          "path": "evaluation-freeze.json",
+          "bytes": 7754,
+          "sha256": "1db2f1ffa9f4005a8890fc0f416fb58e57a7e0bf2529053e02dfa2f2f0ee9554"
+        },
+        {
+          "path": "gpu-runtime.json",
+          "bytes": 1983,
+          "sha256": "f5feef6ba34f103a26822a3ff13d10ad6ad35278251b6a04c8bc6c51a262d350"
+        },
+        {
+          "path": "initial-weights/seed-378.json",
+          "bytes": 307,
+          "sha256": "de4b34be5dd94beaa77555dcedda2cfb608b5c2798407a1c4fb827c3502b8b6f"
+        },
+        {
+          "path": "initial-weights/seed-378.weights.h5",
+          "bytes": 178096,
+          "sha256": "ea63d484ac3c4d21cda74c16270daf0113671aeead107441ae042e5e305edfe6"
+        },
+        {
+          "path": "initial-weights/seed-379.json",
+          "bytes": 307,
+          "sha256": "c9838b2869f8155470acd13fc557a1ba92cff068b2eec052c9c7245054a9605d"
+        },
+        {
+          "path": "initial-weights/seed-379.weights.h5",
+          "bytes": 178096,
+          "sha256": "4454b408d2233b5b5f45d56ace6ddfcf753824f2f7cac418c7c7d8ac8ddfb41a"
+        },
+        {
+          "path": "initial-weights/seed-380.json",
+          "bytes": 307,
+          "sha256": "011b83cde26f36b05623fa09eceb6aecece7a14796e3cfbbe95ff1f90db6ce81"
+        },
+        {
+          "path": "initial-weights/seed-380.weights.h5",
+          "bytes": 178096,
+          "sha256": "5367be4d9c53199db1cee6f803534708220354f67612d4f95f12df27031ec65c"
+        },
+        {
+          "path": "kaggle-runtime.json",
+          "bytes": 1667,
+          "sha256": "719f1f18dbb122279fc9254f6583d560e436c59739004aea3fe4889b26769278"
+        },
+        {
+          "path": "kernel-completion.json",
+          "bytes": 166,
+          "sha256": "a0bc762d5c0d48fb1fd26e9569124c6056d7f45e33bd879a2679def13c150f5d"
+        },
+        {
+          "path": "pilot-report.json",
+          "bytes": 34354,
+          "sha256": "000cf09b0810a82646b739ddf031cdd3a4da76f68cc108f64174667f35267fc5"
+        },
+        {
+          "path": "plan-snapshot.json",
+          "bytes": 2647,
+          "sha256": "53ebad385f17e2836f303aacf6ba91861a517a36299d524e786fd3cc25477397"
+        },
+        {
+          "path": "selected-configuration.json",
+          "bytes": 495,
+          "sha256": "bcd3f9b877faa09a94e76ee2f95677fe73592293ec19f2f6adf11d3a0225d530"
+        },
+        {
+          "path": "source-snapshot.json",
+          "bytes": 1462,
+          "sha256": "5a2b61a7bbcf54780283daec4980923c8f338638261e4e48028488301c332edc"
+        },
+        {
+          "path": "splits.json",
+          "bytes": 13086920,
+          "sha256": "b43a14751cbe51bdcc81108d129f10ec8c08553d3f75a4b5594926c34ac8daf6"
+        },
+        {
+          "path": "students/seed-378/T10-a03/history.json",
+          "bytes": 6293,
+          "sha256": "470aea6a63011eb5d5118ee721f97f1ae3a811a5f6369fdf5b871a72d69c582a"
+        },
+        {
+          "path": "students/seed-378/T10-a03/student.keras",
+          "bytes": 187164,
+          "sha256": "42c4986d11eb2ca6cfcd95a6377ddcc1bcee7a6aa8baed28938d62c9e851a926"
+        },
+        {
+          "path": "students/seed-378/T10-a03/training-report.json",
+          "bytes": 3829,
+          "sha256": "b312cd2d5be70828c9b856af8cd3009beb572a30b810de23d436b65fc2c63744"
+        },
+        {
+          "path": "students/seed-378/T3-a03/history.json",
+          "bytes": 6306,
+          "sha256": "f6605ff028948f8b357286dc1d2a885f62990dac0d3f17f2759fb20b545c8eac"
+        },
+        {
+          "path": "students/seed-378/T3-a03/student.keras",
+          "bytes": 187164,
+          "sha256": "44dd73ea7dba8ba6b2bf331c892ba62cd1e5c2c9b877e08e7c8597bc084bc787"
+        },
+        {
+          "path": "students/seed-378/T3-a03/training-report.json",
+          "bytes": 3827,
+          "sha256": "3b306abf2012563911bfe44d8af1e7620ce18e55fc03dccb21fbf75b606d7650"
+        },
+        {
+          "path": "students/seed-378/T5-a03/history.json",
+          "bytes": 6300,
+          "sha256": "d02faae5cc1b728c9c557921ad7d8962cfd3a82a3bb193074bb90cfdaa9b7642"
+        },
+        {
+          "path": "students/seed-378/T5-a03/student.keras",
+          "bytes": 187164,
+          "sha256": "bc304c644ced2b2f038736b4c292fafc5cb335334847497744d940a62aa696bc"
+        },
+        {
+          "path": "students/seed-378/T5-a03/training-report.json",
+          "bytes": 3828,
+          "sha256": "334e85c11b731d3e1cb72248dbeced29b41a42de981f0c2d332d569d66f73786"
+        },
+        {
+          "path": "students/seed-378/T5-a05/history.json",
+          "bytes": 6315,
+          "sha256": "de0c46e7819e112bd8a29acf6bcf914100183605879ad8da65393b58f5f2b232"
+        },
+        {
+          "path": "students/seed-378/T5-a05/student.keras",
+          "bytes": 187164,
+          "sha256": "9c4b099c5515678b74f91c67e723e8f1568c47cdb6dd290c1b2e0d0abbcd6273"
+        },
+        {
+          "path": "students/seed-378/T5-a05/training-report.json",
+          "bytes": 3828,
+          "sha256": "0e938baa2b5b258debce5aa2074638837ec4d3a961394166b800ea707d5a6842"
+        },
+        {
+          "path": "students/seed-378/baseline/history.json",
+          "bytes": 5869,
+          "sha256": "ecd20e053c91dadeee40d1a6f7b42570829f64acad2d4c7f53702a12f5ca49b7"
+        },
+        {
+          "path": "students/seed-378/baseline/student.keras",
+          "bytes": 187164,
+          "sha256": "509a44fd5a8929ad6e50403a6c110da4b5beb5aae804ea7ad489e4a668dc5f95"
+        },
+        {
+          "path": "students/seed-378/baseline/training-report.json",
+          "bytes": 3640,
+          "sha256": "a0f6bc5367963b3f34b0cd3ab33927cba516f27fe5627a8e59bd157fc72b8da8"
+        },
+        {
+          "path": "students/seed-379/T5-a05/history.json",
+          "bytes": 6317,
+          "sha256": "9264985d72453564d1613c15da2869e37afbc98bffac4a8aba88b8d9127a1df3"
+        },
+        {
+          "path": "students/seed-379/T5-a05/student.keras",
+          "bytes": 187164,
+          "sha256": "a49fc6d8f96b7e9c6f976651da3e370d87a48bfe0b12701acd73230019ea4e47"
+        },
+        {
+          "path": "students/seed-379/T5-a05/training-report.json",
+          "bytes": 3829,
+          "sha256": "434f45d1375d7c77f4d4e4df7b9c8a782880821cee4c9462573496a55ab7a3be"
+        },
+        {
+          "path": "students/seed-379/baseline/history.json",
+          "bytes": 5692,
+          "sha256": "b71a5d9784765fc765c4377471270a92bba4ee4a19d3ec52699caa87870ca438"
+        },
+        {
+          "path": "students/seed-379/baseline/student.keras",
+          "bytes": 187164,
+          "sha256": "4d5be19544ea0130137b72752231884aeeb8a4c1bcf53d6d228efd82764361f7"
+        },
+        {
+          "path": "students/seed-379/baseline/training-report.json",
+          "bytes": 3639,
+          "sha256": "7a670c06120816ccab242efb3dcc5d3d8daf1e10fdc8539bab8fb50a022f3b94"
+        },
+        {
+          "path": "students/seed-380/T5-a05/history.json",
+          "bytes": 6303,
+          "sha256": "227e91eac90d6d2b4042a9c925fb12b283a03d141844613ea0b03b00d10942ce"
+        },
+        {
+          "path": "students/seed-380/T5-a05/student.keras",
+          "bytes": 187164,
+          "sha256": "83f5de84beb28846c60c7ba5e6a568dee2910fc1e045d3168bf2eec8ed8a4520"
+        },
+        {
+          "path": "students/seed-380/T5-a05/training-report.json",
+          "bytes": 3828,
+          "sha256": "f2fff58062a4c94ebaaac30616b9dd4ce6b00f1b2b3ea05a75586cd8adb7fc14"
+        },
+        {
+          "path": "students/seed-380/baseline/history.json",
+          "bytes": 5861,
+          "sha256": "27d3c633527ac89b654c09bd24933feb2ad472f01a1646f723d445efc6d282c5"
+        },
+        {
+          "path": "students/seed-380/baseline/student.keras",
+          "bytes": 187164,
+          "sha256": "da36f330c23f4b9d641b0e60cd0c67cccdb184522263bcde52feed53e25febd3"
+        },
+        {
+          "path": "students/seed-380/baseline/training-report.json",
+          "bytes": 3639,
+          "sha256": "58280a4fe58c938b48c7a7a38fd7246a65b9a31983f04b9b90a320dda6a94fd9"
+        },
+        {
+          "path": "teachers/variant-0/fine_tune-history.json",
+          "bytes": 1960,
+          "sha256": "2b261880b70b8a13638ba61f07dd6e77e40ece616d907f2f683c36cb16220742"
+        },
+        {
+          "path": "teachers/variant-0/head-history.json",
+          "bytes": 721,
+          "sha256": "7e637abcb99858abb1556eedbe9cccb7839ae17ba64ad2e73e5f4a1e6b5cc613"
+        },
+        {
+          "path": "teachers/variant-0/teacher.keras",
+          "bytes": 9843117,
+          "sha256": "2acb67a505aa922193482307b2bbdc3680dab1cf9d5cd442a111adbb09a1f73b"
+        },
+        {
+          "path": "teachers/variant-0/training-report.json",
+          "bytes": 3613,
+          "sha256": "99620c4c484f81bd1dcd7f0d7da71c4864186dbee66e6c39a41ed3d7ea912849"
+        }
+      ]
+    }
+  ]
+}

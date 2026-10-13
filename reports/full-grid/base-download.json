@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "kind": "full-grid-base-archive",
+  "url": "https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-base-evidence.zip",
+  "size_bytes": 12485913,
+  "sha256": "f4cedad875f2a0a573fa532a9c2c84490b3a3087741919c4cbc4859824b386b8",
+  "archive_prefix": "",
+  "inventory": {
+    "confirmation-report.json": {
+      "sha256": "2a5bd169de9fcc6a263725245e9d861c936a867f9214cf82ee2a4fd8d689c2b5",
+      "bytes": 29446
+    },
+    "evaluation-freeze.json": {
+      "sha256": "1db2f1ffa9f4005a8890fc0f416fb58e57a7e0bf2529053e02dfa2f2f0ee9554",
+      "bytes": 7754
+    },
+    "gpu-runtime.json": {
+      "sha256": "f5feef6ba34f103a26822a3ff13d10ad6ad35278251b6a04c8bc6c51a262d350",
+      "bytes": 1983
+    },
+    "initial-weights/seed-378.json": {
+      "sha256": "de4b34be5dd94beaa77555dcedda2cfb608b5c2798407a1c4fb827c3502b8b6f",
+      "bytes": 307
+    },
+    "initial-weights/seed-378.weights.h5": {
+      "sha256": "ea63d484ac3c4d21cda74c16270daf0113671aeead107441ae042e5e305edfe6",
+      "bytes": 178096
+    },
+    "initial-weights/seed-379.json": {
+      "sha256": "c9838b2869f8155470acd13fc557a1ba92cff068b2eec052c9c7245054a9605d",
+      "bytes": 307
+    },
+    "initial-weights/seed-379.weights.h5": {
+      "sha256": "4454b408d2233b5b5f45d56ace6ddfcf753824f2f7cac418c7c7d8ac8ddfb41a",
+      "bytes": 178096
+    },
+    "initial-weights/seed-380.json": {
+      "sha256": "011b83cde26f36b05623fa09eceb6aecece7a14796e3cfbbe95ff1f90db6ce81",
+      "bytes": 307
+    },
+    "initial-weights/seed-380.weights.h5": {
+      "sha256": "5367be4d9c53199db1cee6f803534708220354f67612d4f95f12df27031ec65c",
+      "bytes": 178096
+    },
+    "kaggle-runtime.json": {
+      "sha256": "719f1f18dbb122279fc9254f6583d560e436c59739004aea3fe4889b26769278",
+      "bytes": 1667
+    },
+    "kernel-completion.json": {
+      "sha256": "a0bc762d5c0d48fb1fd26e9569124c6056d7f45e33bd879a2679def13c150f5d",
+      "bytes": 166
+    },
+    "pilot-report.json": {
+      "sha256": "000cf09b0810a82646b739ddf031cdd3a4da76f68cc108f64174667f35267fc5",
+      "bytes": 34354
+    },
+    "plan-snapshot.json": {
+      "sha256": "53ebad385f17e2836f303aacf6ba91861a517a36299d524e786fd3cc25477397",
+      "bytes": 2647
+    },
+    "selected-configuration.json": {
+      "sha256": "bcd3f9b877faa09a94e76ee2f95677fe73592293ec19f2f6adf11d3a0225d530",
+      "bytes": 495
+    },
+    "source-snapshot.json": {
+      "sha256": "5a2b61a7bbcf54780283daec4980923c8f338638261e4e48028488301c332edc",
+      "bytes": 1462
+    },
+    "splits.json": {
+      "sha256": "b43a14751cbe51bdcc81108d129f10ec8c08553d3f75a4b5594926c34ac8daf6",
+      "bytes": 13086920
+    },
+    "students/seed-378/T10-a03/history.json": {
+      "sha256": "470aea6a63011eb5d5118ee721f97f1ae3a811a5f6369fdf5b871a72d69c582a",
+      "bytes": 6293
+    },
+    "students/seed-378/T10-a03/student.keras": {
+      "sha256": "42c4986d11eb2ca6cfcd95a6377ddcc1bcee7a6aa8baed28938d62c9e851a926",
+      "bytes": 187164
+    },
+    "students/seed-378/T10-a03/training-report.json": {
+      "sha256": "b312cd2d5be70828c9b856af8cd3009beb572a30b810de23d436b65fc2c63744",
+      "bytes": 3829
+    },
+    "students/seed-378/T3-a03/history.json": {
+      "sha256": "f6605ff028948f8b357286dc1d2a885f62990dac0d3f17f2759fb20b545c8eac",
+      "bytes": 6306
+    },
+    "students/seed-378/T3-a03/student.keras": {
+      "sha256": "44dd73ea7dba8ba6b2bf331c892ba62cd1e5c2c9b877e08e7c8597bc084bc787",
+      "bytes": 187164
+    },
+    "students/seed-378/T3-a03/training-report.json": {
+      "sha256": "3b306abf2012563911bfe44d8af1e7620ce18e55fc03dccb21fbf75b606d7650",
+      "bytes": 3827
+    },
+    "students/seed-378/T5-a03/history.json": {
+      "sha256": "d02faae5cc1b728c9c557921ad7d8962cfd3a82a3bb193074bb90cfdaa9b7642",
+      "bytes": 6300
+    },
+    "students/seed-378/T5-a03/student.keras": {
+      "sha256": "bc304c644ced2b2f038736b4c292fafc5cb335334847497744d940a62aa696bc",
+      "bytes": 187164
+    },
+    "students/seed-378/T5-a03/training-report.json": {
+      "sha256": "334e85c11b731d3e1cb72248dbeced29b41a42de981f0c2d332d569d66f73786",
+      "bytes": 3828
+    },
+    "students/seed-378/T5-a05/history.json": {
+      "sha256": "de0c46e7819e112bd8a29acf6bcf914100183605879ad8da65393b58f5f2b232",
+      "bytes": 6315
+    },
+    "students/seed-378/T5-a05/student.keras": {
+      "sha256": "9c4b099c5515678b74f91c67e723e8f1568c47cdb6dd290c1b2e0d0abbcd6273",
+      "bytes": 187164
+    },
+    "students/seed-378/T5-a05/training-report.json": {
+      "sha256": "0e938baa2b5b258debce5aa2074638837ec4d3a961394166b800ea707d5a6842",
+      "bytes": 3828
+    },
+    "students/seed-378/baseline/history.json": {
+      "sha256": "ecd20e053c91dadeee40d1a6f7b42570829f64acad2d4c7f53702a12f5ca49b7",
+      "bytes": 5869
+    },
+    "students/seed-378/baseline/student.keras": {
+      "sha256": "509a44fd5a8929ad6e50403a6c110da4b5beb5aae804ea7ad489e4a668dc5f95",
+      "bytes": 187164
+    },
+    "students/seed-378/baseline/training-report.json": {
+      "sha256": "a0f6bc5367963b3f34b0cd3ab33927cba516f27fe5627a8e59bd157fc72b8da8",
+      "bytes": 3640
+    },
+    "students/seed-379/T5-a05/history.json": {
+      "sha256": "9264985d72453564d1613c15da2869e37afbc98bffac4a8aba88b8d9127a1df3",
+      "bytes": 6317
+    },
+    "students/seed-379/T5-a05/student.keras": {
+      "sha256": "a49fc6d8f96b7e9c6f976651da3e370d87a48bfe0b12701acd73230019ea4e47",
+      "bytes": 187164
+    },
+    "students/seed-379/T5-a05/training-report.json": {
+      "sha256": "434f45d1375d7c77f4d4e4df7b9c8a782880821cee4c9462573496a55ab7a3be",
+      "bytes": 3829
+    },
+    "students/seed-379/baseline/history.json": {
+      "sha256": "b71a5d9784765fc765c4377471270a92bba4ee4a19d3ec52699caa87870ca438",
+      "bytes": 5692
+    },
+    "students/seed-379/baseline/student.keras": {
+      "sha256": "4d5be19544ea0130137b72752231884aeeb8a4c1bcf53d6d228efd82764361f7",
+      "bytes": 187164
+    },
+    "students/seed-379/baseline/training-report.json": {
+      "sha256": "7a670c06120816ccab242efb3dcc5d3d8daf1e10fdc8539bab8fb50a022f3b94",
+      "bytes": 3639
+    },
+    "students/seed-380/T5-a05/history.json": {
+      "sha256": "227e91eac90d6d2b4042a9c925fb12b283a03d141844613ea0b03b00d10942ce",
+      "bytes": 6303
+    },
+    "students/seed-380/T5-a05/student.keras": {
+      "sha256": "83f5de84beb28846c60c7ba5e6a568dee2910fc1e045d3168bf2eec8ed8a4520",
+      "bytes": 187164
+    },
+    "students/seed-380/T5-a05/training-report.json": {
+      "sha256": "f2fff58062a4c94ebaaac30616b9dd4ce6b00f1b2b3ea05a75586cd8adb7fc14",
+      "bytes": 3828
+    },
+    "students/seed-380/baseline/history.json": {
+      "sha256": "27d3c633527ac89b654c09bd24933feb2ad472f01a1646f723d445efc6d282c5",
+      "bytes": 5861
+    },
+    "students/seed-380/baseline/student.keras": {
+      "sha256": "da36f330c23f4b9d641b0e60cd0c67cccdb184522263bcde52feed53e25febd3",
+      "bytes": 187164
+    },
+    "students/seed-380/baseline/training-report.json": {
+      "sha256": "58280a4fe58c938b48c7a7a38fd7246a65b9a31983f04b9b90a320dda6a94fd9",
+      "bytes": 3639
+    },
+    "teachers/variant-0/fine_tune-history.json": {
+      "sha256": "2b261880b70b8a13638ba61f07dd6e77e40ece616d907f2f683c36cb16220742",
+      "bytes": 1960
+    },
+    "teachers/variant-0/head-history.json": {
+      "sha256": "7e637abcb99858abb1556eedbe9cccb7839ae17ba64ad2e73e5f4a1e6b5cc613",
+      "bytes": 721
+    },
+    "teachers/variant-0/teacher.keras": {
+      "sha256": "2acb67a505aa922193482307b2bbdc3680dab1cf9d5cd442a111adbb09a1f73b",
+      "bytes": 9843117
+    },
+    "teachers/variant-0/training-report.json": {
+      "sha256": "99620c4c484f81bd1dcd7f0d7da71c4864186dbee66e6c39a41ed3d7ea912849",
+      "bytes": 3613
+    }
+  },
+  "inventory_sha256": "845b0d8d713c044a6d86ac7e372d901521d38e47552382c08ad52b8158074a93"
+}

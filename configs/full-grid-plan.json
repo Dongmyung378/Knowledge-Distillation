@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "protocol": "gtsrb-full-grid-extension-v1",
+  "training_location": "kaggle_gpu_only",
+  "dataset_source": "meowmeowmeowmeowmeow/gtsrb-german-traffic-sign/versions/1",
+  "split_seed": 378,
+  "split_track_ratios": [0.7, 0.15, 0.15],
+  "seeds": [378, 379, 380],
+  "deployment_seed": 378,
+  "base_bindings": {
+    "plan_sha256": "51f5fe79cfbcaeea12fb78ce059085bc26367813209c4ab61f02de4f5aeaf969",
+    "training_freeze_sha256": "9784fe2ac7e678b8b1ad01b7b64575de3c81854246918d618ceaf1ad634dc95e",
+    "core_source_sha256": "f86d605a689be6e47c2db561a72ed1fb77a12cb487affd8c9d2440fa6093c608",
+    "manifest_sha256": "adf978947af03876338282d798bf9c179267752e8c36f71b21865031cbe7a546",
+    "artifact_inventory_sha256": "845b0d8d713c044a6d86ac7e372d901521d38e47552382c08ad52b8158074a93"
+  },
+  "environment_pins": {
+    "python": "3.12.15",
+    "gpu_name": "Tesla T4",
+    "packages": {
+      "tensorflow": "2.19.0",
+      "keras": "3.9.2",
+      "numpy": "1.26.4",
+      "h5py": "3.13.0",
+      "pandas": "2.2.3",
+      "Pillow": "11.1.0",
+      "scikit-learn": "1.6.1",
+      "matplotlib": "3.10.1",
+      "kagglehub": "0.3.10",
+      "setuptools": "75.8.0",
+      "wheel": "0.45.1",
+      "gtsrb-knowledge-distillation": "2.0.0",
+      "nvidia-cublas-cu12": "12.5.3.2",
+      "nvidia-cuda-cupti-cu12": "12.5.82",
+      "nvidia-cuda-nvcc-cu12": "12.5.82",
+      "nvidia-cuda-nvrtc-cu12": "12.5.82",
+      "nvidia-cuda-runtime-cu12": "12.5.82",
+      "nvidia-cudnn-cu12": "9.3.0.75",
+      "nvidia-cufft-cu12": "11.2.3.61",
+      "nvidia-curand-cu12": "10.3.6.82",
+      "nvidia-cusolver-cu12": "11.6.3.83",
+      "nvidia-cusparse-cu12": "12.5.1.3",
+      "nvidia-nccl-cu12": "2.23.4",
+      "nvidia-nvjitlink-cu12": "12.5.82"
+    }
+  },
+  "student_training": {
+    "max_epochs": 30,
+    "patience": 5,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "augmentation": true,
+    "deterministic": true,
+    "verbose": 2
+  },
+  "kd_candidates": [
+    {"id": "T3-a01", "temperature": 3.0, "alpha": 0.1},
+    {"id": "T3-a03", "temperature": 3.0, "alpha": 0.3},
+    {"id": "T3-a05", "temperature": 3.0, "alpha": 0.5},
+    {"id": "T5-a01", "temperature": 5.0, "alpha": 0.1},
+    {"id": "T5-a03", "temperature": 5.0, "alpha": 0.3},
+    {"id": "T5-a05", "temperature": 5.0, "alpha": 0.5},
+    {"id": "T10-a01", "temperature": 10.0, "alpha": 0.1},
+    {"id": "T10-a03", "temperature": 10.0, "alpha": 0.3},
+    {"id": "T10-a05", "temperature": 10.0, "alpha": 0.5}
+  ],
+  "diagnostic_controls": [
+    {"id": "T5-a00", "temperature": 5.0, "alpha": 0.0, "eligible_for_selection": false}
+  ],
+  "selection": {
+    "split": "validation",
+    "metric": "mean_unweighted_validation_accuracy_over_three_seeds",
+    "minimum_mean_accuracy_gain": 0.002,
+    "minimum_positive_pairs": 2,
+    "tie_break": "higher mean validation accuracy, then lower mean validation CE, then earlier declared candidate",
+    "all_grid_runs_required": true,
+    "controls_eligible_for_selection": false,
+    "final_outcomes_used_for_selection": false,
+    "seed_role": "All three seeds are development-selection repetitions, not independent confirmation seeds."
+  },
+  "reuse_policy": {
+    "teacher": "Reuse the improved experiment's exact selected MobileNetV2 artifact; do not reuse the historical notebook teacher.",
+    "baseline_seeds": [378, 379, 380],
+    "kd_runs": [
+      {"seed": 378, "id": "T3-a03"},
+      {"seed": 378, "id": "T5-a03"},
+      {"seed": 378, "id": "T10-a03"},
+      {"seed": 378, "id": "T5-a05"},
+      {"seed": 379, "id": "T5-a05"},
+      {"seed": 380, "id": "T5-a05"}
+    ],
+    "required_checks": "Immutable source, split, configuration, runtime pins, teacher, initialization, completed checkpoint and history checksums. Copy files into a new study; never write to the base run."
+  },
+  "exposure": {
+    "old_locked_holdout_results_already_public": true,
+    "historical_full_train_and_official_test_exposed": true,
+    "new_study_is_registered_after_previous_results": true,
+    "holdout_interpretation": "An extended comparison on the same previously reported evaluation set, not an untouched confirmatory benchmark.",
+    "selection_access": "Only current validation metrics enter configuration selection. No new holdout or official-test inference occurs in this runner.",
+    "preservation": "The historical notebook, four-candidate plan, previous reports and previous freezes remain unchanged."
+  },
+  "worker_policy": {
+    "maximum_workers": 2,
+    "assignment": "Round-robin over declared seed-major grid tasks followed by diagnostic controls, after removing the six imported KD runs.",
+    "effective_dtype": "float32",
+    "gpu_visibility": "The parent assigns one T4 per worker through CUDA_VISIBLE_DEVICES before Python/TensorFlow starts."
+  }
+}

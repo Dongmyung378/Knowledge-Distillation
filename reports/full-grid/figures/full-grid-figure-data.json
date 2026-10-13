@@ -1,0 +1,143 @@
+{
+  "status": "rendered_from_completed_measurements",
+  "selected_candidate_id": "T5-a01",
+  "grid_cells": 9,
+  "runs": 27,
+  "rows": [
+    {
+      "id": "T3-a01",
+      "temperature": 3,
+      "alpha": 0.1,
+      "validation_mean_percent": 85.52136818567912,
+      "validation_sample_sd_pp": 1.6411145224638095,
+      "reference_mean_percent": 86.06837606837607,
+      "reference_sample_sd_pp": 1.8976668836072417,
+      "seeds": [
+        378,
+        379,
+        380
+      ]
+    },
+    {
+      "id": "T3-a03",
+      "temperature": 3,
+      "alpha": 0.3,
+      "validation_mean_percent": 86.24501427014668,
+      "validation_sample_sd_pp": 1.9241479188835142,
+      "reference_mean_percent": 87.33333333333334,
+      "reference_sample_sd_pp": 2.708147678189719,
+      "seeds": [
+        378,
+        379,
+        380
+      ]
+    },
+    {
+      "id": "T3-a05",
+      "temperature": 3,
+      "alpha": 0.5,
+      "validation_mean_percent": 85.39031346638997,
+      "validation_sample_sd_pp": 2.3747989983221793,
+      "reference_mean_percent": 85.65242165242165,
+      "reference_sample_sd_pp": 1.7574722460244743,
+      "seeds": [
+        378,
+        379,
+        380
+      ]
+    },
+    {
+      "id": "T5-a01",
+      "temperature": 5,
+      "alpha": 0.1,
+      "validation_mean_percent": 87.07692225774129,
+      "validation_sample_sd_pp": 1.7948699848992653,
+      "reference_mean_percent": 87.80626780626781,
+      "reference_sample_sd_pp": 2.0779135433874663,
+      "seeds": [
+        378,
+        379,
+        380
+      ]
+    },
+    {
+      "id": "T5-a03",
+      "temperature": 5,
+      "alpha": 0.3,
+      "validation_mean_percent": 85.92592477798462,
+      "validation_sample_sd_pp": 1.1575214654266275,
+      "reference_mean_percent": 85.33333333333333,
+      "reference_sample_sd_pp": 2.019048741399668,
+      "seeds": [
+        378,
+        379,
+        380
+      ]
+    },
+    {
+      "id": "T5-a05",
+      "temperature": 5,
+      "alpha": 0.5,
+      "validation_mean_percent": 86.6495708624522,
+      "validation_sample_sd_pp": 2.0702816006023643,
+      "reference_mean_percent": 87.50997150997152,
+      "reference_sample_sd_pp": 2.18043105643963,
+      "seeds": [
+        378,
+        379,
+        380
+      ]
+    },
+    {
+      "id": "T10-a01",
+      "temperature": 10,
+      "alpha": 0.1,
+      "validation_mean_percent": 82.25640853246053,
+      "validation_sample_sd_pp": 3.4310481266546313,
+      "reference_mean_percent": 84.02849002849003,
+      "reference_sample_sd_pp": 3.254798413630382,
+      "seeds": [
+        378,
+        379,
+        380
+      ]
+    },
+    {
+      "id": "T10-a03",
+      "temperature": 10,
+      "alpha": 0.3,
+      "validation_mean_percent": 85.2307677268982,
+      "validation_sample_sd_pp": 1.0643684121877526,
+      "reference_mean_percent": 85.45868945868946,
+      "reference_sample_sd_pp": 1.7466316128173438,
+      "seeds": [
+        378,
+        379,
+        380
+      ]
+    },
+    {
+      "id": "T10-a05",
+      "temperature": 10,
+      "alpha": 0.5,
+      "validation_mean_percent": 86.21652324994405,
+      "validation_sample_sd_pp": 1.6560343212189506,
+      "reference_mean_percent": 86.6096866096866,
+      "reference_sample_sd_pp": 1.5831434845484116,
+      "seeds": [
+        378,
+        379,
+        380
+      ]
+    }
+  ],
+  "study_sha256": "76240878b78ab893bf179646549e18d724e57486dd8d6c7b265c1710b6ac76f5",
+  "release_sha256": "2aa286dacab5520758f8bd6380dcd8b76cba2af7cbf9234aedccd86f6dc02bfb",
+  "palette": {
+    "teacher": "#694483",
+    "baseline": "#939099",
+    "student": "#88994A",
+    "ink": "#40384C",
+    "grid": "#E4DFE9"
+  }
+}

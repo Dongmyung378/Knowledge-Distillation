@@ -10,7 +10,58 @@ A TensorFlow model-compression project for GTSRB's 43 traffic-sign classes. A Mo
 
 [Architecture](./docs/architecture.md) | [Evaluation](./docs/evaluation.md) | [CPU runtime](./docs/runtime.md) | [Kaggle training](./docs/training.md) | [Historical notebook](./notebooks/knowledge_distillation_gtsrb.ipynb)
 
-## Results and evidence
+## Complete nine-recipe extension
+
+All combinations of temperature 3, 5 and 10 with alpha 0.1, 0.3 and 0.5 were compared across three seeds. The 27 KD results comprise six imported and 21 additional runs, plus three pure-soft diagnostic controls excluded from selection. Validation selects **T5-a01**; deployment seed stays **378**.
+
+| Model | Correct / count | Accuracy | macro F1 | Balanced accuracy |
+| --- | --- | --- | --- | --- |
+| Teacher | 4,887 / 5,850 | 83.54% | 0.7465 | 0.7548 |
+| Supervised baseline | 4,303 / 5,850 | 73.56% | 0.6253 | 0.6329 |
+| Selected student, Keras | 5,013 / 5,850 | 85.69% | 0.7719 | 0.7620 |
+| Deployment student, FP32 | 5,013 / 5,850 | 85.69% | 0.7719 | 0.7620 |
+
+The three-seed mean reference accuracy gain is **+9.73 ± 2.16 pp** over matched baselines. Sample SD is not a confidence interval. All three seeds participate in development selection; the 5,850 reference images already had published outcomes. This is not an untouched independent final benchmark.
+
+![Selected model reference quality and measured CPU deployment costs](./assets/figures/knowledge-distillation-release.png)
+
+![Full validation and reference grid](./assets/figures/full-grid-comparison.png)
+
+[Full grid and reproduction](./docs/full-grid.md) | [Teacher/student and fixed-T5 controls](./docs/teacher-student-analysis.md)
+
+## Run the current saved models
+
+Windows PowerShell:
+
+```powershell
+.\launch-kd.bat doctor
+.\launch-kd.bat download --manifest reports/full-grid/artifact-download.json --output artifacts/full-grid
+.\launch-kd.bat download --manifest reports/full-grid/artifact-download.json --output artifacts/full-grid --verify-only
+.\launch-kd.bat fetch-data
+.\launch-kd.bat evaluate --model artifacts/full-grid/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/full-grid/evaluation-freeze.json --output .local/reproduced-full-grid-student
+```
+
+Linux:
+
+```bash
+bash launch-kd.sh doctor
+bash launch-kd.sh download --manifest reports/full-grid/artifact-download.json --output artifacts/full-grid
+bash launch-kd.sh download --manifest reports/full-grid/artifact-download.json --output artifacts/full-grid --verify-only
+bash launch-kd.sh fetch-data
+bash launch-kd.sh evaluate --model artifacts/full-grid/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/full-grid/evaluation-freeze.json --output .local/reproduced-full-grid-student
+```
+
+
+The new descriptor installs models under `artifacts/full-grid/models/` and starting evidence under `artifacts/full-grid/original-base-run/`. Download the [12.71 MiB (13,326,858 bytes) model bundle](https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-models.zip) and [11.91 MiB (12,485,913 bytes) original-evidence bundle](https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-base-evidence.zip). URLs, sizes and SHA hashes are declared in the descriptor; actual anonymous transfer verification remains a separate receipt.
+
+The default training entry point retains the four-candidate protocol. The nine-cell study uses separate `scripts/full_grid_study.py` and `configs/full-grid-plan.json`. The [extension guide](./docs/full-grid.md) prepares retraining on your own Kaggle account from the public starting evidence.
+
+<details>
+<summary>Preserved four-candidate study and historical notebook results</summary>
+
+The following measurements, commands and environment checks belong to the earlier study. They do not claim a completed new-model replay for this extension. The original notebook's nine-condition results remain historical evidence.
+
+### Results and evidence
 
 The seed-378 checkpoints were frozen before evaluation on the same **5,850-image** locked holdout. All paired outcomes and verification evidence are in the [measured results report](./docs/results.md).
 
@@ -35,9 +86,9 @@ Failed criteria: validation accuracy loss, CPU p50 speedup.
 The selected deployment artifact records **87.06% (5,093/5,850)** locked-holdout accuracy, **0.7903** macro F1, **0.429 / 0.456 ms** CPU p50 / p95 and **140.0 KiB (143,316 bytes)** size.
 Final outcomes do not reselect the seed, checkpoint or quantization format.
 
-![Measured holdout quality and CPU deployment costs](./assets/figures/knowledge-distillation-release.png)
+![Measured holdout quality and CPU deployment costs](./assets/figures/four-candidate-release.png)
 
-### Historical development results
+#### Historical development results
 
 | Historical measurement | Recorded value |
 | --- | ---: |
@@ -51,7 +102,7 @@ These values come from the original single-seed, nine-condition notebook. Its of
 
 The new split and selection procedure differ from the historical experiment. Old and new percentages must not be treated as a controlled before/after comparison on the same untouched evaluation population.
 
-## What the improved implementation demonstrates
+### What the improved implementation demonstrates
 
 1. **Evaluation by physical sign.** Class-stratified train, validation and locked-holdout sets keep every traffic-sign track in one split. Relative paths, class labels, track IDs, image bytes and SHA-256 hashes bind the exact inventory. Official-test inference is a separate audit after freezing.
 2. **Matched Baseline/KD controls.** Both students share the 34,406-parameter architecture, initial weights within each seed, deterministic data order, augmentation, class weights and maximum training budget. Seeds 378, 379 and 380 measure paired variation. The deployment seed is declared as 378 before final evaluation.
@@ -62,7 +113,7 @@ The new split and selection procedure differ from the historical experiment. Old
 
 These are implemented capabilities. Completed training, export and environment checks are separately identified in the release evidence rather than inferred from the presence of code.
 
-## Run without retraining
+### Run without retraining
 
 If you use a source ZIP from the portfolio project page, extract it to a writable folder and run the same commands.
 
@@ -92,7 +143,7 @@ bash launch-kd.sh predict --model artifacts/runtime/models/student-fp32.tflite -
 
 The example image is a training-collection input for checking the inference path, not a quality benchmark. The model descriptor extracts checkpoints under `artifacts/runtime/models/`; the published inventory identifies the exact filenames. The model bundle was downloaded in full without authentication from the [verified endpoint](https://park-dongmyung.com/downloads/knowledge-distillation-models-v2.zip) and matched its SHA-256 and byte count (10.83 MiB (11,353,209 bytes)). `reports/artifact-download.json` installs its exact declared inventory.
 
-### Repeat the frozen evaluation
+#### Repeat the frozen evaluation
 
 Use the published `reports/split-manifest.json` and pre-evaluation freeze. Keep the original freeze when repeating a released model's evaluation.
 
@@ -102,7 +153,7 @@ Use the published `reports/split-manifest.json` and pre-evaluation freeze. Keep 
 
 On Linux, replace `.\launch-kd.bat` with `bash launch-kd.sh`. Use a new output directory for each run. Published manifests and freeze files identify the exact model, denominator, configuration and source. Evaluation produces aggregate metrics, an all-class confusion matrix and image-ID predictions.
 
-### Run correctness tests
+#### Run correctness tests
 
 After `doctor` has prepared `.venv`:
 
@@ -117,7 +168,7 @@ CUDA_VISIBLE_DEVICES=-1 .venv/bin/python -m unittest discover -s tests -v
 
 **Runtime and saved-model verification:** Windows, Python 3.12.15: 62/63 correctness tests passed, 1 skipped, 0 failures. Full 5,850-image saved-model holdout reruns matched reference accuracy and macro F1 (`baseline` 4,303/5,850, `distilled` 5,093/5,850, `fp32` 5,093/5,850). Linux (WSL2), Python 3.12.15: 63/63 correctness tests passed, 0 skipped, 0 failures. Full 5,850-image saved-model holdout reruns matched reference accuracy and macro F1 (`baseline` 4,303/5,850, `distilled` 5,093/5,850, `fp32` 5,093/5,850). The operating-system checks use the same physical computer and are not an independent external review. Synthetic correctness checks and full saved-model evaluation are reported as separate scopes.
 
-## Training and reproduction limits
+### Training and reproduction limits
 
 Full project training runs only in a GPU-enabled Kaggle kernel. The [declared plan](./configs/experiment-plan.json) bounds teacher variants and KD candidates, separates pilot selection from paired confirmation, and freezes model, source and configuration hashes before final inference. See the [training guide](./docs/training.md) for commands and saved outputs. The original notebook is historical evidence rather than the current training entry point.
 
@@ -125,7 +176,7 @@ The locked holdout is excluded from training and selection in the new experiment
 
 Same source, model and data hashes support repeated saved-model evaluation. Hardware, drivers and floating-point implementations can affect timing and small numerical differences. Checks in another operating-system environment on the same computer are environment verification, not an independent external review. GTSRB classification is a bounded research task and does not demonstrate production road-scene perception.
 
-## Repository guide
+### Repository guide
 
 | Location | Purpose |
 | --- | --- |
@@ -138,3 +189,5 @@ Same source, model and data hashes support repeated saved-model evaluation. Hard
 | `notebooks/knowledge_distillation_gtsrb.ipynb` | Labelled historical experiment |
 
 Method references: [GTSRB dataset](https://benchmark.ini.rub.de/gtsrb_dataset.html), [knowledge distillation](https://arxiv.org/abs/1503.02531), [MobileNetV2 preprocessing](https://keras.io/api/applications/mobilenet/mobilenet_models/), [Keras transfer learning](https://keras.io/guides/transfer_learning/).
+
+</details>

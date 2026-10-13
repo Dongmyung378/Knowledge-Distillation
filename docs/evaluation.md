@@ -1,3 +1,5 @@
+> **Preserved documentation for the earlier four-candidate study.** Results, default download descriptors and training commands below belong to that study. For the current nine-cell extension use the [full-grid results and explicit reproduction commands](./full-grid.md) and [teacher/student analysis](./teacher-student-analysis.md). The launcher's original default descriptor must not be read as the new full-grid release. Original measurements and prose remain below.
+
 <div align="right"><strong>English</strong> | <a href="./evaluation.ko.md">한국어</a></div>
 
 # Evaluation protocol

@@ -1,0 +1,23 @@
+{
+  "status": "passed_frozen_model_packaging",
+  "models": 37,
+  "original_base_files": 47,
+  "artifacts": [
+    {
+      "name": "full-grid-models",
+      "kind": "zip",
+      "path": "models",
+      "url": "https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-models.zip",
+      "bytes": 13326858,
+      "sha256": "8cb31a7a87c9b10ed9bf78137add7419ef4ea1f3e8f3ca5de136f037d8c3dfd5"
+    },
+    {
+      "name": "original-base-run",
+      "kind": "zip",
+      "path": "original-base-run",
+      "url": "https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-base-evidence.zip",
+      "bytes": 12485913,
+      "sha256": "f4cedad875f2a0a573fa532a9c2c84490b3a3087741919c4cbc4859824b386b8"
+    }
+  ]
+}

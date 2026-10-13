@@ -1,0 +1,347 @@
+{
+  "status": "completed",
+  "worker_index": 1,
+  "worker_count": 2,
+  "study_snapshot_sha256": "da2efee95c81d87b6edfe72bd7c811b1fc124e08e8f61cabf1d753fb335f4604",
+  "assigned_tasks": [
+    {
+      "seed": 378,
+      "id": "T3-a05",
+      "group": "grid",
+      "temperature": 3.0,
+      "alpha": 0.5,
+      "relative_dir": "students/seed-378/T3-a05",
+      "imported": false
+    },
+    {
+      "seed": 378,
+      "id": "T10-a01",
+      "group": "grid",
+      "temperature": 10.0,
+      "alpha": 0.1,
+      "relative_dir": "students/seed-378/T10-a01",
+      "imported": false
+    },
+    {
+      "seed": 379,
+      "id": "T3-a01",
+      "group": "grid",
+      "temperature": 3.0,
+      "alpha": 0.1,
+      "relative_dir": "students/seed-379/T3-a01",
+      "imported": false
+    },
+    {
+      "seed": 379,
+      "id": "T3-a05",
+      "group": "grid",
+      "temperature": 3.0,
+      "alpha": 0.5,
+      "relative_dir": "students/seed-379/T3-a05",
+      "imported": false
+    },
+    {
+      "seed": 379,
+      "id": "T5-a03",
+      "group": "grid",
+      "temperature": 5.0,
+      "alpha": 0.3,
+      "relative_dir": "students/seed-379/T5-a03",
+      "imported": false
+    },
+    {
+      "seed": 379,
+      "id": "T10-a03",
+      "group": "grid",
+      "temperature": 10.0,
+      "alpha": 0.3,
+      "relative_dir": "students/seed-379/T10-a03",
+      "imported": false
+    },
+    {
+      "seed": 380,
+      "id": "T3-a01",
+      "group": "grid",
+      "temperature": 3.0,
+      "alpha": 0.1,
+      "relative_dir": "students/seed-380/T3-a01",
+      "imported": false
+    },
+    {
+      "seed": 380,
+      "id": "T3-a05",
+      "group": "grid",
+      "temperature": 3.0,
+      "alpha": 0.5,
+      "relative_dir": "students/seed-380/T3-a05",
+      "imported": false
+    },
+    {
+      "seed": 380,
+      "id": "T5-a03",
+      "group": "grid",
+      "temperature": 5.0,
+      "alpha": 0.3,
+      "relative_dir": "students/seed-380/T5-a03",
+      "imported": false
+    },
+    {
+      "seed": 380,
+      "id": "T10-a03",
+      "group": "grid",
+      "temperature": 10.0,
+      "alpha": 0.3,
+      "relative_dir": "students/seed-380/T10-a03",
+      "imported": false
+    },
+    {
+      "seed": 378,
+      "id": "T5-a00",
+      "group": "control",
+      "temperature": 5.0,
+      "alpha": 0.0,
+      "relative_dir": "students/seed-378/T5-a00",
+      "imported": false
+    },
+    {
+      "seed": 380,
+      "id": "T5-a00",
+      "group": "control",
+      "temperature": 5.0,
+      "alpha": 0.0,
+      "relative_dir": "students/seed-380/T5-a00",
+      "imported": false
+    }
+  ],
+  "runtime": {
+    "python": "3.12.15",
+    "packages": {
+      "tensorflow": "2.19.0",
+      "keras": "3.9.2",
+      "numpy": "1.26.4",
+      "h5py": "3.13.0",
+      "pandas": "2.2.3",
+      "Pillow": "11.1.0",
+      "scikit-learn": "1.6.1",
+      "matplotlib": "3.10.1",
+      "kagglehub": "0.3.10",
+      "setuptools": "75.8.0",
+      "wheel": "0.45.1",
+      "gtsrb-knowledge-distillation": "2.0.0",
+      "nvidia-cublas-cu12": "12.5.3.2",
+      "nvidia-cuda-cupti-cu12": "12.5.82",
+      "nvidia-cuda-nvcc-cu12": "12.5.82",
+      "nvidia-cuda-nvrtc-cu12": "12.5.82",
+      "nvidia-cuda-runtime-cu12": "12.5.82",
+      "nvidia-cudnn-cu12": "9.3.0.75",
+      "nvidia-cufft-cu12": "11.2.3.61",
+      "nvidia-curand-cu12": "10.3.6.82",
+      "nvidia-cusolver-cu12": "11.6.3.83",
+      "nvidia-cusparse-cu12": "12.5.1.3",
+      "nvidia-nccl-cu12": "2.23.4",
+      "nvidia-nvjitlink-cu12": "12.5.82"
+    },
+    "gpu_names": [
+      "Tesla T4"
+    ],
+    "tensorflow_training_device": "/GPU:0",
+    "dtype": "float32"
+  },
+  "results": [
+    {
+      "seed": 378,
+      "id": "T3-a05",
+      "group": "grid",
+      "model_path": "students/seed-378/T3-a05/student.keras",
+      "report_path": "students/seed-378/T3-a05/training-report.json",
+      "model_sha256": "0cbd5d4963ee4b0055c2b3a1c961256101d86b7a9c80f44cd0e9ceb367d181c2",
+      "report_file": {
+        "sha256": "2d18b2ffe1155dadc7c096a1e5e0a90e615df2084c67ca494f73716b406fd2fb",
+        "bytes": 3806
+      },
+      "history_file": {
+        "sha256": "ba68f9d1306c0dfe37bb22003976605746624e6f504986cb3d462fab65e5caec",
+        "bytes": 6296
+      }
+    },
+    {
+      "seed": 378,
+      "id": "T10-a01",
+      "group": "grid",
+      "model_path": "students/seed-378/T10-a01/student.keras",
+      "report_path": "students/seed-378/T10-a01/training-report.json",
+      "model_sha256": "2a61ccd1dc9d08abb71d316cc61818c49436a17ec1e8047fded83efacc796af9",
+      "report_file": {
+        "sha256": "b195658f6507dfd4848d1eb623d85b70eaf76d306618d76d3101e63e0c2a7134",
+        "bytes": 3807
+      },
+      "history_file": {
+        "sha256": "c5b61c8253fd63360415f9d47386febcadc527df876473486ecadbc31ead3927",
+        "bytes": 6305
+      }
+    },
+    {
+      "seed": 379,
+      "id": "T3-a01",
+      "group": "grid",
+      "model_path": "students/seed-379/T3-a01/student.keras",
+      "report_path": "students/seed-379/T3-a01/training-report.json",
+      "model_sha256": "aa8f350cebdd12a434b54e2d2007a2b2a7135854fd9dc427c75dd750bf29b12d",
+      "report_file": {
+        "sha256": "73640d4cc39d36187121def5edcee71c29630f07ccc58c2bb13c348b6aea12ef",
+        "bytes": 3810
+      },
+      "history_file": {
+        "sha256": "a37e9ce52d6badd05a87e650697ab90bd0cc7299a7dd3670f72ac212c70e4c39",
+        "bytes": 6305
+      }
+    },
+    {
+      "seed": 379,
+      "id": "T3-a05",
+      "group": "grid",
+      "model_path": "students/seed-379/T3-a05/student.keras",
+      "report_path": "students/seed-379/T3-a05/training-report.json",
+      "model_sha256": "1e780c1e80eb811161ef29aa237437728587f9461097db1029d02fa863b75ce7",
+      "report_file": {
+        "sha256": "f87947278139ac0f25e4edcba3396dcb46364fef321b37ebb2aac13cc2d185e2",
+        "bytes": 3805
+      },
+      "history_file": {
+        "sha256": "16fc9b5720d25289e18c65772a308014ebe294ac652c4ed19d337cbe815036e2",
+        "bytes": 6309
+      }
+    },
+    {
+      "seed": 379,
+      "id": "T5-a03",
+      "group": "grid",
+      "model_path": "students/seed-379/T5-a03/student.keras",
+      "report_path": "students/seed-379/T5-a03/training-report.json",
+      "model_sha256": "6edb3f1604201ecbecf57e3c781865f84c14c79e6fea0e0dd460e59aac22bc9e",
+      "report_file": {
+        "sha256": "4d3275c988c7ecc7c4e30a5c517164b83a0fc6b63a15ba0dbb1a36d280ee40ad",
+        "bytes": 3805
+      },
+      "history_file": {
+        "sha256": "efb1a0819c98d9220848d94329c32a831b8f0fd8428bd16f5af8a7b3167aa026",
+        "bytes": 5274
+      }
+    },
+    {
+      "seed": 379,
+      "id": "T10-a03",
+      "group": "grid",
+      "model_path": "students/seed-379/T10-a03/student.keras",
+      "report_path": "students/seed-379/T10-a03/training-report.json",
+      "model_sha256": "923a5a1423b99072ac30a39f5a204a29edbef4fdc4f9a4d12cb3c56e573db997",
+      "report_file": {
+        "sha256": "cc770c83590c00082a84d66d63f4ada38dc9d65ad5875fa449824661f9023685",
+        "bytes": 3811
+      },
+      "history_file": {
+        "sha256": "9f9aeb6e144f8a012d73b9b6d031e97519096bf7f46ed6185f5b68b39c60b297",
+        "bytes": 6304
+      }
+    },
+    {
+      "seed": 380,
+      "id": "T3-a01",
+      "group": "grid",
+      "model_path": "students/seed-380/T3-a01/student.keras",
+      "report_path": "students/seed-380/T3-a01/training-report.json",
+      "model_sha256": "8e4e829a1fc299d2849cfad1537ddf84baa2b9ca15daaac2737b6d24614f07ba",
+      "report_file": {
+        "sha256": "51896c5c8de3c26d8a69a5850cb40fd36dc6549e14b846e7137a6face902b00e",
+        "bytes": 3810
+      },
+      "history_file": {
+        "sha256": "b2027b773dfb932743d9549088c7314f524abcbbe500549788bc4d4e473f065b",
+        "bytes": 6294
+      }
+    },
+    {
+      "seed": 380,
+      "id": "T3-a05",
+      "group": "grid",
+      "model_path": "students/seed-380/T3-a05/student.keras",
+      "report_path": "students/seed-380/T3-a05/training-report.json",
+      "model_sha256": "2e950976e4b14f56c20390d4c456f2edf8267dc5bb2e9df03f4218d3146895a4",
+      "report_file": {
+        "sha256": "5b40230cd693a08e2c0d9cd4deaf0562c56fc5179cca13806201a74207828659",
+        "bytes": 3808
+      },
+      "history_file": {
+        "sha256": "8f8eb016aea6950f15cbe27d09fa5a3ccb89cfa4c6eae8497f9cbcba033689db",
+        "bytes": 6300
+      }
+    },
+    {
+      "seed": 380,
+      "id": "T5-a03",
+      "group": "grid",
+      "model_path": "students/seed-380/T5-a03/student.keras",
+      "report_path": "students/seed-380/T5-a03/training-report.json",
+      "model_sha256": "bfd82b9f67b2cdf5952f94f792ef8f1e7a796c45867321e7a2ca8ce8eb58472f",
+      "report_file": {
+        "sha256": "dccc0957a4c1e7449cee945a44db14c01d53df01b89610d782b6bd007e2e9120",
+        "bytes": 3810
+      },
+      "history_file": {
+        "sha256": "4e4bb7a6a8ccd08f352cd167dc90269f77c0cedce93b34d35bdd00e2cf126400",
+        "bytes": 6300
+      }
+    },
+    {
+      "seed": 380,
+      "id": "T10-a03",
+      "group": "grid",
+      "model_path": "students/seed-380/T10-a03/student.keras",
+      "report_path": "students/seed-380/T10-a03/training-report.json",
+      "model_sha256": "b2138160c146e76f84253fd17292b8aabda4d7157d4cd9a97107e5b68504b256",
+      "report_file": {
+        "sha256": "9f2affa4316f1d0ca3b2fc9591a2dc5bbd48441b5c7d6f2e0f8fa18b21166284",
+        "bytes": 3811
+      },
+      "history_file": {
+        "sha256": "488d945952821333442032baf50844981ba337c11aa4a37a8dab9ba7780f34cf",
+        "bytes": 6295
+      }
+    },
+    {
+      "seed": 378,
+      "id": "T5-a00",
+      "group": "control",
+      "model_path": "students/seed-378/T5-a00/student.keras",
+      "report_path": "students/seed-378/T5-a00/training-report.json",
+      "model_sha256": "159044387ea7dce34d24d46ab6f1beece561c5d03abb524ad353d772d1d14a95",
+      "report_file": {
+        "sha256": "ed55ae357af89c5c5c1ac1d69abbf502069b6c7911c1f9975808663f89e50404",
+        "bytes": 3809
+      },
+      "history_file": {
+        "sha256": "8feb167dd33e3686737588283103cb7a57c6aa910207f32a575d4c7704c4723f",
+        "bytes": 6295
+      }
+    },
+    {
+      "seed": 380,
+      "id": "T5-a00",
+      "group": "control",
+      "model_path": "students/seed-380/T5-a00/student.keras",
+      "report_path": "students/seed-380/T5-a00/training-report.json",
+      "model_sha256": "3fe98efee3890ead7095d903ca65e1ce864417be60fb007acc6679b1d4e670fc",
+      "report_file": {
+        "sha256": "718e7babfec51af55916fabc2c706be1a335be04dbd1adf392f4a6b6e8f109b3",
+        "bytes": 3808
+      },
+      "history_file": {
+        "sha256": "37dd97b754c2718d49e6fa460d5b7851bc5e949d97a94145a9e9b544b88b00a7",
+        "bytes": 6279
+      }
+    }
+  ],
+  "seconds_this_invocation": 15547.11528279,
+  "final_inference_performed": false,
+  "base_run_written": false
+}

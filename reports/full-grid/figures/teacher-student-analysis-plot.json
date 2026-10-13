@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "display_only": true,
+  "source_summary_sha256": "7f9f308e945251faa02e3328e66672d1c3dfb5e71ed2b7a9ab2a792d1137fba2",
+  "plot_script_sha256": "0ad7f7d62e9b563a35ebbbe05d13d01a346510599bc0f7bfb62f6eb28b620164",
+  "freeze_sha256": "67db9589db3cd6c812176ed9a61489d9e6cfd552a7355c4f416acbe8e252672a",
+  "data": {
+    "selected_id": "T5-a01",
+    "selected_temperature": 5,
+    "selected_alpha": 0.1,
+    "selection_origin": "Caller-provided validation-selected ID; never inferred from final accuracy.",
+    "count": 5850,
+    "physical_tracks": 195,
+    "fixed_teacher_model": "teacher",
+    "fixed_teacher_accuracy_percent": 83.53846153846153,
+    "fixed_teacher_model_sha256": "2acb67a505aa922193482307b2bbdc3680dab1cf9d5cd442a111adbb09a1f73b",
+    "selected_candidate_pairs": [
+      {
+        "seed": 378,
+        "model": "grid_T5-a01_seed_378",
+        "repairs": 465,
+        "regressions": 339,
+        "net_correct": 126,
+        "accuracy_gain_pp": 2.1538461538461537
+      },
+      {
+        "seed": 379,
+        "model": "grid_T5-a01_seed_379",
+        "repairs": 552,
+        "regressions": 183,
+        "net_correct": 369,
+        "accuracy_gain_pp": 6.3076923076923075
+      },
+      {
+        "seed": 380,
+        "model": "grid_T5-a01_seed_380",
+        "repairs": 517,
+        "regressions": 263,
+        "net_correct": 254,
+        "accuracy_gain_pp": 4.3418803418803416
+      }
+    ],
+    "T5_controls": [
+      {
+        "role": "hard_only",
+        "runs": [
+          {
+            "seed": 378,
+            "model": "baseline_seed_378",
+            "accuracy_percent": 73.55555555555556
+          },
+          {
+            "seed": 379,
+            "model": "baseline_seed_379",
+            "accuracy_percent": 80.75213675213675
+          },
+          {
+            "seed": 380,
+            "model": "baseline_seed_380",
+            "accuracy_percent": 79.93162393162393
+          }
+        ],
+        "mean_accuracy_percent": 78.07977207977208,
+        "sample_sd_accuracy_pp": 3.939506528824625
+      },
+      {
+        "role": "soft_only",
+        "runs": [
+          {
+            "seed": 378,
+            "model": "control_T5-a00_seed_378",
+            "accuracy_percent": 85.41880341880342
+          },
+          {
+            "seed": 379,
+            "model": "control_T5-a00_seed_379",
+            "accuracy_percent": 90.03418803418803
+          },
+          {
+            "seed": 380,
+            "model": "control_T5-a00_seed_380",
+            "accuracy_percent": 87.24786324786325
+          }
+        ],
+        "mean_accuracy_percent": 87.56695156695157,
+        "sample_sd_accuracy_pp": 2.3241787374288148
+      },
+      {
+        "role": "mixed_T5_a05",
+        "runs": [
+          {
+            "seed": 378,
+            "model": "grid_T5-a05_seed_378",
+            "accuracy_percent": 87.05982905982907
+          },
+          {
+            "seed": 379,
+            "model": "grid_T5-a05_seed_379",
+            "accuracy_percent": 89.88034188034189
+          },
+          {
+            "seed": 380,
+            "model": "grid_T5-a05_seed_380",
+            "accuracy_percent": 85.58974358974359
+          }
+        ],
+        "mean_accuracy_percent": 87.50997150997152,
+        "sample_sd_accuracy_pp": 2.18043105643963
+      }
+    ],
+    "errorbar_policy": "Sample SD over three student-training seeds; not confidence intervals.",
+    "alpha0_caveat": "No label CE in the training objective; validation labels still choose checkpoints and learning-rate changes.",
+    "alpha_weight_caveat": "Changing alpha also rescales KL; at T5 mixed uses 12.5*KL+.5*CE and pure-soft uses25*KL.",
+    "scope": "Previously observed evaluation collection; descriptive paired-pipeline comparison, not causal identification."
+  },
+  "files": {
+    "teacher-student-analysis.png": {
+      "bytes": 233498,
+      "sha256": "ec1a404e83ae4d816de97520bc141e47321c995ac74895e6565637856bb3f564"
+    },
+    "teacher-student-analysis.svg": {
+      "bytes": 31138,
+      "sha256": "3ab3bf601514178a556a90a0dfeb249bfac0e196ea0a6fac83136b1b1aa3210f"
+    }
+  }
+}

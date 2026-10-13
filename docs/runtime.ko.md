@@ -1,3 +1,5 @@
+> **앞선 4개 후보 연구의 보존 문서입니다.** 아래 결과, 기본 다운로드 명세와 학습 명령은 이전 연구에 해당합니다. 최신 9개 조합 연구에는 [확장 결과와 명시적 재현 명령](./full-grid.ko.md) 및 [교사와 학생 분석](./teacher-student-analysis.ko.md)을 사용하십시오. 기존 실행기의 기본 명세를 최신 전체 조합 모델로 간주하지 않습니다. 원본 수치와 설명은 아래에 유지합니다.
+
 <div align="right"><a href="./runtime.md">English</a> | <strong>한국어</strong></div>
 
 # CPU 실행 및 검증
