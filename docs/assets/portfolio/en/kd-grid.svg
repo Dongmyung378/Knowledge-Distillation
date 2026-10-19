@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="950" viewBox="0 0 1200 950" role="img" aria-labelledby="title desc" lang="en">
+<style>text{font-family:'DejaVu Sans',Arial,sans-serif!important}</style><title id="title">Repeated validation and reference evaluation of all 9 conditions</title>
+<desc id="desc">Temperatures 3, 5, 10 and hard-label weights 0.1, 0.3, 0.5 each use 3 seeds. Validation selects T5-a01; deployment retains T5-a05. Means and sample deviations are not independent-confirmation intervals.</desc>
+<style>text{font-family:'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;font-variant-numeric:tabular-nums} .axis{fill:#64696B}</style>
+<rect x="0" y="0" width="1200" height="950" fill="#F6F3F6" rx="0" stroke-width="1" />
+<text x="48" y="64" fill="#382D3D" font-size="36" font-weight="750" text-anchor="start">Repeated experiments across 9 conditions</text>
+<text x="48" y="104" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">Each cell averages seeds 378, 379, 380. The ± values are sample standard deviations, not confidence intervals.</text>
+<text x="331" y="176" fill="#382D3D" font-size="30" font-weight="750" text-anchor="middle">Validation accuracy</text>
+<text x="331" y="212" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">Mean % / sample SD pp</text>
+<text x="188" y="253" fill="#382D3D" font-size="23" font-weight="400" text-anchor="middle">α = 0.1</text>
+<text x="333" y="253" fill="#382D3D" font-size="23" font-weight="400" text-anchor="middle">α = 0.3</text>
+<text x="478" y="253" fill="#382D3D" font-size="23" font-weight="400" text-anchor="middle">α = 0.5</text>
+<text x="103" y="343" fill="#64696B" font-size="21" font-weight="400" text-anchor="end">T=3</text>
+<rect x="121" y="282" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="187.5" y="336" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">85.52</text>
+<text x="187.5" y="373" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 1.64</text>
+<rect x="266" y="282" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="332.5" y="336" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">86.25</text>
+<text x="332.5" y="373" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 1.92</text>
+<rect x="411" y="282" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="477.5" y="336" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">85.39</text>
+<text x="477.5" y="373" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 2.37</text>
+<text x="103" y="486" fill="#64696B" font-size="21" font-weight="400" text-anchor="end">T=5</text>
+<rect x="121" y="425" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#BF9556" stroke-width="4" />
+<text x="187.5" y="479" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">87.08</text>
+<text x="187.5" y="516" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 1.79</text>
+<rect x="266" y="425" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="332.5" y="479" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">85.93</text>
+<text x="332.5" y="516" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 1.16</text>
+<rect x="411" y="425" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#526D35" stroke-width="4" />
+<text x="477.5" y="479" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">86.65</text>
+<text x="477.5" y="516" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 2.07</text>
+<text x="103" y="629" fill="#64696B" font-size="21" font-weight="400" text-anchor="end">T=10</text>
+<rect x="121" y="568" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="187.5" y="622" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">82.26</text>
+<text x="187.5" y="659" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 3.43</text>
+<rect x="266" y="568" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="332.5" y="622" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">85.23</text>
+<text x="332.5" y="659" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 1.06</text>
+<rect x="411" y="568" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="477.5" y="622" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">86.22</text>
+<text x="477.5" y="659" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 1.66</text>
+<text x="898" y="176" fill="#382D3D" font-size="30" font-weight="750" text-anchor="middle">Reference accuracy</text>
+<text x="898" y="212" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">Mean % / sample SD pp</text>
+<text x="755" y="253" fill="#382D3D" font-size="23" font-weight="400" text-anchor="middle">α = 0.1</text>
+<text x="900" y="253" fill="#382D3D" font-size="23" font-weight="400" text-anchor="middle">α = 0.3</text>
+<text x="1045" y="253" fill="#382D3D" font-size="23" font-weight="400" text-anchor="middle">α = 0.5</text>
+<text x="670" y="343" fill="#64696B" font-size="21" font-weight="400" text-anchor="end">T=3</text>
+<rect x="688" y="282" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="754.5" y="336" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">86.07</text>
+<text x="754.5" y="373" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 1.90</text>
+<rect x="833" y="282" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="899.5" y="336" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">87.33</text>
+<text x="899.5" y="373" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 2.71</text>
+<rect x="978" y="282" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="1044.5" y="336" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">85.65</text>
+<text x="1044.5" y="373" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 1.76</text>
+<text x="670" y="486" fill="#64696B" font-size="21" font-weight="400" text-anchor="end">T=5</text>
+<rect x="688" y="425" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#BF9556" stroke-width="4" />
+<text x="754.5" y="479" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">87.81</text>
+<text x="754.5" y="516" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 2.08</text>
+<rect x="833" y="425" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="899.5" y="479" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">85.33</text>
+<text x="899.5" y="516" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 2.02</text>
+<rect x="978" y="425" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#526D35" stroke-width="4" />
+<text x="1044.5" y="479" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">87.51</text>
+<text x="1044.5" y="516" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 2.18</text>
+<text x="670" y="629" fill="#64696B" font-size="21" font-weight="400" text-anchor="end">T=10</text>
+<rect x="688" y="568" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="754.5" y="622" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">84.03</text>
+<text x="754.5" y="659" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 3.25</text>
+<rect x="833" y="568" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="899.5" y="622" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">85.46</text>
+<text x="899.5" y="659" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 1.75</text>
+<rect x="978" y="568" width="133" height="127" fill="#FFFFFF" rx="13" stroke="#DED8DF" stroke-width="1" />
+<text x="1044.5" y="622" fill="#382D3D" font-size="32" font-weight="750" text-anchor="middle">86.61</text>
+<text x="1044.5" y="659" fill="#64696B" font-size="23" font-weight="400" text-anchor="middle">± 1.58</text>
+<rect x="119" y="750" width="20" height="20" fill="#BF9556" rx="4" stroke-width="1" />
+<text x="151" y="770" fill="#382D3D" font-size="24" font-weight="700" text-anchor="start">T5-a01: validation-selected</text>
+<rect x="675" y="750" width="20" height="20" fill="#526D35" rx="4" stroke-width="1" />
+<text x="707" y="770" fill="#382D3D" font-size="24" font-weight="700" text-anchor="start">T5-a05: retained deployment</text>
+<text x="48" y="829" fill="#64696B" font-size="21" font-weight="400" text-anchor="start">T is distillation temperature; α weights hard-label loss. Reference results did not select the setting.</text>
+<text x="48" y="861" fill="#64696B" font-size="21" font-weight="400" text-anchor="start">Deployment retention is a later decision considering observed results and continuity of the public model.</text>
+<text x="48" y="919" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">Reference set: the same 5,850 images. Repeated development seeds, not independent final confirmation.</text>
+<metadata>{"project_id": "project-02", "visual_data_sha256": "c897dbe3fbcd453d1f2ad93f960aa9e6269991f04af71ef6f46d9e292ff3ec17", "generated_from_published_measurements": true}</metadata>
+</svg>

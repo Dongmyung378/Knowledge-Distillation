@@ -29,7 +29,7 @@ GTSRB의 43개 교통 표지판 클래스를 분류하는 TensorFlow 모델 경�
 
 연구는 세 시드의 검증 정확도 평균으로 설정을 선택하고 시드 378은 사전에 고정했습니다. 새 설정의 참고 정확도 평균이 0.30%p 높다는 사실만으로 확실한 배포 개선을 입증하지는 않으며, 고정된 시드 378의 체크포인트는 기존보다 1.37%p 낮습니다. 기존 모델 유지는 배포의 연속성과 관찰된 참고 성능을 고려한 결정입니다. 이미 확인한 결과를 고려한 후속 배포 결정이라는 점을 공개하며, 연구의 선택 결과를 바꾸거나 미사용 평가로 표현하지 않습니다. 정책은 [`reports/deployment/deployment-policy.json`](./reports/deployment/deployment-policy.json)에 기록합니다.
 
-![유지한 T5-a05 대표 모델의 성능과 해당 모델의 CPU 배포 비용](./assets/figures/knowledge-distillation-release.png)
+![유지한 T5-a05 대표 모델의 성능과 해당 모델의 CPU 배포 비용](./assets/figures/ko/knowledge-distillation-release.png)
 
 ## 프로젝트 전체 결과와 교사 및 학생 분석 결론
 
@@ -39,7 +39,7 @@ GTSRB의 43개 교통 표지판 클래스를 분류하는 TensorFlow 모델 경�
 
 이 프로젝트는 동일 조건의 실험 설계, 모델 경량화, 오류 분석, CPU 벤치마크와 파일 검증 역량을 보여줍니다. **INT8은 두 연구의 변환 모두에서 큰 검증 정확도 감소와 속도 기준 미달을 확인해 배포에서 제외**했습니다. 최초 9개 조합 노트북, 두 통제 실험, 실패한 변환과 동결된 근거도 보존합니다.
 
-![개발 시드 3개에서 비교한 전체 9개 설정, 검증 선택은 T5-a01 유지](./assets/figures/full-grid-comparison.png)
+![개발 시드 3개에서 비교한 전체 9개 설정, 검증 선택은 T5-a01 유지](./assets/figures/ko/full-grid-comparison.png)
 
 전체 조합의 세 시드는 모두 개발 선택에 참여했습니다. 참고 평가 결과는 이미 공개됐고 공식 테스트는 과거에 모델 선택에 사용됐습니다. 이 결과는 제한된 교통 표지판 분류 비교를 뒷받침하며 실제 도로 환경의 신뢰성을 입증하지 않습니다.
 
@@ -99,7 +99,7 @@ CPU 측정 환경: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (Microsoft Win
 선택한 배포 파일의 최종 평가 정확도는 **87.06% (5,093/5,850)**, macro F1은 **0.7903**, CPU p50 / p95는 **0.429 / 0.456 ms**, 크기는 **140.0 KiB (143,316 bytes)**입니다.
 최종 평가 결과로 시드, 체크포인트 또는 양자화 채택 여부를 다시 정하지 않습니다.
 
-![최종 평가와 CPU 배포 비용의 실측 비교](./assets/figures/four-candidate-release.png)
+![최종 평가와 CPU 배포 비용의 실측 비교](./assets/figures/ko/four-candidate-release.png)
 
 #### 최초 개발 결과
 

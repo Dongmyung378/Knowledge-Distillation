@@ -39,7 +39,7 @@ T5-a01의 참고 정확도 평균은 개발 시드 3개에서 0.30%p 높습니�
 
 T5-a05의 세 시드 참고 정확도는 **87.51% ± 2.18%p**, 대응한 독립 학습 기준은 **78.08% ± 3.94%p**입니다. 대응 차이는 평균 **+9.43%p ± 3.93%p**입니다. 평균과 표본 표준편차이며 신뢰구간이나 교사 시드의 변동이 아닙니다.
 
-![유지한 대표 모델과 해당 모델의 기존 CPU 측정](../assets/figures/knowledge-distillation-release.png)
+![유지한 대표 모델과 해당 모델의 기존 CPU 측정](../assets/figures/ko/knowledge-distillation-release.png)
 
 ## 학생이 교사보다 높은 성능을 보인 이유
 

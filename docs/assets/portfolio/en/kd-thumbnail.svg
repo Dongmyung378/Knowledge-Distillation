@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc" lang="en">
+<style>text{font-family:'DejaVu Sans',Arial,sans-serif!important}</style><title id="title">Knowledge distillation for compact models</title>
+<desc id="desc">Teacher probability distributions supervise a compact student. The representative student has 87.06% reference accuracy and approximately 98.5% fewer parameters.</desc>
+<style>text{font-family:'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;font-variant-numeric:tabular-nums} .axis{fill:#64696B}</style>
+<rect x="0" y="0" width="1200" height="760" fill="#F6F3F6" rx="0" stroke-width="1" />
+<text x="56" y="84" fill="#382D3D" font-size="47" font-weight="750" text-anchor="start">Knowledge distillation for compact models</text>
+<text x="56" y="136" fill="#64696B" font-size="32" font-weight="400" text-anchor="start">Compact traffic-sign recognition</text>
+<rect x="55" y="192" width="470" height="380" fill="#FFFFFF" rx="20" stroke="#DDDDE0" stroke-width="1" />
+<text x="84" y="246" fill="#74506E" font-size="37" font-weight="750" text-anchor="start">Teacher model</text>
+<circle cx="118" cy="316" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="197" cy="316" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="276" cy="316" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="355" cy="316" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="434" cy="316" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="118" cy="380" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="197" cy="380" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="276" cy="380" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="355" cy="380" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="434" cy="380" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="118" cy="444" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="197" cy="444" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="276" cy="444" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="355" cy="444" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<circle cx="434" cy="444" r="20" fill="#74506E" stroke-width="1" opacity="0.9" />
+<text x="84" y="531" fill="#382D3D" font-size="31" font-weight="700" text-anchor="start">2,313,067 parameters</text>
+<line x1="545" y1="366" x2="672" y2="366" stroke="#74506E" stroke-width="6" />
+<path d="M656.692,373.394 L672.000,366.000 L656.692,358.606" fill="none" stroke="#74506E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+<text x="608" y="326" fill="#382D3D" font-size="33" font-weight="700" text-anchor="middle">Distillation</text>
+<rect x="694" y="243" width="451" height="278" fill="#FFFFFF" rx="20" stroke="#DDDDE0" stroke-width="1" />
+<text x="723" y="298" fill="#526D35" font-size="37" font-weight="750" text-anchor="start">Representative student</text>
+<circle cx="776" cy="360" r="20" fill="#526D35" stroke-width="1" />
+<circle cx="871" cy="360" r="20" fill="#526D35" stroke-width="1" />
+<circle cx="966" cy="360" r="20" fill="#526D35" stroke-width="1" />
+<text x="723" y="466" fill="#382D3D" font-size="32" font-weight="700" text-anchor="start">34,406 parameters</text>
+<rect x="55" y="617" width="1090" height="105" fill="#526D35" rx="18" stroke-width="1" />
+<text x="84" y="661" fill="#FFFFFF" font-size="35" font-weight="750" text-anchor="start">Approximately 98.5% fewer parameters</text>
+<text x="84" y="704" fill="#E9EFDF" font-size="29" font-weight="400" text-anchor="start">Representative T5-a05 / FP32</text>
+<text x="1109" y="687" fill="#FFFFFF" font-size="64" font-weight="750" text-anchor="end">87.06%</text>
+<metadata>{"project_id": "project-02", "visual_data_sha256": "c897dbe3fbcd453d1f2ad93f960aa9e6269991f04af71ef6f46d9e292ff3ec17", "generated_from_published_measurements": true}</metadata>
+</svg>

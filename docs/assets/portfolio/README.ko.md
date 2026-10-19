@@ -8,6 +8,7 @@
 
 ```bash
 python docs/assets/portfolio/render_visuals.py --input docs/assets/portfolio/visual-data.json --output docs/assets/portfolio
+python scripts/localize_public_figures.py --png
 ```
 
 `visual-receipt.json`은 SVG 파일의 바이트 수와 체크섬을 표시용 데이터에 연결합니다. 소스 다운로드 ZIP에도 사이트와 같은 시각 자료를 포함합니다. 처리 흐름도는 구현한 단계를 설명하며 새로운 성능 측정값이 아닙니다.
@@ -19,3 +20,5 @@ python docs/assets/portfolio/render_visuals.py --input docs/assets/portfolio/vis
 - [kd-costs.svg](kd-costs.svg)
 - [kd-grid.svg](kd-grid.svg)
 - [kd-errors.svg](kd-errors.svg)
+
+번역 명령은 공개 SVG의 문구를 번역하고 로컬 Chrome/Chromium으로 한국어 그래프 PNG를 저장합니다. 그래프 형상과 수치를 유지하며 네트워크나 모델을 사용하지 않습니다. `docs/figure-localization.json`에 근거를 기록합니다. Chrome을 자동으로 찾지 못하면 `--chrome 경로`를 지정합니다. 원본 영어 과학 그래프와 한국어 포트폴리오 SVG는 그대로 보존합니다.

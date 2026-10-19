@@ -30,11 +30,11 @@
 
 굵게 표시한 설정은 검증으로 선택했습니다. 각 값은 시드 378, 379, 380의 평균과 표본 표준편차입니다. 표준편차는 신뢰구간이 아니며 교사 학습 시드의 변동도 측정하지 않습니다.
 
-![전체 조합의 검증 및 참고 평가 비교](../assets/figures/full-grid-comparison.png)
+![전체 조합의 검증 및 참고 평가 비교](../assets/figures/ko/full-grid-comparison.png)
 
 ## 연구 선택 모델과 대응 차이
 
-![선택 모델의 참고 평가와 실제 CPU 배포 비용](../assets/figures/full-grid-release.png)
+![선택 모델의 참고 평가와 실제 CPU 배포 비용](../assets/figures/ko/full-grid-release.png)
 
 | 모델 | 정답 / 평가 | 정확도 | macro F1 | Balanced accuracy |
 | --- | --- | --- | --- | --- |

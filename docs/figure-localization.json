@@ -1,0 +1,102 @@
+{
+  "scope": "Language-only derivatives of published figures; no experiment, model, data split or selection is changed. Original numeric shapes and palettes are retained.",
+  "source_hash_policy": "SHA-256 of source SVG bytes with CRLF normalized to LF, matching published Git text. Source files are never rewritten.",
+  "generator_sha256": "167fb5c1bafacb305f771975678e8d110b958f33bafbe6b0db7d9d7ce46da211",
+  "files": [
+    {
+      "source": "assets/figures/knowledge-distillation-release.svg",
+      "target": "assets/figures/ko/knowledge-distillation-release.svg",
+      "language": "ko",
+      "source_sha256": "6e5af3953436c7803b198d0d02a793af6a11a094a129f1855fba1733effe9401",
+      "svg_sha256": "88eb4a1b9a70d60b988d508346aadb59c6b48a91d9e430674af5c9008c70518f",
+      "png_sha256": "cc2551d0e30733a784073d5e46ad350b5f7dc044be1304bfa46260a774dcc396",
+      "png_size": [
+        3001,
+        1769
+      ]
+    },
+    {
+      "source": "assets/figures/four-candidate-release.svg",
+      "target": "assets/figures/ko/four-candidate-release.svg",
+      "language": "ko",
+      "source_sha256": "d6153b6e9508e923f45cc7174536ad5db3b7a82120a048d04d01cce5cffe6b48",
+      "svg_sha256": "7c3ef3a5509405eff866f213e6163f2d7028cdd85e70838e71ed7212585dd437",
+      "png_sha256": "718d0ebbd82d1910b755b79ded56ea48d5b15c99b592716aa6355dff7a333176",
+      "png_size": [
+        3001,
+        1769
+      ]
+    },
+    {
+      "source": "assets/figures/full-grid-comparison.svg",
+      "target": "assets/figures/ko/full-grid-comparison.svg",
+      "language": "ko",
+      "source_sha256": "cf62105448e92350843325f56fc1835e38741a99f32d7e316ee785d02cae326f",
+      "svg_sha256": "747ce998938658666f3787ad8b821f1510661e86c901ad84e2c7ebfc83ef6ec5",
+      "png_sha256": "8a122a4a4bcc4451836a33551269076fa0e4c1a1020d51bf7ffacb2d211bad09",
+      "png_size": [
+        2700,
+        1440
+      ]
+    },
+    {
+      "source": "assets/figures/full-grid-release.svg",
+      "target": "assets/figures/ko/full-grid-release.svg",
+      "language": "ko",
+      "source_sha256": "d1815350df109b102acdd301efe5a0b626adecd8d17a4f04c3514dcd54f5107b",
+      "svg_sha256": "fa9dc5fdf1cdc409a852a24259aa8f2f8c6cea9c66510808bcc0636732498e66",
+      "png_sha256": "b056847fc2b040c7d59f60ef74854ba810eedb7062d0c235bda9141bbf42175d",
+      "png_size": [
+        3001,
+        1769
+      ]
+    },
+    {
+      "source": "assets/figures/teacher-student-analysis.svg",
+      "target": "assets/figures/ko/teacher-student-analysis.svg",
+      "language": "ko",
+      "source_sha256": "e89a8eb4901ac21fec9fd17861acf56bb6b9ed782835e0b64155c4dab3904f95",
+      "svg_sha256": "daecc24c247ebf54b857fac0c275e4cb8ec3fcf8f03a1f72c451c396222adc53",
+      "png_sha256": "5bd40c7cfb5461c7be57d2cf5ec1724b050ce8d0d4115438fb15ed312665f82c",
+      "png_size": [
+        2747,
+        1275
+      ]
+    },
+    {
+      "source": "docs/assets/portfolio/kd-thumbnail.svg",
+      "target": "docs/assets/portfolio/en/kd-thumbnail.svg",
+      "language": "en",
+      "source_sha256": "8e78ef87ce704567551a6ee0ec39631a259e9ca4e4ed014423881ab77e7377cf",
+      "svg_sha256": "1b680959342e5e008d6d086a2061c67688dd0e0460403a626ad93137afe8c299"
+    },
+    {
+      "source": "docs/assets/portfolio/kd-results.svg",
+      "target": "docs/assets/portfolio/en/kd-results.svg",
+      "language": "en",
+      "source_sha256": "05bb06c4d4bd0ff5bd95cc3d85aafd547eb70bd39d34d30bda01568b8b570a88",
+      "svg_sha256": "2415e83107472bced53802465ea13d74c03c1f8d6ef1f969142a37eb3f95256c"
+    },
+    {
+      "source": "docs/assets/portfolio/kd-costs.svg",
+      "target": "docs/assets/portfolio/en/kd-costs.svg",
+      "language": "en",
+      "source_sha256": "147a1164c454104e149e50cf8be3111d986e33d71f9bc52db634e47d034ab287",
+      "svg_sha256": "8bd3e466f7ec616167319c42ff8260d0b3ba5218265b7eaffd1dac07336e8c48"
+    },
+    {
+      "source": "docs/assets/portfolio/kd-grid.svg",
+      "target": "docs/assets/portfolio/en/kd-grid.svg",
+      "language": "en",
+      "source_sha256": "5f846d3804f7ce288071d19e9f41d09b6929caec193a208414573ecd47c36a1b",
+      "svg_sha256": "7a2c64981703d92cfac5ff37faef3905d0cae845e1051ed5b9b99df74438c639"
+    },
+    {
+      "source": "docs/assets/portfolio/kd-errors.svg",
+      "target": "docs/assets/portfolio/en/kd-errors.svg",
+      "language": "en",
+      "source_sha256": "2eef90e13c289fca8bc75f2c55b58f74fd83f5706447a4ffc6dbab4ddb359522",
+      "svg_sha256": "e135e650dbb445bd37d5e44bf645121ce89f5f68ef7da2747e488cfa16f3d26b"
+    }
+  ]
+}

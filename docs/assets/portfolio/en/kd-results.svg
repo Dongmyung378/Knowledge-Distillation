@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="765" viewBox="0 0 1200 765" role="img" aria-labelledby="title desc" lang="en">
+<style>text{font-family:'DejaVu Sans',Arial,sans-serif!important}</style><title id="title">Representative deployment and retained study results</title>
+<desc id="desc">On the same 5850 reference images: teacher 83.54%, hard-label student 73.56%, representative distilled student 87.06%, and the study-selected student 85.69%. Deployment retention and research selection have distinct roles.</desc>
+<style>text{font-family:'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;font-variant-numeric:tabular-nums} .axis{fill:#64696B}</style>
+<rect x="0" y="0" width="1200" height="765" fill="#F6F3F6" rx="0" stroke-width="1" />
+<text x="48" y="64" fill="#382D3D" font-size="36" font-weight="750" text-anchor="start">Representative deployment and extended study</text>
+<text x="48" y="104" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">Same 5,850 reference images. Deployment: T5-a05. Validation selection among 9 conditions: T5-a01.</text>
+<line x1="390.0" y1="171" x2="390.0" y2="625" stroke="#DDDDE0" stroke-width="1" />
+<text x="390.0" y="658" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">0</text>
+<line x1="502.2" y1="171" x2="502.2" y2="625" stroke="#DDDDE0" stroke-width="1" />
+<text x="502.2" y="658" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">20</text>
+<line x1="614.4" y1="171" x2="614.4" y2="625" stroke="#DDDDE0" stroke-width="1" />
+<text x="614.4" y="658" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">40</text>
+<line x1="726.5999999999999" y1="171" x2="726.5999999999999" y2="625" stroke="#DDDDE0" stroke-width="1" />
+<text x="726.5999999999999" y="658" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">60</text>
+<line x1="838.8" y1="171" x2="838.8" y2="625" stroke="#DDDDE0" stroke-width="1" />
+<text x="838.8" y="658" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">80</text>
+<line x1="951.0" y1="171" x2="951.0" y2="625" stroke="#DDDDE0" stroke-width="1" />
+<text x="951.0" y="658" fill="#64696B" font-size="21" font-weight="400" text-anchor="middle">100</text>
+<text x="48" y="212" fill="#382D3D" font-size="27" font-weight="700" text-anchor="start">Teacher model</text>
+<text x="48" y="249" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">MobileNetV2</text>
+<rect x="390" y="184" width="468.6507692307692" height="46" fill="#74506E" rx="8" stroke-width="1" />
+<text x="982" y="216" fill="#74506E" font-size="31" font-weight="750" text-anchor="start">83.54%</text>
+<text x="982" y="256" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">4,887 / 5,850</text>
+<text x="48" y="325" fill="#382D3D" font-size="27" font-weight="700" text-anchor="start">Hard-label student</text>
+<text x="48" y="362" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">Same architecture / hard labels only</text>
+<rect x="390" y="297" width="412.64666666666665" height="46" fill="#AAA1A8" rx="8" stroke-width="1" />
+<text x="982" y="329" fill="#AAA1A8" font-size="31" font-weight="750" text-anchor="start">73.56%</text>
+<text x="982" y="369" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">4,303 / 5,850</text>
+<text x="48" y="438" fill="#382D3D" font-size="27" font-weight="700" text-anchor="start">Representative KD</text>
+<text x="48" y="475" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">T5-a05 / retained deployment</text>
+<rect x="390" y="410" width="488.4056410256411" height="46" fill="#526D35" rx="8" stroke-width="1" />
+<text x="982" y="442" fill="#526D35" font-size="31" font-weight="750" text-anchor="start">87.06%</text>
+<text x="982" y="482" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">5,093 / 5,850</text>
+<text x="48" y="551" fill="#382D3D" font-size="27" font-weight="700" text-anchor="start">Fixed study student</text>
+<text x="48" y="588" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">T5-a01 / retained study selection</text>
+<rect x="390" y="523" width="480.7338461538461" height="46" fill="#BF9556" rx="8" stroke-width="1" />
+<text x="982" y="555" fill="#BF9556" font-size="31" font-weight="750" text-anchor="start">85.69%</text>
+<text x="982" y="595" fill="#64696B" font-size="22" font-weight="400" text-anchor="start">5,013 / 5,850</text>
+<text x="1138" y="660" fill="#64696B" font-size="22" font-weight="400" text-anchor="end">Accuracy (%)</text>
+<text x="48" y="734" fill="#64696B" font-size="20" font-weight="400" text-anchor="start">Reference outcomes were already observed. Retention is an operational decision; study selection is unchanged.</text>
+<metadata>{"project_id": "project-02", "visual_data_sha256": "c897dbe3fbcd453d1f2ad93f960aa9e6269991f04af71ef6f46d9e292ff3ec17", "generated_from_published_measurements": true}</metadata>
+</svg>
