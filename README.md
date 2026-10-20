@@ -4,11 +4,30 @@
 
 # Knowledge Distillation for Traffic Sign Recognition
 
+Given a cropped traffic-sign image, the model predicts which sign category it belongs to. The project asks whether a small model can learn from a larger model while retaining useful recognition quality and reducing the memory and CPU time needed to run it. It classifies an image already containing a sign; it does not locate signs in a full road scene.
+
 A TensorFlow model-compression project for GTSRB's 43 traffic-sign classes. A MobileNetV2 teacher guides a compact CNN with **34,406 parameters**. Matched supervised baselines, a complete nine-recipe study and pure-soft controls distinguish measured training effects from deployment decisions.
 
 **Original development period: February-April 2026.** Later engineering improvements retain this period and add controlled experiments, CPU deployment measurements and reproducible saved-model evaluation.
 
 [Deployment and project outcome](./docs/deployment.md) | [Complete nine-recipe study](./docs/full-grid.md) | [Why students outperform the teacher](./docs/teacher-student-analysis.md) | [Architecture](./docs/architecture.md) | [Historical notebook](./notebooks/knowledge_distillation_gtsrb.ipynb)
+
+## Understanding the experiment
+
+| Term used in the results | Meaning here |
+| --- | --- |
+| Teacher, student and distillation | The larger teacher supplies probabilities for the sign classes. The smaller student learns from that distribution rather than merely copying the teacher's single predicted class. |
+| Matched supervised baseline | The same small student architecture learns from the correct labels without the teacher's guidance. Shared starting conditions make it a more useful comparison for the effect of the training procedure. |
+| Temperature and alpha | Temperature softens the teacher/student probability distributions used for distillation. Alpha sets the coefficient of the correct-label loss relative to the teacher-matching loss; it is not a measured fraction of the resulting gradient. |
+| Seed and paired seeds | A seed controls pseudorandom choices such as initial weights and data order. The three seeds repeat training under different starting conditions, with baseline and distilled models matched within each seed. They are not three datasets. |
+| Validation and reference evaluation | Validation guides recipe and checkpoint selection. The reference set reports the chosen models' outcomes afterward; its previously observed status and limits are retained below. |
+| FP32 TFLite and INT8 | TFLite is the saved format used by the lightweight inference runtime. FP32 retains floating-point parameters; INT8 quantization reduces numerical precision to seek a smaller, faster artifact, which must be checked for quality loss. |
+
+A physical-sign track groups photographs of the same sign; keeping a track in one split prevents those related photographs from crossing the evaluation boundary. An epoch is a pass through the training data, and a checkpoint stores model weights at a point during training.
+
+The recipe label T5-a05 means temperature 5 with alpha 0.5; T5-a01 uses alpha 0.1. The experiment-selected recipe and the model offered for deployment are described separately so their different decisions remain visible.
+
+**Reading the tables:** accuracy counts correct images. For each class, precision asks how often a prediction of that class is correct, and recall asks how many actual examples of that class were found. Macro F1 balances these two measures and gives every class equal weight; balanced accuracy averages class recall. A percentage-point gain is a direct subtraction of percentages. The ± sample SD describes variability across training seeds, not a confidence interval. CPU p50 is median latency, while p95 describes the slower end of the measured requests. Parameter count, file size and runtime measure different deployment costs.
 
 ## Representative deployment: retain the released 87.06% model
 

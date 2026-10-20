@@ -2,6 +2,10 @@
 
 # Complete temperature/alpha grid across three development seeds
 
+This study compares ways of teaching the same small traffic-sign classifier with a larger teacher. A **recipe** is one temperature/alpha combination: temperature controls how soft the class probabilities are during teaching, and alpha controls the coefficient of learning from the correct label. **Three seeds** means training repetitions with different pseudorandom starting values, while matching the baseline and student within each repetition.
+
+In the objective below, CE is cross-entropy, which penalizes assigning too little probability to the correct class. KL measures disagreement between teacher and student distributions. A pure-soft control uses only the teacher-matching part in the student's objective, helping test explanations for the observed results. The teacher and model-selection process still use labels.
+
 All nine combinations of temperature 3, 5 and 10 with hard-label loss mixing coefficient alpha 0.1, 0.3 and 0.5 were trained for seeds 378, 379 and 380. Six completed KD runs were reused and 21 were added. The exact teacher, three supervised baselines and shared initialization files were verified before reuse. Three `T5-a00` pure-soft diagnostic controls are excluded from recipe selection.
 
 The objective is `alpha * weighted_CE + (1-alpha) * T^2 * KL(teacher || student)`. Alpha is a hard-label loss mixing coefficient. Class weights and temperature-squared scaling affect term magnitudes; alpha 0.5 does not establish 50% of the realized loss or gradient.

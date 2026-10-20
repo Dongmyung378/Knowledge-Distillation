@@ -2,6 +2,8 @@
 
 # Teacher/student error differences and fixed-T5 controls
 
+The question is why a smaller student can classify more reference images correctly than its teacher. Distillation teaches the student from the teacher's full probability distribution, not a rule requiring it to repeat the teacher's top choice. This report compares their saved predictions and matched training controls to separate observed error changes from plausible explanations. CE means learning from the correct label, KL means matching a probability distribution, and BN means batch normalization, a layer whose training policy can affect model behavior.
+
 ## Current deployment and supported conclusion
 
 The representative deployment retains **T5-a05, seed 378**: **87.06% (5,093/5,850)** accuracy, **0.7903** macro F1 and **0.7817** balanced accuracy. The complete nine-recipe experiment still selects **T5-a01** by mean validation accuracy. Neither the study's frozen reports nor its selection has been rewritten. The detailed T5-a01 error analysis below remains labelled as the study-selected model.

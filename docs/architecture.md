@@ -2,6 +2,8 @@
 
 # Architecture
 
+The runtime takes a cropped sign image and predicts a sign class. Training additionally uses a larger teacher to guide a smaller student with its class-probability distribution. The supervised baseline uses the same small architecture without teacher guidance. A seed fixes pseudorandom starting choices so the two small-model training paths can be matched. Model export then packages the saved student for CPU inference; exporting, evaluating accuracy and measuring latency are separate steps.
+
 The project compares a MobileNetV2 teacher, an independently trained compact student and a distilled student on GTSRB's 43 classes. Baseline and distilled students share the same 34,406-parameter architecture. Their inference graphs are the same; distillation changes the training objective, not the deployment model.
 
 ## Input and model boundary

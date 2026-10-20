@@ -8,6 +8,12 @@ Measured results with supplied saved-model reproduction and anonymous-delivery r
 
 The improved experiment evaluates a fixed 34,406-parameter student against a matched independently trained student and an ImageNet-initialized MobileNetV2 teacher. Current model selection uses a class-stratified, physical-sign-track validation split. Model, configuration, source and data hashes are frozen before locked-holdout inference. The declared deployment seed is 378.
 
+## Reading the controls and metrics
+
+The teacher is the larger source of class probabilities. The baseline and distilled candidate share the smaller architecture; only the latter learns from the teacher as part of its objective. A seed identifies repeatable pseudorandom starting choices. Matching baseline and distilled runs within each seed lets their difference be compared before averaging across repetitions. Sample SD after ± describes the spread of those repetitions, not a confidence interval.
+
+Precision asks how often a predicted sign class is correct, and recall asks how many actual images of that class were found. Macro F1 balances these measures within each class and gives every class equal weight. Percentage-point gains subtract accuracies directly. CPU p50 is median latency and p95 summarizes slower calls; parameter reduction alone is not a speedup measurement. FP32 TFLite is a saved floating-point inference artifact, whereas INT8 is a lower-precision conversion evaluated for its own accuracy and runtime costs. The broader [experiment guide](full-grid.md) explains the recipe labels and the separate deployment decision.
+
 ## Locked-holdout quality
 
 All rows below use the same **5,850 images** and the same record inventory. Accuracy is correct predictions divided by evaluated images; macro F1 averages all 43 classes and uses the 0-1 scale.
