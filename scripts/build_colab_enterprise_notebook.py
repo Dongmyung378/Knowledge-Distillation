@@ -1,9 +1,22 @@
-"""Build a self-contained Google Cloud Colab Enterprise (L4) one-shot Jupyter notebook.
+"""Build a clean, self-contained One-Shot Verification & L4 Reproduction Notebook.
 
-The generated notebook embeds a SHA-256-verified ``tar.gz`` snapshot of ``seg_kd/``,
-``configs/l4-plan.json``, ``scripts/run_l4_study.py``, ``tests/``, ``pyproject.toml``,
-and ``requirements-l4.txt`` so users can upload ONLY the single ``.ipynb`` file to
-Vertex AI Colab Enterprise and click **Run All** without Google Drive or Git setup.
+The generated notebook (``notebooks/colab_enterprise_l4_one_shot.ipynb``) embeds a
+SHA-256-verified ``tar.gz`` snapshot of ``seg_kd/``, ``configs/l4-plan.json``,
+``scripts/run_l4_study.py``, ``scripts/verify_release_models.py``, ``tests/``, and the
+frozen ``reports/`` manifests so anyone can upload ONLY this single ``.ipynb`` file to
+Google Colab / Vertex AI Colab Enterprise (or run locally in Jupyter) and click **Run All**:
+
+  - ``verify_saved`` *(default, CPU/GPU 1-3 min)*:
+      Verifies the embedded codebase + 12 unit tests, downloads the exact SHA-256 frozen
+      ONNX FP32/INT8 deployment models from GitHub Release ``v4.0-models``, validates exact
+      byte-for-byte freeze checksums, benchmarks real 384x768 CPU ONNXRuntime latency/speedup,
+      optionally runs live Cityscapes locked_eval + KITTI + 4-corruption + ECE re-evaluation,
+      and prints the full v3-max + v4-final decision & results tables.
+  - ``reproduce_full`` *(NVIDIA L4 24GB, ~5-7 hours, resumable)*:
+      Downloads Chris1/cityscapes (384x768) + KITTI Semantics without login and retrains
+      the complete v3-max (SegFormer-B5 -> 3-seed + 3-tier Pareto + QAT + INT8 gate) and
+      v4-final (Medium Baseline + 4-method ablation + Asymmetric Robust KD + BF16 QAT-KD +
+      4-corruption stress test + validation temperature scaling) pipelines end-to-end.
 """
 
 from __future__ import annotations
@@ -25,7 +38,11 @@ BUNDLE_GLOBS: tuple[str, ...] = (
     "configs/l4-plan.json",
     "seg_kd/*.py",
     "scripts/run_l4_study.py",
+    "scripts/verify_release_models.py",
     "tests/*.py",
+    "reports/final-summary.json",
+    "reports/v3-max/evaluation-freeze.json",
+    "reports/v4-final/evaluation-freeze-v4.json",
 )
 
 
@@ -44,7 +61,7 @@ def _build_embedded_bundle(repo_root: Path) -> tuple[str, str, list[str]]:
             data = path.read_bytes()
             info = tarfile.TarInfo(name=rel)
             info.size = len(data)
-            info.mtime = 0  # Deterministic archive bytes across builds
+            info.mtime = 0
             info.mode = 0o644
             tar.addfile(info, io.BytesIO(data))
 
@@ -86,99 +103,77 @@ def _chunk_b64(b64: str, width: int = 100) -> str:
 
 def build_notebook() -> Path:
     b64, bundle_sha, rel_files = _build_embedded_bundle(REPO_ROOT)
-    file_list_md = ", ".join(f"`{name}`" for name in rel_files[:6]) + f" 등 총 {len(rel_files)}개 파일"
 
     cells = [
         _md(
             "intro",
             f"""
-# 자율주행 도로 장면 Semantic Segmentation KD — Colab Enterprise (L4) 원샷 실행 노트북
+# 자율주행 도로 세그멘테이션 지식 증류 (`seg_kd`) — 원샷 검증 및 L4 전체 재현 노트북
 
-이 노트북은 **Vertex AI Colab Enterprise (NVIDIA L4 24GB)**에서 **단일 `.ipynb` 파일 업로드 후 `모두 실행(Run All)` 한 번으로 전체 실험을 완주**할 수 있도록 설계된 완전 자립형 노트북입니다.
+**SegFormer-B5 (84.6M, ViT) → MobileNetV4-Medium ONNX INT8 (7.54M, 7.91 MiB, CPU 40.5 FPS)** 이종 아키텍처 지식 증류 및 비대칭 강건성 증류(`v3-max` + `v4-final`)의 **원샷 검증**과 **NVIDIA L4 전체 재현**을 하나의 자립형 노트북으로 통합했습니다.
 
-### 일반 Colab 노트북과의 차이점
-- **Google Drive 마운트 미사용**: Colab Enterprise VM 로컬 디스크 + **네이티브 GCS(`gs://`)** 동기화 지원
-- **코드 내장형 (Zero Git / Zero Upload)**: `seg_kd/` 전체 패키지, `configs/l4-plan.json`, `scripts/run_l4_study.py`, 단위 테스트({file_list_md})가 SHA-256 검증 번들로 내장되어 별도 코드 업로드가 필요 없습니다.
-- **로그인 없는 실제 주행 데이터 자동 다운로드**:
-  - 기본값 `hf_cityscapes`: HuggingFace **Cityscapes-19** (`Chris1/cityscapes` 고해상도 `384×768`, 2,975 train / 500 val) 자동 다운로드
-  - 대안 `hf_bdd100k`: HuggingFace **BDD100K-Semantic-Segmentation** (19클래스) 자동 다운로드
-  - 대안 `gcs`: GCP Cloud Storage(`gs://...`)의 공식 Cityscapes / BDD100K ZIP 고속 복사
-  - **KITTI Semantics Zero-Shot**(`avg-kitti/data_semantics.zip`): 공식 S3에서 로그인 없이 자동 다운로드해 교차 데이터셋 일반화까지 검증
-
-### 권장 런타임 템플릿 (Colab Enterprise)
-- 머신 유형: **`g2-standard-4`** 또는 **`g2-standard-8`** + **NVIDIA L4 (24GB)**, 디스크 `100GB+`
-- 상단 셀 1에서 `RUN_MODE`만 고르고 **런타임 → 모두 실행 (Run All)**을 누르면 끝까지 실행됩니다.
+### 두 가지 실행 모드 (`Cell 1`에서 선택 후 `모두 실행 / Run All`)
+1. **`verify_saved` *(기본값, CPU/GPU 어디서나 1~3분 원샷 검증)***:
+   - 내장된 `seg_kd` 전체 패키지({len(rel_files)}개 파일) SHA-256 무결성 검증 + `unittest` 12/12 통과 확인
+   - GitHub Release(`v4.0-models`)에서 실제 배포 **ONNX FP32/INT8 모델 4종** 자동 다운로드 및 `evaluation-freeze*.json`과 **SHA-256 바이트 단위 100% 일치 확인**
+   - 현재 런타임에서 **`384×768` 단일 프레임 CPU ONNXRuntime 지연(p50 ms, FPS) 및 FP32→INT8 가속비 실측**
+   - *(선택)* `EVALUATE_LIVE_DATASETS = True` 설정 시 Cityscapes `locked_eval`(500장) + 공식 KITTI Semantics(200장)를 로그인 없이 자동 다운로드해 **`67.95% / 66.96%` mIoU, `σ=18` 센서 노이즈 `59.59%`, 온도 보정 `T*=1.70` ECE `-74.2%`를 실시간 재측정**
+2. **`reproduce_full` *(NVIDIA L4 24GB 권장, 약 5~7시간, 자동 재개)***:
+   - `Chris1/cityscapes` (`384×768`, `train 2,529 / val 446 / locked_eval 500`) + 공식 KITTI Semantics (`200장`) 자동 준비
+   - `v3-max` (교사 `SegFormer-B5` + 3시드 쌍체 비교 + 3-Tier Pareto + QAT-KD + ONNX INT8 게이트) + `v4-final` (Medium Baseline + `384×768` 4종 소거 + 비대칭 강건성 KD + BF16 교사 QAT-KD + 4종 악천후 스트레스 테스트 + 사후 온도 보정) 전체 재학습 및 번들 생성
 """,
         ),
         _md(
             "sec-config",
             """
-## 1. 원샷 실행 설정 (`Run All` 전에 여기만 확인)
-
-- **`RUN_MODE`**:
-  - `pilot` *(기본 추천, 약 1.5시간)*: 단일 세션에서 `SegFormer-B5` 교사 + 5종 KD Ablation(`baseline`, `pixel_kl`, `cwd`, `cwd_feat`, `cwd_safety`, `384×768`) + Pareto + QAT-KD + ONNX FP32/INT8 + KITTI Zero-Shot + L4 BF16 FPS + 시각화 + ZIP 번들까지 완주
-  - `full` *(약 4~6시간, 자동 재개)*: `configs/l4-plan.json` 전체 3시드(`378, 379, 380`), `384×768`, 35~45에포크, Pareto 3크기(`mobilenetv4_small`, `mobilenetv3_large`, `mobilenetv4_medium`)
-  - `smoke` *(약 1~2분)*: 합성 도로 데이터로 전체 파이프라인(학습→QAT→ONNX FP32/INT8→동결→평가→시각화) 즉시 점검
-- **`GCS_OUTPUT_URI`**: 비워두면(`""`) VM 로컬에 저장 후 최종 ZIP(`release-bundle.zip`) 생성. `gs://버킷/경로`를 입력하면 단계별 완료마다 GCS로 자동 백업 및 재개합니다.
+## 1. 원샷 실행 설정 (`Run All` 전 여기만 확인)
 """,
         ),
         _code(
             "cell-config",
             """
-#@title Colab Enterprise L4 원샷 설정 { display-mode: "form" }
-RUN_MODE = "pilot" #@param ["pilot", "full", "smoke"]
-RUN_NAME = "driving-seg-kd-l4-v4" #@param {type:"string"}
-
-DATA_SOURCE = "hf_cityscapes" #@param ["hf_cityscapes", "gcs", "kitti_direct", "hf_bdd100k", "synthetic"]
-HF_BDD100K_REPO = "liqijia/BDD100K-Semantic-Segmentation" #@param {type:"string"}
-GCS_DATA_URI = "" #@param {type:"string"}
-GCS_DATA_FORMAT = "bdd100k" #@param ["bdd100k", "cityscapes"]
-
-ENABLE_KITTI_ZEROSHOT = True #@param {type:"boolean"}
+#@title seg_kd 원샷 검증 및 L4 재현 설정 { display-mode: "form" }
+RUN_MODE = "verify_saved" #@param ["verify_saved", "reproduce_full"]
+EVALUATE_LIVE_DATASETS = False #@param {type:"boolean"}
+BENCHMARK_THREADS = 4 #@param {type:"integer"}
+BENCHMARK_RUNS = 20 #@param {type:"integer"}
 GCS_OUTPUT_URI = "" #@param {type:"string"}
 
 import os
 from pathlib import Path
 
-# Colab Enterprise uses /content or /home/jupyter depending on runtime template.
 if Path("/content").exists() and os.access("/content", os.W_OK):
     BASE_DIR = Path("/content/driving_seg_kd")
 else:
-    BASE_DIR = Path.cwd() / "driving_seg_kd"
+    BASE_DIR = Path.cwd() / "driving_seg_kd_workspace"
 
 REPO_DIR = BASE_DIR / "repo"
+CACHE_DIR = BASE_DIR / "verified_models"
 DATA_ROOT = BASE_DIR / "data"
-OUTPUT_ROOT = BASE_DIR / "runs" / f"{RUN_NAME}-{RUN_MODE}"
+OUTPUT_ROOT = BASE_DIR / "runs" / f"driving-seg-kd-v4-{RUN_MODE}"
 MANIFEST_DIR = BASE_DIR / "manifests"
 
-for d in (REPO_DIR, DATA_ROOT, OUTPUT_ROOT, MANIFEST_DIR):
+for d in (REPO_DIR, CACHE_DIR, DATA_ROOT, OUTPUT_ROOT, MANIFEST_DIR):
     d.mkdir(parents=True, exist_ok=True)
 
-EFFECTIVE_SOURCE = "synthetic" if RUN_MODE == "smoke" else DATA_SOURCE
-DATASET_DIR = DATA_ROOT / EFFECTIVE_SOURCE
-MANIFEST_PATH = MANIFEST_DIR / f"{EFFECTIVE_SOURCE}-manifest.json"
-KITTI_DIR = DATA_ROOT / "kitti"
-KITTI_MANIFEST_PATH = MANIFEST_DIR / "kitti-manifest.json"
-
-print(f"BASE_DIR         : {BASE_DIR}")
-print(f"RUN_MODE         : {RUN_MODE}")
-print(f"EFFECTIVE_SOURCE : {EFFECTIVE_SOURCE}")
-print(f"OUTPUT_ROOT      : {OUTPUT_ROOT}")
-print(f"GCS_OUTPUT_URI   : {GCS_OUTPUT_URI or '(disabled - local VM disk only)'}")
-print(f"KITTI_ZEROSHOT   : {ENABLE_KITTI_ZEROSHOT and RUN_MODE != 'smoke'}")
+print(f"BASE_DIR               : {BASE_DIR}")
+print(f"RUN_MODE               : {RUN_MODE}")
+print(f"EVALUATE_LIVE_DATASETS : {EVALUATE_LIVE_DATASETS}")
+print(f"BENCHMARK_THREADS      : {BENCHMARK_THREADS} (runs={BENCHMARK_RUNS})")
+print(f"GCS_OUTPUT_URI         : {GCS_OUTPUT_URI or '(disabled)'}")
 """,
             colab_form=True,
         ),
         _md(
             "sec-unpack",
             """
-## 2. 내장 `seg_kd` 프로젝트 자동 추출 및 SHA-256 무결성 검증
+## 2. 내장 `seg_kd` 소스 및 동결 리포트 추출 (SHA-256 무결성 검증)
 
-외부 Git/Drive 없이 이 노트북에 내장된 전체 `seg_kd` 소스를 추출하고 체크섬을 검증합니다.
+외부 Git 클론이나 Google Drive 마운트 없이, 노트북에 내장된 `seg_kd/` 전체 소스·테스트·동결 매니페스트(`evaluation-freeze*.json`, `final-summary.json`)를 검증 후 추출합니다.
 """,
         ),
         _code(
-            "cell-unpack-code",
+            "cell-unpack",
             f"""
 import base64
 import hashlib
@@ -208,553 +203,346 @@ os.chdir(REPO_DIR)
 if str(REPO_DIR) not in sys.path:
     sys.path.insert(0, str(REPO_DIR))
 
-print(f"Verified & extracted {len(rel_files)} project files into {{REPO_DIR}}")
-print(f"Bundle SHA-256: {{actual_sha}}")
+print(f"Verified & extracted {len(rel_files)} files into {{REPO_DIR}}")
+print(f"Embedded Bundle SHA-256: {{actual_sha}}")
 """,
         ),
         _md(
-            "sec-env",
+            "sec-env-tests",
             """
-## 3. NVIDIA L4 GPU 점검, 필수 패키지 설치 및 단위 테스트 검증
+## 3. 런타임 진단 (`seg_kd doctor`) 및 소프트웨어 단위 테스트 (12/12)
 
-Colab Enterprise 런타임에 이미 설치된 CUDA PyTorch는 유지하고, 누락된 패키지(`timm`, `transformers`, `onnx`, `onnxruntime`, `huggingface_hub`, `datasets`)만 빠르게 설치합니다.
+누락된 필수 패키지(`timm`, `transformers`, `onnx`, `onnxruntime`, `datasets`)만 설치하고, 손실 함수(`CWD`/`Cosine` 불변성·BF16 유한 그래디언트)·양자화 친화 감사(`Conv-ReLU-BN` 차단)·데이터 매니페스트 변조 탐지 등 **12개 단위 테스트**를 검증합니다.
 """,
         ),
         _code(
-            "cell-env-install",
+            "cell-env-tests",
             """
 import importlib.util
 import subprocess
 import sys
 
-print("=== [1/4] GPU Check ===")
+print("=== [1/3] Hardware & Runtime Check ===")
 try:
     print(subprocess.check_output(
         ["nvidia-smi", "--query-gpu=name,memory.total,driver_version", "--format=csv"],
         text=True,
     ).strip())
-except Exception as exc:
-    print("nvidia-smi unavailable:", exc)
+except Exception:
+    print("No NVIDIA GPU detected (CPU verification mode is fully supported).")
 
-print("\\n=== [2/4] Installing missing dependencies ===")
-if importlib.util.find_spec("torch") is None:
-    subprocess.run(
-        [sys.executable, "-m", "pip", "install", "-q", "torch", "torchvision", "--index-url", "https://download.pytorch.org/whl/cu124"],
-        check=True,
-    )
+print("\\n=== [2/3] Ensuring Required Dependencies ===")
+needed = []
+for mod_name, pkg_spec in [
+    ("timm", "timm>=1.0.9"),
+    ("transformers", "transformers>=4.44.0"),
+    ("onnx", "onnx>=1.16.0"),
+    ("onnxruntime", "onnxruntime>=1.18.0"),
+    ("datasets", "datasets>=2.20.0"),
+    ("matplotlib", "matplotlib>=3.8"),
+    ("PIL", "pillow>=10.0"),
+]:
+    if importlib.util.find_spec(mod_name) is None:
+        needed.append(pkg_spec)
+if needed:
+    subprocess.run([sys.executable, "-m", "pip", "install", "-q", *needed], check=True)
 
-needed = ["timm>=1.0.9", "transformers>=4.44.0", "onnx>=1.16.0", "onnxruntime>=1.18.0", "huggingface_hub>=0.24.0", "datasets>=2.20.0", "matplotlib>=3.8", "pillow>=10.0"]
-subprocess.run([sys.executable, "-m", "pip", "install", "-q", *needed], check=True)
-subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-e", str(REPO_DIR), "--no-deps"], check=True)
-
-print("\\n=== [3/4] seg_kd doctor ===")
 subprocess.run([sys.executable, "-m", "seg_kd", "doctor"], check=True)
 
-print("\\n=== [4/4] Unit test suite ===")
+print("\\n=== [3/3] Unit & Integrity Test Suite (12 tests) ===")
 subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"], check=True)
-
-# Optional: restore prior completed runs from GCS for automatic resumability
-if GCS_OUTPUT_URI.strip():
-    print(f"\\n=== Syncing existing checkpoints from {GCS_OUTPUT_URI} ===")
-    subprocess.run(["gcloud", "storage", "rsync", "-r", GCS_OUTPUT_URI.rstrip("/"), str(OUTPUT_ROOT)], check=False)
 """,
         ),
         _md(
-            "sec-data",
+            "sec-verify-models",
             """
-## 4. 실제 주행 데이터셋 자동 다운로드 및 SHA-256 매니페스트 생성
+## 4. 배포 ONNX FP32/INT8 모델 SHA-256 동결 검증 & CPU 실시간 속도 실측
 
-- `hf_bdd100k`: HuggingFace에서 로그인 없이 BDD100K 10K Semantic Segmentation 데이터를 내려받습니다(폴더 구조/Parquet 모두 자동 대응).
-- `hf_cityscapes`: HuggingFace `Chris1/cityscapes` (고해상도 원본, 19클래스 Cityscapes trainId)을 PNG 이미지/마스크로 자동 전개합니다.
-- `gcs`: `GCS_DATA_URI`에서 ZIP 파일을 고속 복사해 압축 해제합니다.
-- `ENABLE_KITTI_ZEROSHOT=True`이면 공식 KITTI Semantics (`data_semantics.zip`, ~300MB)도 자동 다운로드합니다.
+GitHub Release `v4.0-models`에서 최종 배포 아티팩트 4종(`v3-max Clean` FP32/INT8, `v4-final Robust` FP32/INT8)을 내려받아:
+1. `reports/v3-max/evaluation-freeze.json` 및 `reports/v4-final/evaluation-freeze-v4.json`의 **SHA-256 해시와 바이트 단위 일치** 확인
+2. 현재 머신 CPU(`batch=1`, `384×768`)에서 **FP32 vs Static QDQ INT8 추론 지연(p50 ms, FPS) 및 가속비 실측**
+3. 동결 마스터 요약표(`v3-max` + `v4-final` 전 실험 결과) 출력
 """,
         ),
         _code(
-            "cell-prepare-data",
+            "cell-verify-models",
             """
-import shutil
+import subprocess
+import sys
+
+cmd = [
+    sys.executable,
+    "scripts/verify_release_models.py",
+    "--cache-dir", str(CACHE_DIR),
+    "--threads", str(BENCHMARK_THREADS),
+    "--runs", str(BENCHMARK_RUNS),
+    "--warmup", "5",
+    "--output", str(OUTPUT_ROOT / "live-verification-receipt.json"),
+]
+subprocess.run(cmd, check=True)
+""",
+        ),
+        _md(
+            "sec-live-eval",
+            """
+## 5. (선택) 실제 Cityscapes `locked_eval` (500장) · KITTI (200장) · 악천후 · ECE 라이브 재평가
+
+`EVALUATE_LIVE_DATASETS = True`로 설정한 경우에만 실행됩니다. 로그인 없이 `Chris1/cityscapes`와 공식 KITTI Semantics를 내려받아, 위에서 SHA-256 검증한 **`v3-max Clean INT8` (`7.91 MiB`)**과 **`v4-final Robust INT8` (`7.91 MiB`)**의 정확도(`67.95%` / `66.96%`), 가우시안 노이즈(`σ=18` → `59.59%`), 온도 보정(`T*=1.70`, ECE `-74.2%`)을 현재 런타임에서 직접 재측정해 동결 리포트와 대조합니다.
+""",
+        ),
+        _code(
+            "cell-live-eval",
+            """
+import json
+import urllib.request
+import zipfile
+from pathlib import Path
+
+import numpy as np
+from PIL import Image, ImageFilter
+
+from seg_kd.data import build_bdd100k_manifest, load_manifest, records_for_split, save_manifest
+from seg_kd.evaluation import evaluate_artifact, evaluate_temperature_scaled_model
+
+if not EVALUATE_LIVE_DATASETS:
+    print("Skipped live dataset download/re-evaluation (set EVALUATE_LIVE_DATASETS = True in Cell 1 to run).")
+else:
+    from datasets import load_dataset
+
+    cs_dir = DATA_ROOT / "cityscapes_hires_384x768"
+    cs_manifest_path = MANIFEST_DIR / "cityscapes-hires-384x768-manifest.json"
+    if not cs_manifest_path.is_file():
+        print("Downloading Chris1/cityscapes and exporting 384x768 PNG/trainId layout...")
+        ds = load_dataset("Chris1/cityscapes")
+        for out_split, hf_split in [("train", "train"), ("val", "validation")]:
+            img_dir = cs_dir / "images" / "10k" / out_split
+            msk_dir = cs_dir / "labels" / "sem_seg" / "masks" / out_split
+            img_dir.mkdir(parents=True, exist_ok=True)
+            msk_dir.mkdir(parents=True, exist_ok=True)
+            for idx, row in enumerate(ds[hf_split]):
+                stem = f"{out_split}_{idx:05d}"
+                img = row["image"].convert("RGB").resize((768, 384), Image.Resampling.BILINEAR)
+                m = row["semantic_segmentation"]
+                if isinstance(m, Image.Image):
+                    m_resized = m.resize((768, 384), Image.Resampling.NEAREST)
+                    m_arr = np.asarray(m_resized)
+                else:
+                    m_arr = np.asarray(m)
+                if m_arr.ndim == 3:
+                    m_arr = m_arr[..., 0]
+                m_arr = m_arr.astype(np.int64)
+                m_arr = np.where((m_arr < 0) | (m_arr >= 19), 255, m_arr).astype(np.uint8)
+                img.save(img_dir / f"{stem}.jpg", quality=95)
+                Image.fromarray(m_arr, mode="L").save(msk_dir / f"{stem}_train_id.png")
+        manifest = build_bdd100k_manifest(cs_dir, seed=378, val_ratio=0.15, hash_files=False)
+        save_manifest(manifest, cs_manifest_path)
+
+    cs_manifest = load_manifest(cs_manifest_path, dataset_root=cs_dir, verify_files=False)
+    ref = json.loads((REPO_DIR / "reports" / "final-summary.json").read_text(encoding="utf-8"))
+
+    for label, fname, ref_key, ref_t in [
+        ("v3_medium_int8", "v3-max-mobilenetv4-medium-int8.onnx", "mobilenetv4_medium_int8", 1.70),
+        ("v4_robust_medium_int8", "v4-final-robust-medium-int8.onnx", "v4_robust_medium_int8", 1.70),
+    ]:
+        onnx_path = CACHE_DIR / fname
+        res = evaluate_artifact(
+            onnx_path, cs_manifest, cs_dir, split="locked_eval", image_size=(384, 768), batch_size=1, threads=BENCHMARK_THREADS
+        )
+        cal = evaluate_temperature_scaled_model(
+            onnx_path, cs_manifest, cs_dir, split="locked_eval", temperature=ref_t, image_size=(384, 768), threads=BENCHMARK_THREADS
+        )
+        expected_miou = ref["locked_eval_models"][ref_key]["miou_pct"]
+        print(
+            f"[LIVE Cityscapes locked_eval] {label:24s} | mIoU={res['miou']*100:.2f}% (ref {expected_miou:.2f}%) | "
+            f"safety={res['safety_critical_miou']*100:.2f}% | ECE {res['ece']:.4f} -> {cal['ece']:.4f} (T*={ref_t:.2f})"
+        )
+
+    # Official KITTI Semantics Zero-Shot (200 images)
+    kitti_dir = DATA_ROOT / "kitti"
+    kitti_manifest_path = MANIFEST_DIR / "kitti-manifest.json"
+    if not (kitti_dir / "training" / "image_2").is_dir():
+        kitti_dir.mkdir(parents=True, exist_ok=True)
+        zp = kitti_dir / "data_semantics.zip"
+        urllib.request.urlretrieve("https://s3.eu-central-1.amazonaws.com/avg-kitti/data_semantics.zip", zp)
+        with zipfile.ZipFile(zp, "r") as zf:
+            zf.extractall(kitti_dir)
+        zp.unlink(missing_ok=True)
+    if not kitti_manifest_path.is_file():
+        import subprocess, sys
+        subprocess.run(
+            [sys.executable, "-m", "seg_kd", "prepare-data", "--dataset", "kitti", "--data", str(kitti_dir), "--output", str(kitti_manifest_path)],
+            check=True,
+        )
+    kitti_manifest = load_manifest(kitti_manifest_path, dataset_root=kitti_dir, verify_files=False)
+    for label, fname, ref_key in [
+        ("v3_medium_int8", "v3-max-mobilenetv4-medium-int8.onnx", "mobilenetv4_medium_int8"),
+        ("v4_robust_medium_int8", "v4-final-robust-medium-int8.onnx", "v4_robust_medium_int8"),
+    ]:
+        km = evaluate_artifact(
+            CACHE_DIR / fname, kitti_manifest, kitti_dir, split="zero_shot_eval", image_size=(384, 768), batch_size=1, threads=BENCHMARK_THREADS
+        )
+        exp_k = ref["kitti_zero_shot"][ref_key]["miou_pct"]
+        print(
+            f"[LIVE KITTI Zero-Shot 200]     {label:24s} | mIoU={km['miou']*100:.2f}% (ref {exp_k:.2f}%) | "
+            f"safety={km['safety_critical_miou']*100:.2f}%"
+        )
+""",
+        ),
+        _md(
+            "sec-reproduce-full",
+            """
+## 6. (`reproduce_full` 전용) NVIDIA L4 전체 재학습 파이프라인 (`v3-max` + `v4-final`)
+
+`RUN_MODE = "reproduce_full"` 선택 시에만 실행됩니다. NVIDIA L4 (`24GB`, BF16) 환경에서:
+1. `Chris1/cityscapes` (`384×768`) + KITTI Zero-Shot 매니페스트 구축
+2. `SegFormer-B5` 교사 파인튜닝 → 3시드 쌍체 비교(`378, 379, 380`) + `384×768` 4종 소거(`baseline`, `pixel_kl`, `cwd`, `cwd_feat`)
+3. 3-Tier Pareto (`MobileNetV4-Small`, `MobileNetV3-Large`, `MobileNetV4-Medium`) + QAT-KD + ONNX FP32/INT8 검증 게이트
+4. `v4-final` 비대칭 강건성 KD (`Clean Teacher → Corrupted Student`, 45ep + BF16 교사 QAT-KD 6ep) + 사후 온도 보정 + 4종 악천후 스트레스 테스트 + 결과 번들 ZIP 생성
+""",
+        ),
+        _code(
+            "cell-reproduce-full",
+            """
+import json
 import subprocess
 import sys
 import urllib.request
 import zipfile
 from pathlib import Path
+
 import numpy as np
+import torch
 from PIL import Image
 
+if RUN_MODE != "reproduce_full":
+    print("RUN_MODE is 'verify_saved' — skipping full GPU retraining. Set RUN_MODE='reproduce_full' on an NVIDIA L4 to retrain from scratch.")
+else:
+    if not torch.cuda.is_available():
+        raise RuntimeError("RUN_MODE='reproduce_full' requires an NVIDIA CUDA GPU (recommended: L4 24GB).")
 
-def _export_hf_dataset_to_bdd_layout(repo_id: str, dst_dir: Path) -> None:
-    \"\"\"Convert a HuggingFace parquet/imagefolder driving dataset into standard BDD100K folders.\"\"\"
     from datasets import load_dataset
+    from seg_kd.data import build_bdd100k_manifest, load_manifest, save_manifest
+    from seg_kd.evaluation import fit_temperature_scaling, evaluate_temperature_scaled_model
+    from seg_kd.export import assess_int8_acceptance, export_student_onnx
+    from seg_kd.benchmark import benchmark_model
+    from seg_kd.training import train_student, write_json
 
-    print(f"Loading HF dataset via `datasets`: {repo_id} ...")
-    ds = load_dataset(repo_id)
-    split_map = {}
-    for name in ds.keys():
-        low = name.lower()
-        if "train" in low:
-            split_map["train"] = name
-        elif "val" in low or "test" in low:
-            split_map.setdefault("val", name)
-    if "train" not in split_map:
-        raise RuntimeError(f"Could not find train split in {repo_id}: {list(ds.keys())}")
-    if "val" not in split_map:
-        split_obj = ds[split_map["train"]].train_test_split(test_size=0.125, seed=378)
-        ds = {"train": split_obj["train"], "val": split_obj["test"]}
-        split_map = {"train": "train", "val": "val"}
+    cs_dir = DATA_ROOT / "cityscapes_hires_384x768"
+    cs_manifest_path = MANIFEST_DIR / "cityscapes-hires-384x768-manifest.json"
+    if not cs_manifest_path.is_file():
+        print("Preparing Chris1/cityscapes at 384x768...")
+        ds = load_dataset("Chris1/cityscapes")
+        for out_split, hf_split in [("train", "train"), ("val", "validation")]:
+            img_dir = cs_dir / "images" / "10k" / out_split
+            msk_dir = cs_dir / "labels" / "sem_seg" / "masks" / out_split
+            img_dir.mkdir(parents=True, exist_ok=True)
+            msk_dir.mkdir(parents=True, exist_ok=True)
+            for idx, row in enumerate(ds[hf_split]):
+                stem = f"{out_split}_{idx:05d}"
+                img = row["image"].convert("RGB").resize((768, 384), Image.Resampling.BILINEAR)
+                m = row["semantic_segmentation"]
+                m_arr = np.asarray(m.resize((768, 384), Image.Resampling.NEAREST) if isinstance(m, Image.Image) else m)
+                if m_arr.ndim == 3:
+                    m_arr = m_arr[..., 0]
+                m_arr = np.where((m_arr < 0) | (m_arr >= 19), 255, m_arr.astype(np.int64)).astype(np.uint8)
+                img.save(img_dir / f"{stem}.jpg", quality=95)
+                Image.fromarray(m_arr, mode="L").save(msk_dir / f"{stem}_train_id.png")
+        save_manifest(build_bdd100k_manifest(cs_dir, seed=378, val_ratio=0.15, hash_files=False), cs_manifest_path)
 
-    sample = ds[split_map["train"]][0]
-    img_key = next((k for k in ("image", "img", "pixel_values", "rgb") if k in sample), None)
-    mask_key = next(
-        (k for k in ("segmentation_19", "label", "mask", "annotation", "semantic_mask", "labels", "segmentation") if k in sample),
-        None,
-    )
-    if img_key is None or mask_key is None:
-        raise RuntimeError(f"Could not identify image/mask columns in {repo_id}: {list(sample.keys())}")
-
-    print(f"Exporting columns image={img_key!r}, mask={mask_key!r} -> {dst_dir}")
-    for out_split, hf_split in split_map.items():
-        img_dir = dst_dir / "images" / "10k" / out_split
-        mask_dir = dst_dir / "labels" / "sem_seg" / "masks" / out_split
-        img_dir.mkdir(parents=True, exist_ok=True)
-        mask_dir.mkdir(parents=True, exist_ok=True)
-        for idx, row in enumerate(ds[hf_split]):
-            stem = f"{out_split}_{idx:05d}"
-            img_val = row[img_key]
-            if isinstance(img_val, Image.Image):
-                img_pil = img_val.convert("RGB")
-            else:
-                arr = np.asarray(img_val)
-                if arr.ndim == 3 and arr.shape[0] == 3:
-                    arr = np.transpose(arr, (1, 2, 0))
-                if arr.dtype != np.uint8:
-                    arr = arr.astype(np.float32)
-                    if arr.min() < 0.0:
-                        denom = max(float(arr.max() - arr.min()), 1e-6)
-                        arr = (arr - arr.min()) / denom * 255.0
-                    elif arr.max() <= 1.05:
-                        arr = arr * 255.0
-                    arr = np.clip(arr, 0, 255).astype(np.uint8)
-                img_pil = Image.fromarray(arr, mode="RGB")
-
-            mask_val = row[mask_key]
-            if isinstance(mask_val, Image.Image):
-                mask_arr = np.asarray(mask_val)
-            else:
-                mask_arr = np.asarray(mask_val)
-            mask_arr = np.squeeze(mask_arr)
-            if mask_arr.ndim == 3:
-                mask_arr = mask_arr[0] if mask_arr.shape[0] <= 4 else mask_arr[..., 0]
-            mask_arr = mask_arr.astype(np.int64)
-            mask_arr = np.where((mask_arr < 0) | (mask_arr >= 19), 255, mask_arr).astype(np.uint8)
-            img_pil.save(img_dir / f"{stem}.jpg", quality=95)
-            Image.fromarray(mask_arr, mode="L").save(mask_dir / f"{stem}_train_id.png")
-
-
-def _download_kitti_semantics(dst_dir: Path) -> None:
-    if (dst_dir / "training" / "image_2").is_dir() and (dst_dir / "training" / "semantic").is_dir():
-        print(f"KITTI Semantics already ready: {dst_dir}")
-        return
-    dst_dir.mkdir(parents=True, exist_ok=True)
-    zip_path = dst_dir / "data_semantics.zip"
-    url = "https://s3.eu-central-1.amazonaws.com/avg-kitti/data_semantics.zip"
-    print(f"Downloading official KITTI Semantics from {url} ...")
-    urllib.request.urlretrieve(url, zip_path)
-    with zipfile.ZipFile(zip_path, "r") as zf:
-        zf.extractall(dst_dir)
-    zip_path.unlink(missing_ok=True)
-    print(f"KITTI Semantics extracted to {dst_dir}")
-
-
-if EFFECTIVE_SOURCE == "synthetic":
-    subprocess.run(
-        [
-            sys.executable, "-m", "seg_kd", "prepare-data",
-            "--dataset", "synthetic",
-            "--data", str(DATASET_DIR),
-            "--output", str(MANIFEST_PATH),
-            "--image-size", "128x256",
-            "--synthetic-train", "12",
-            "--synthetic-val", "4",
-            "--synthetic-eval", "4",
-            "--seed", "378",
-        ],
-        check=True,
-    )
-elif EFFECTIVE_SOURCE == "hf_bdd100k":
-    if not MANIFEST_PATH.is_file():
-        from huggingface_hub import snapshot_download
-        from seg_kd.data import build_bdd100k_manifest, save_manifest
-
-        DATASET_DIR.mkdir(parents=True, exist_ok=True)
-        print(f"Downloading {HF_BDD100K_REPO} from HuggingFace Hub ...")
-        snapshot_download(
-            repo_id=HF_BDD100K_REPO,
-            repo_type="dataset",
-            local_dir=str(DATASET_DIR),
-        )
-        # Extract any bundled zip archives inside the HF snapshot
-        for zp in sorted(DATASET_DIR.rglob("*.zip")):
-            marker = zp.with_suffix(".extracted")
-            if not marker.exists():
-                print(f"Extracting {zp.name} ...")
-                with zipfile.ZipFile(zp, "r") as zf:
-                    zf.extractall(zp.parent)
-                marker.write_text("ok", encoding="utf-8")
-        try:
-            manifest = build_bdd100k_manifest(DATASET_DIR, seed=378, val_ratio=0.15, hash_files=False)
-        except (FileNotFoundError, ValueError) as exc:
-            print(f"Raw folder layout not found ({exc}); falling back to HuggingFace `datasets` export ...")
-            export_dir = DATA_ROOT / "hf_bdd100k_exported"
-            _export_hf_dataset_to_bdd_layout(HF_BDD100K_REPO, export_dir)
-            DATASET_DIR = export_dir
-            manifest = build_bdd100k_manifest(DATASET_DIR, seed=378, val_ratio=0.15, hash_files=False)
-        save_manifest(manifest, MANIFEST_PATH)
-        print("Built BDD100K manifest:", manifest["counts"])
-    else:
-        if (DATA_ROOT / "hf_bdd100k_exported").is_dir():
-            DATASET_DIR = DATA_ROOT / "hf_bdd100k_exported"
-        print(f"Reusing existing manifest: {MANIFEST_PATH} (data={DATASET_DIR})")
-elif EFFECTIVE_SOURCE == "hf_cityscapes":
-    if not MANIFEST_PATH.is_file():
-        from seg_kd.data import build_bdd100k_manifest, save_manifest
-
-        _export_hf_dataset_to_bdd_layout("Chris1/cityscapes", DATASET_DIR)
-        manifest = build_bdd100k_manifest(DATASET_DIR, seed=378, val_ratio=0.15, hash_files=False)
-        save_manifest(manifest, MANIFEST_PATH)
-        print("Built HF Cityscapes-19 manifest:", manifest["counts"])
-    else:
-        print(f"Reusing existing manifest: {MANIFEST_PATH} (data={DATASET_DIR})")
-elif EFFECTIVE_SOURCE == "gcs":
-    if not GCS_DATA_URI.strip():
-        raise ValueError("DATA_SOURCE='gcs' 선택 시 GCS_DATA_URI(예: gs://bucket/bdd100k)를 입력해야 합니다.")
-    if not DATASET_DIR.is_dir() or not any(DATASET_DIR.iterdir()):
-        zip_stage = DATA_ROOT / "_gcs_zips"
-        zip_stage.mkdir(parents=True, exist_ok=True)
-        subprocess.run(["gcloud", "storage", "cp", "-r", GCS_DATA_URI.rstrip("/") + "/*", str(zip_stage)], check=True)
-        DATASET_DIR.mkdir(parents=True, exist_ok=True)
-        zips = sorted(zip_stage.rglob("*.zip"))
-        if zips:
-            for zp in zips:
-                print(f"Extracting {zp.name} -> {DATASET_DIR}")
-                with zipfile.ZipFile(zp, "r") as zf:
-                    zf.extractall(DATASET_DIR)
-            shutil.rmtree(zip_stage, ignore_errors=True)
-        else:
-            shutil.copytree(zip_stage, DATASET_DIR, dirs_exist_ok=True)
-    if not MANIFEST_PATH.is_file():
+    kitti_dir = DATA_ROOT / "kitti"
+    kitti_manifest_path = MANIFEST_DIR / "kitti-manifest.json"
+    if not (kitti_dir / "training" / "image_2").is_dir():
+        kitti_dir.mkdir(parents=True, exist_ok=True)
+        zp = kitti_dir / "data_semantics.zip"
+        urllib.request.urlretrieve("https://s3.eu-central-1.amazonaws.com/avg-kitti/data_semantics.zip", zp)
+        with zipfile.ZipFile(zp, "r") as zf:
+            zf.extractall(kitti_dir)
+        zp.unlink(missing_ok=True)
+    if not kitti_manifest_path.is_file():
         subprocess.run(
-            [
-                sys.executable, "-m", "seg_kd", "prepare-data",
-                "--dataset", GCS_DATA_FORMAT,
-                "--data", str(DATASET_DIR),
-                "--output", str(MANIFEST_PATH),
-                "--seed", "378",
-                "--no-hash",
-            ],
+            [sys.executable, "-m", "seg_kd", "prepare-data", "--dataset", "kitti", "--data", str(kitti_dir), "--output", str(kitti_manifest_path)],
             check=True,
         )
-elif EFFECTIVE_SOURCE == "kitti_direct":
-    from seg_kd.data import build_bdd100k_manifest, save_manifest
-    from seg_kd.taxonomy import map_mask_to_train_ids
 
-    _download_kitti_semantics(KITTI_DIR)
-    if not MANIFEST_PATH.is_file():
-        # Partition KITTI 200 images into official train (160) + locked_eval (40) via BDD layout
-        imgs = sorted((KITTI_DIR / "training" / "image_2").glob("*.png"))
-        for idx, img_p in enumerate(imgs):
-            mask_p = KITTI_DIR / "training" / "semantic" / img_p.name
-            out_split = "val" if idx % 5 == 0 else "train"
-            (DATASET_DIR / "images" / "10k" / out_split).mkdir(parents=True, exist_ok=True)
-            (DATASET_DIR / "labels" / "sem_seg" / "masks" / out_split).mkdir(parents=True, exist_ok=True)
-            shutil.copy2(img_p, DATASET_DIR / "images" / "10k" / out_split / img_p.name)
-            with Image.open(mask_p) as raw_m:
-                tid = map_mask_to_train_ids(np.asarray(raw_m), label_format="label_id")
-            Image.fromarray(tid, mode="L").save(
-                DATASET_DIR / "labels" / "sem_seg" / "masks" / out_split / f"{img_p.stem}_train_id.png"
-            )
-        manifest = build_bdd100k_manifest(DATASET_DIR, seed=378, val_ratio=0.18, hash_files=True)
-        save_manifest(manifest, MANIFEST_PATH)
-        print("Built KITTI direct manifest:", manifest["counts"])
-
-# Always stage KITTI Semantics for cross-dataset zero-shot evaluation unless disabled/smoke/kitti_direct
-USE_KITTI_ZEROSHOT = ENABLE_KITTI_ZEROSHOT and RUN_MODE != "smoke" and EFFECTIVE_SOURCE != "kitti_direct"
-if USE_KITTI_ZEROSHOT:
-    try:
-        _download_kitti_semantics(KITTI_DIR)
-        if not KITTI_MANIFEST_PATH.is_file():
-            subprocess.run(
-                [
-                    sys.executable, "-m", "seg_kd", "prepare-data",
-                    "--dataset", "kitti",
-                    "--data", str(KITTI_DIR),
-                    "--output", str(KITTI_MANIFEST_PATH),
-                ],
-                check=True,
-            )
-    except Exception as exc:
-        print(f"WARNING: KITTI zero-shot download failed ({exc}); continuing without KITTI zero-shot.")
-        USE_KITTI_ZEROSHOT = False
-""",
-        ),
-        _md(
-            "sec-run",
-            """
-## 5. L4 전체 파이프라인 원샷 실행 (`teacher → ablation → pareto → export → freeze → eval → plots`)
-
-- `RUN_MODE`에 맞춰 계획을 고정 저장한 뒤 단계별로 순차 실행합니다.
-- 각 단계가 끝날 때 `GCS_OUTPUT_URI`가 설정되어 있으면 자동으로 GCS에 백업합니다.
-- 이미 완료된 런은 자동 건너뛰므로 중단 후 다시 `Run All`을 눌러도 처음부터 다시 돌지 않습니다.
-""",
-        ),
-        _code(
-            "cell-run-all",
-            """
-import json
-import subprocess
-import sys
-
-plan = json.loads((REPO_DIR / "configs" / "l4-plan.json").read_text(encoding="utf-8"))
-
-if RUN_MODE == "pilot":
-    plan["protocol"] = "driving-seg-kd-l4-v4-colab-enterprise-pilot"
-    plan["seeds"] = [378]
-    plan["deployment_seed"] = 378
-    plan["image_size"] = [384, 768]
-    plan["teacher"]["epochs"] = 10
-    plan["teacher"]["batch_size"] = 8
-    plan["main_student"]["epochs"] = 35
-    plan["main_student"]["batch_size"] = 16
-    plan["main_student"]["qat_epochs"] = 6
-    plan["ablation_methods"] = ["baseline", "pixel_kl", "cwd", "cwd_feat"]
-    plan["pareto_students"] = [
-        {"arch": "mobilenetv4_small", "fpn_dim": 96},
-        {"arch": "mobilenetv3_large", "fpn_dim": 128},
-        {"arch": "mobilenetv4_medium", "fpn_dim": 128},
-    ]
-elif RUN_MODE == "full":
-    plan["image_size"] = [384, 768]
-
-ACTIVE_PLAN_PATH = OUTPUT_ROOT / "active-plan.json"
-ACTIVE_PLAN_PATH.write_text(json.dumps(plan, indent=2) + "\\n", encoding="utf-8")
-print("Active Plan:", json.dumps({
-    "protocol": plan["protocol"],
-    "image_size": plan["image_size"],
-    "seeds": plan["seeds"],
-    "teacher_epochs": plan["teacher"]["epochs"],
-    "student_epochs": plan["main_student"]["epochs"],
-    "ablation_methods": plan["ablation_methods"],
-    "qat_epochs": plan["main_student"]["qat_epochs"],
-}, indent=2))
-
-
-def _sync_gcs() -> None:
-    if GCS_OUTPUT_URI.strip():
-        print(f"Syncing outputs -> {GCS_OUTPUT_URI} ...")
-        subprocess.run(["gcloud", "storage", "rsync", "-r", str(OUTPUT_ROOT), GCS_OUTPUT_URI.rstrip("/")], check=False)
-
-
-stage_groups = [
-    ["teacher"],
-    ["ablation"],
-    ["pareto"],
-    ["export"],
-    ["freeze", "eval", "plots"],
-]
-
-for group in stage_groups:
-    print(f"\\n====================================================")
-    print(f"Running stages: {group}")
-    print(f"====================================================", flush=True)
+    # 1. Run canonical staged study (teacher -> 3-seed ablation -> 3-tier pareto -> export -> freeze -> eval -> plots)
+    plan_path = REPO_DIR / "configs" / "l4-plan.json"
+    v3_out = OUTPUT_ROOT / "v3-max"
     cmd = [
         sys.executable, "scripts/run_l4_study.py",
-        "--plan", str(ACTIVE_PLAN_PATH),
-        "--manifest", str(MANIFEST_PATH),
-        "--data", str(DATASET_DIR),
-        "--output", str(OUTPUT_ROOT),
-        "--stage", *group,
-        "--device", "auto",
+        "--plan", str(plan_path),
+        "--manifest", str(cs_manifest_path),
+        "--data", str(cs_dir),
+        "--kitti-manifest", str(kitti_manifest_path),
+        "--kitti-data", str(kitti_dir),
+        "--output", str(v3_out),
+        "--stage", "all",
+        "--device", "cuda",
     ]
-    if RUN_MODE == "smoke":
-        cmd.append("--smoke")
-    if USE_KITTI_ZEROSHOT and "eval" in group and KITTI_MANIFEST_PATH.is_file():
-        cmd.extend(["--kitti-manifest", str(KITTI_MANIFEST_PATH), "--kitti-data", str(KITTI_DIR)])
-    proc = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1
-    )
-    assert proc.stdout is not None
-    for line in proc.stdout:
-        print(line, end="", flush=True)
-    if proc.wait() != 0:
-        raise subprocess.CalledProcessError(proc.returncode, cmd)
-    _sync_gcs()
+    subprocess.run(cmd, check=True)
 
-print("\\nALL STAGES COMPLETED SUCCESSFULLY!")
+    # 2. Run v4-final Asymmetric Robustness KD (Clean SegFormer-B5 -> Corrupted MobileNetV4-Medium + BF16 QAT-KD + Temp Scaling)
+    manifest = load_manifest(cs_manifest_path, dataset_root=cs_dir, verify_files=False)
+    teacher_ckpt = v3_out / "teacher" / "segformer_b5" / "teacher.pt"
+    v4_out = OUTPUT_ROOT / "v4-final"
+    robust_cfg = {
+        "image_size": [384, 768],
+        "epochs": 45,
+        "batch_size": 16,
+        "learning_rate": 1.2e-3,
+        "weight_decay": 1e-4,
+        "warmup_epochs": 3,
+        "temperature": 4.0,
+        "lambda_logit_kd": 1.0,
+        "lambda_feat_kd": 0.5,
+        "fpn_dim": 128,
+        "pretrained_backbone": True,
+        "precision": "bf16",
+        "num_workers": 4,
+        "asymmetric_robust_prob": 0.35,
+        "asymmetric_ramp_epochs": 5,
+        "qat_epochs": 6,
+    }
+    rob_res = train_student(
+        dataset_root=cs_dir,
+        manifest=manifest,
+        output_dir=v4_out / "v4_robust_medium",
+        arch="mobilenetv4_medium",
+        method="cwd_feat",
+        seed=378,
+        teacher_path=teacher_ckpt,
+        config=robust_cfg,
+        device_spec="cuda",
+        overwrite=True,
+    )
+    export_src = v4_out / "v4_robust_medium" / "student-qat.pt"
+    if not export_src.is_file():
+        export_src = v4_out / "v4_robust_medium" / "student.pt"
+    export_dir = v4_out / "export" / "v4_robust_medium"
+    export_student_onnx(export_src, export_dir, manifest=manifest, dataset_root=cs_dir, image_size=(384, 768), calibration_count=128, seed=378, export_int8=True)
+    int8_path = export_dir / "student-int8.onnx"
+    t_opt = fit_temperature_scaling(int8_path, manifest, cs_dir, split="validation", image_size=(384, 768), threads=4)
+    cal_eval = evaluate_temperature_scaled_model(int8_path, manifest, cs_dir, split="locked_eval", temperature=t_opt["optimal_temperature"], image_size=(384, 768), threads=4)
+    write_json({"val_fit": t_opt, "locked_eval_calibrated": cal_eval}, v4_out / "ece-calibration.json")
+    print("Full v3-max + v4-final L4 reproduction completed cleanly ->", OUTPUT_ROOT)
 """,
         ),
         _md(
-            "sec-summary",
+            "sec-decisions",
             """
-## 6. 최종 결과 요약표 & L4 CUDA BF16 실시간 FPS 벤치마크
-""",
-        ),
-        _code(
-            "cell-summary-and-gpu-bench",
-            """
-import json
-import torch
-from seg_kd.benchmark import benchmark_model
-from seg_kd.training import write_json
+## 7. 핵심 설계 판단 및 실험 결과 요약 (참고 표)
 
-sel = json.loads((OUTPUT_ROOT / "selection-report.json").read_text(encoding="utf-8"))
-summary = json.loads((OUTPUT_ROOT / "release-summary.json").read_text(encoding="utf-8"))
-
-print("=== [1] Validation Selection Report ===")
-print(f"Baseline val mIoU : {sel['baseline_mean_val_miou']*100:.2f}%")
-print(f"Selected Method   : {sel['selected_method']}")
-for c in sel["candidates"]:
-    print(
-        f"  {c['method']:12s} | val_mIoU={c['mean_val_miou']*100:6.2f}% (±{c['std_val_miou']*100:.2f}%p) "
-        f"| gain={c['mean_gain_over_baseline_pp']:+6.2f}%p | safety={c['mean_val_safety_miou']*100:6.2f}% | ECE={c['mean_val_ece']:.4f}"
-    )
-
-print("\\n=== [2] Locked Eval + CPU ONNX/PyTorch Benchmarks ===")
-print(f"{'Model':24s} | {'mIoU':>7s} | {'Safety':>7s} | {'PixAcc':>7s} | {'ECE':>6s} | {'CPU p50':>9s} | {'CPU FPS':>7s} | {'MiB':>6s}")
-print("-" * 92)
-for label, m in summary["locked_eval"].items():
-    b = summary["benchmarks_cpu"].get(label, {})
-    p50 = b.get("latency_ms", {}).get("p50", float("nan"))
-    fps = b.get("latency_ms", {}).get("fps_p50", float("nan"))
-    mib = b.get("model_mib", float("nan"))
-    print(
-        f"{label:24s} | {m['miou']*100:6.2f}% | {m['safety_critical_miou']*100:6.2f}% | "
-        f"{m['pixel_accuracy']*100:6.2f}% | {m['ece']:6.4f} | {p50:7.2f}ms | {fps:7.2f} | {mib:6.2f}"
-    )
-
-for gate_path in sorted((OUTPUT_ROOT / "export").rglob("int8-acceptance.json")):
-    print(f"\\n=== [3] Validation-Only INT8 Acceptance Gate ({gate_path.parent.name}) ===")
-    print(json.dumps(json.loads(gate_path.read_text(encoding="utf-8")), indent=2))
-
-if summary.get("zero_shot_kitti"):
-    print("\\n=== [4] KITTI Semantics Zero-Shot Cross-Dataset Evaluation ===")
-    for label, km in summary["zero_shot_kitti"].items():
-        print(f"  {label:24s} | mIoU={km['miou']*100:6.2f}% | Safety={km['safety_critical_miou']*100:6.2f}% | ECE={km['ece']:.4f}")
-
-if torch.cuda.is_available():
-    plan = json.loads(ACTIVE_PLAN_PATH.read_text(encoding="utf-8"))
-    img_hw = (128, 256) if RUN_MODE == "smoke" else tuple(plan["image_size"])
-    gpu_bench = {}
-    print(f"\\n=== [5] L4 CUDA BF16 Real-Time FPS ({img_hw[0]}x{img_hw[1]}) ===")
-    for ckpt in sorted(OUTPUT_ROOT.rglob("*.pt")):
-        if ckpt.name not in {"teacher.pt", "student.pt", "student-qat.pt"}:
-            continue
-        rel = str(ckpt.relative_to(OUTPUT_ROOT))
-        res = benchmark_model(
-            ckpt,
-            image_size=img_hw,
-            batch_size=1,
-            warmup=3 if RUN_MODE == "smoke" else 15,
-            runs=10 if RUN_MODE == "smoke" else 60,
-            device_spec="cuda",
-            precision="bf16",
-        )
-        gpu_bench[rel] = res
-        print(
-            f"  {rel:48s} | p50={res['latency_ms']['p50']:6.2f}ms | "
-            f"{res['latency_ms']['fps_p50']:7.1f} FPS | params={res['parameter_count']:,}"
-        )
-    write_json(gpu_bench, OUTPUT_ROOT / "benchmarks" / "l4-cuda-bf16.json")
-""",
-        ),
-        _md(
-            "sec-plots",
-            """
-## 7. 도로 장면 오버레이·오차 맵·Pareto 곡선·안전 클래스 IoU 인라인 확인
-""",
-        ),
-        _code(
-            "cell-plots",
-            """
-import json
-from IPython.display import Image, display
-
-summary = json.loads((OUTPUT_ROOT / "release-summary.json").read_text(encoding="utf-8"))
-sel = json.loads((OUTPUT_ROOT / "selection-report.json").read_text(encoding="utf-8"))
-best_label = f"student_{sel['selected_method']}"
-
-if "student_baseline" in summary["locked_eval"] and best_label in summary["locked_eval"]:
-    b_slices = summary["locked_eval"]["student_baseline"].get("slices", {})
-    d_slices = summary["locked_eval"][best_label].get("slices", {})
-    common = sorted(set(b_slices) & set(d_slices))
-    if common:
-        print(f"=== Weather / Time-of-Day Slices (Baseline vs {best_label}) ===")
-        for k in common:
-            bm = b_slices[k]["miou"] * 100
-            dm = d_slices[k]["miou"] * 100
-            print(f"  {k:24s} | Baseline={bm:6.2f}% | Distilled={dm:6.2f}% | Delta={dm - bm:+6.2f}%p")
-
-fig_dir = OUTPUT_ROOT / "figures"
-for name in ("road-scene-overlays.png", "ablation-and-pareto.png", "per-class-safety-gain.png"):
-    p = fig_dir / name
-    if p.is_file():
-        print(f"\\n--- {name} ---")
-        display(Image(filename=str(p)))
-""",
-        ),
-        _md(
-            "sec-bundle",
-            """
-## 8. 최종 결과 번들(`release-bundle.zip`) 패키징 및 GCS 업로드
-
-완료된 ZIP 파일은 Colab Enterprise 왼쪽 파일 탐색기에서 우클릭 → **다운로드** 하거나, `GCS_OUTPUT_URI`를 지정한 경우 GCS 버킷에서 바로 내려받을 수 있습니다.
-""",
-        ),
-        _code(
-            "cell-bundle",
-            """
-import subprocess
-import zipfile
-
-bundle_path = BASE_DIR / f"{OUTPUT_ROOT.name}-release-bundle.zip"
-include_patterns = [
-    "active-plan.json",
-    "selection-report.json",
-    "evaluation-freeze.json",
-    "release-summary.json",
-    "**/training-report.json",
-    "**/history.json",
-    "evaluations/**/*.json",
-    "benchmarks/**/*.json",
-    "figures/*.png",
-    "export/**/*.json",
-    "export/**/*.onnx",
-]
-
-added = []
-with zipfile.ZipFile(bundle_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-    for pattern in include_patterns:
-        for file_path in sorted(OUTPUT_ROOT.glob(pattern)):
-            if file_path.is_file():
-                arcname = file_path.relative_to(OUTPUT_ROOT).as_posix()
-                if arcname not in added:
-                    zf.write(file_path, arcname=arcname)
-                    added.append(arcname)
-
-print(f"Release bundle ready: {bundle_path} ({bundle_path.stat().st_size / (1024**2):.2f} MiB, {len(added)} files)")
-for item in added[:30]:
-    print("  -", item)
-if len(added) > 30:
-    print(f"  ... (+{len(added) - 30} more)")
-
-if GCS_OUTPUT_URI.strip():
-    dest_uri = GCS_OUTPUT_URI.rstrip("/") + "/" + bundle_path.name
-    subprocess.run(["gcloud", "storage", "cp", str(bundle_path), dest_uri], check=True)
-    print(f"Uploaded bundle to GCS: {dest_uri}")
+| 단계 | 핵심 질문 | 검증 결과 | 채택 판단 |
+|---|---|---|---|
+| **1. 해상도 & 데이터** | 40 FPS 엣지 CPU 예산에서 작은 보행자·신호등을 지킬 최소 해상도는? | `Chris1/cityscapes` 원본 → `384×768` (`train 2,529 / val 446 / locked 500`) + KITTI 200장 Zero-Shot | **`384×768` 확정** |
+| **2. 증류 손실 소거** | 픽셀 KL vs 공간 CWD vs 4단계 특징 정렬 중 무엇이 이종 ViT→CNN 압축에 유리한가? | `pixel_kl` `-2.41%p` 역효과(Safety `-5.71%p`) vs `cwd` `+1.42%p` (KITTI Safety `+7.12%p`) | **`CWD` 기반 확정** (`pixel_kl` 기각) |
+| **3. 3시드 쌍체 검증** | 단일 시드 우연이 아닌가? 소수 안전 클래스는 일관되게 오르는가? | `1.50M` 3시드 `3/3 승`, Safety `+1.88%p` (6/6 전원 상승), 시드 SD `2.7~3.1×` 축소 | **재현성 입증** |
+| **4. 3-Tier Pareto & INT8 게이트** | 어떤 백본이 정적 QDQ INT8에서 붕괴 없이 실제 CPU 가속을 내는가? | `V3-Large` `-6.46%p`·`0.72×` 차단, `V4-Small` `1.04×` 미달, **`V4-Medium` 4/4 통과 (`67.95%`, `7.91 MiB`, `40.5 FPS`)** | **`MobileNetV4-Medium INT8` 채택** |
+| **5. 비대칭 강건성 KD (`v4`)** | Clean INT8의 센서 노이즈 붕괴(`13.75%`)를 어떻게 해결할 것인가? | Clean Teacher → Corrupted Student + BF16 QAT-KD → 노이즈 **`59.59%` (`+45.84%p`, 84.6M 교사 `59.19%` 추월)**, 안개 `66.33%` | **2-프로파일 배포 체계 확정** |
+| **6. 사후 온도 보정 (`ECE`)** | CWD의 확률 과신(`ECE 0.026`)을 mIoU 손실·지연 없이 해결할 수 있는가? | Validation 전용 `T* = 1.70~1.72` 단일 나눗셈 → **ECE `-74.2%` (`0.0260 → 0.0067`), mIoU 변화 `0.00%p`, 지연 `0 ms`** | **추론 후처리 표준 채택** |
 """,
         ),
     ]
 
-    # Validate AST syntax of every code cell!
     for cell in cells:
         if cell["cell_type"] == "code":
             ast.parse("".join(cell["source"]), filename=f"cell:{cell['id']}")

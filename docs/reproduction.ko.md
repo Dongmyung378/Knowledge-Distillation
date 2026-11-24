@@ -1,91 +1,58 @@
-# 재현 및 실행 가이드
+# 원샷 검증 및 L4 전체 재현 가이드
 
-[한국어 README](../README.ko.md) · [English](./reproduction.md) · [아키텍처](./architecture.ko.md) · [실험 결과](./results.ko.md)
+[한국어 README](../README.ko.md) · [English](./reproduction.md) · [설계 판단 및 과정](./methodology-and-decisions.ko.md) · [실험 결과](./results.ko.md)
 
-## 1. 로컬 CPU 즉시 검증 (약 2분)
+본 프로젝트는 의미 없는 합성 데이터 데모 대신, **실제 학습·동결된 ONNX FP32/INT8 배포 모델(`v4.0-models`)과 `v3-max` / `v4-final` 동결 리포트를 원샷으로 검증**하거나 **NVIDIA L4에서 전체 실험을 처음부터 재현**할 수 있도록 단일 자립형 노트북으로 정리했습니다.
 
-GPU나 대용량 외부 데이터셋 없이 전체 파이프라인의 수학적 무결성, 양자화 감사, ONNX 변환, SHA-256 평가 동결, 사후 온도 보정을 로컬에서 검증할 수 있습니다.
+---
+
+## 1. 원샷 노트북으로 즉시 검증하기 (권장 · CPU/GPU 모두 지원)
+
+[`notebooks/colab_enterprise_l4_one_shot.ipynb`](../notebooks/colab_enterprise_l4_one_shot.ipynb) 파일 하나만 Google Colab, Vertex AI Colab Enterprise, 또는 로컬 Jupyter에 올리고 **런타임 → 모두 실행**(Run All)을 누르면 됩니다. (외부 Git 클론·Google Drive 마운트 불필요 — 코드·테스트·동결 매니페스트 23개 파일이 SHA-256 검증 번들로 내장됨)
+
+### 모드 A: `RUN_MODE = "verify_saved"` *(기본값 · 1~3분 원샷 검증)*
+1. **내장 코드 무결성 & 단위 테스트**: SHA-256 번들 추출 후 `seg_kd doctor` 및 `unittest` **12/12 PASS** 확인
+2. **배포 모델 SHA-256 동결 검증**: GitHub Release [`v4.0-models`](https://github.com/Dongmyung378/Knowledge-Distillation/releases/tag/v4.0-models)에서 실제 배포 ONNX 모델 4종(`v3 Clean` FP32/INT8, `v4 Robust` FP32/INT8)을 자동 다운로드해 `evaluation-freeze*.json`의 SHA-256과 **바이트 단위 100% 일치** 검증
+3. **실제 CPU ONNXRuntime 속도 실측**: 현재 머신(`384×768`, `batch=1`, 4스레드)에서 FP32 vs Static QDQ INT8 지연 시간(p50 ms, FPS)과 가속비·용량 축소비(`-72.5%`)를 실시간 측정하고 Validation-Only INT8 게이트(4/4) 로직 검증
+4. ***(선택) 실제 데이터셋 라이브 재평가 (`EVALUATE_LIVE_DATASETS = True`)***: 로그인 없이 `Chris1/cityscapes` (`locked_eval` 500장)와 공식 KITTI Semantics (`200장`)를 자동 다운로드해, 실제 ONNX INT8 모델의 `67.95% / 66.96%` mIoU · KITTI Zero-Shot · 온도 보정(`T*=1.70`) ECE를 눈앞에서 직접 재측정해 동결 리포트와 대조
+
+### 모드 B: `RUN_MODE = "reproduce_full"` *(NVIDIA L4 24GB · 전체 재학습·재현)*
+- `Chris1/cityscapes` (`384×768`, `train 2,529 / val 446 / locked_eval 500`) + KITTI(`200장`) 자동 준비
+- `SegFormer-B5` 교사 → `v3-max` (3시드 쌍체 비교 + 3-Tier Pareto + QAT-KD + ONNX INT8 게이트 + 동결 평가) → `v4-final` (Medium Baseline + `384×768` 4종 소거 + 비대칭 강건성 KD 45ep + BF16 교사 QAT-KD 6ep + ONNX INT8 게이트 + 사후 온도 보정) 전체 원샷 재현
+
+---
+
+## 2. 로컬 CLI 원샷 검증 (노트북 없이 터미널 실행)
 
 ```bash
-# 1. 가상환경 구성 및 패키지 설치
-python -m venv .venv
-# Windows: .venv\Scripts\activate  |  Linux/macOS: source .venv/bin/activate
+# 1. 패키지 설치 (ONNXRuntime 포함)
 pip install -e ".[export]"
 
-# 2. 런타임 진단 및 단위·통합 테스트 (12 tests)
-python -m seg_kd doctor
+# 2. 단위·무결성 테스트 12종 실행
 python -m unittest discover -s tests -v
 
-# 3. 합성 도로 데이터 End-to-End 스모크 파이프라인 실행
-python -m seg_kd prepare-data --dataset synthetic \
-  --data ./tmp/syn-data --output ./tmp/syn-manifest.json --image-size 128x256
-python scripts/run_l4_study.py \
-  --plan configs/l4-plan.json \
-  --manifest ./tmp/syn-manifest.json \
-  --data ./tmp/syn-data \
-  --output ./tmp/syn-out \
-  --smoke
+# 3. GitHub Release 배포 ONNX 모델 4종 SHA-256 동결 대조 + CPU 4스레드 속도 실측 + 마스터 요약 감사
+python scripts/verify_release_models.py --threads 4 --runs 20
 ```
 
 ---
 
-## 2. Vertex AI Colab Enterprise (NVIDIA L4) 원샷 재현
+## 3. 공개 배포 모델 아티팩트 ([GitHub Release `v4.0-models`](https://github.com/Dongmyung378/Knowledge-Distillation/releases/tag/v4.0-models))
 
-전체 `384×768` Cityscapes + KITTI Zero-Shot + `SegFormer-B5` → `MobileNetV4` 연구를 재현하려면 자립형 노트북을 사용합니다.
-
-1. [`notebooks/colab_enterprise_l4_one_shot.ipynb`](../notebooks/colab_enterprise_l4_one_shot.ipynb) 파일을 Colab Enterprise (`g2-standard-4` / NVIDIA L4 24GB, 디스크 `100GB+`)에 업로드합니다.
-2. 셀 1의 폼 파라미터에서 `DATA_SOURCE="hf_cityscapes"`, `ENABLE_KITTI_ZEROSHOT=True`, `RUN_MODE="full"`(또는 빠른 검증 시 `"pilot"`)을 선택합니다.
-3. **런타임 → 모두 실행**(Run All)을 클릭하면 내장된 SHA-256 소스 번들을 자동 검증·압축 해제한 뒤 데이터 다운로드, 단위 테스트, 단계별 학습·QAT·ONNX 내보내기·동결 평가·시각화·ZIP 번들 생성까지 자동 완주합니다.
-
----
-
-## 3. CLI 단계별 수동 실행
-
-직접 데이터 디렉터리를 보유한 Linux GPU 워크스테이션에서는 `seg_kd` CLI와 오케스트레이터를 단계별로 실행할 수 있습니다.
-
-```bash
-# 1. Cityscapes 매니페스트 생성 (도시 단위 분리 + SHA-256 해싱)
-python -m seg_kd prepare-data \
-  --dataset cityscapes \
-  --data /data/cityscapes \
-  --output ./manifests/cityscapes-manifest.json \
-  --seed 378
-
-# 2. KITTI Semantics Zero-Shot 매니페스트 생성
-python -m seg_kd prepare-data \
-  --dataset kitti \
-  --data /data/kitti \
-  --output ./manifests/kitti-manifest.json
-
-# 3. 단계별 재개 가능 실행 (teacher -> ablation -> pareto -> export -> freeze -> eval -> plots)
-python scripts/run_l4_study.py \
-  --plan configs/l4-plan.json \
-  --manifest ./manifests/cityscapes-manifest.json \
-  --data /data/cityscapes \
-  --kitti-manifest ./manifests/kitti-manifest.json \
-  --kitti-data /data/kitti \
-  --output ./runs/driving-seg-kd-l4 \
-  --stage all \
-  --device auto
-```
+| 파일명 | 크기 | 동결 SHA-256 (앞 16자리) | 용도 |
+|---|---:|---|---|
+| `v3-max-mobilenetv4-medium-int8.onnx` | 7.90 MiB | `8cda8dff653f4561` | 주간 최고 성능 INT8 (`67.95%`, `40.49 FPS`, Gate PASS) |
+| `v3-max-mobilenetv4-medium-fp32.onnx` | 28.71 MiB | `434c8e4243a55f35` | `v3-max` FP32 기준 대조 모델 (`68.51%`, `26.24 FPS`) |
+| `v4-final-robust-medium-int8.onnx` | 7.90 MiB | `fac9853786e9bb35` | 악천후·노이즈 강건 INT8 (`59.59%` 노이즈 교사 추월, Gate PASS) |
+| `v4-final-robust-medium-fp32.onnx` | 28.71 MiB | `1cb99d88e685d1f6` | `v4-final` FP32 기준 대조 모델 (`60.61%` 노이즈) |
 
 ---
 
-## 4. 리포트 및 포트폴리오 차트 재생성
-
-`outputs/v3-max/` 및 `outputs/v4-final/` 번들이 준비된 상태에서 아래 명령을 실행하면 `reports/final-summary.json`과 `assets/figures/`의 모든 차트·한/영 SVG를 결정론적으로 재생성합니다.
-
-```bash
-python scripts/generate_reports_and_figures.py
-```
-
----
-
-## 5. 환경 및 하드웨어 명세 (검증 완료 기준)
+## 4. 검증 완료 환경 명세
 
 | 항목 | 검증 환경 |
 |---|---|
 | GPU 학습 런타임 | NVIDIA L4 (`22.03 GiB` VRAM), CUDA `12.8`, PyTorch `2.11.0+cu128`, Python `3.13.15`, Linux |
 | CPU 벤치마크 런타임 | 4-thread ONNXRuntime Static QDQ INT8 / FP32 (`384×768`, `batch=1`) |
-| 로컬 단위 테스트 검증 | Windows 11, Python `3.12`, `unittest` 12/12 PASS |
-| 난수 시드 | 주력 쌍체 검증 `378, 379, 380` · 배포 기준 시드 `378` |
+| CI / 로컬 단위 검증 | GitHub Actions Linux & Windows 11, `unittest` 12/12 PASS + Release SHA-256 4/4 일치 |
+| 난수 시드 | 3시드 쌍체 검증 `378, 379, 380` · 배포 기준 시드 `378` |

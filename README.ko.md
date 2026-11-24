@@ -1,12 +1,27 @@
 # 자율주행 도로 세그멘테이션 지식 증류 · `seg_kd`
 
-[English](./README.md) · [아키텍처](./docs/architecture.ko.md) · [실험 결과](./docs/results.ko.md) · [재현 가이드](./docs/reproduction.ko.md) · [검증 요약 JSON](./reports/final-summary.json)
+[English](./README.md) · [설계 판단 및 과정](./docs/methodology-and-decisions.ko.md) · [아키텍처](./docs/architecture.ko.md) · [실험 결과](./docs/results.ko.md) · [원샷 검증 가이드](./docs/reproduction.ko.md) · [검증 요약 JSON](./reports/final-summary.json)
 
-84.6M 파라미터의 Vision Transformer 교사(`SegFormer-B5`, `323.14 MiB`, CPU `0.61 FPS`)를 7.5M 경량 Edge CNN 학생(`MobileNetV4-Medium + FPN`, **ONNX INT8 `7.91 MiB`**, CPU **`40.49 FPS`**, NVIDIA L4 BF16 **`57.20 FPS`**)으로 압축하는 **이종 아키텍처 지식 증류(Cross-Architecture Knowledge Distillation)** 파이프라인입니다.
+84.6M 파라미터의 Vision Transformer 교사(`SegFormer-B5`, `323.14 MiB`, CPU `0.61 FPS`)를 7.5M 경량 Edge CNN 학생(`MobileNetV4-Medium + FPN`, **ONNX INT8 `7.91 MiB`**, CPU **`40.49 FPS`**, NVIDIA L4 BF16 **`57.20 FPS`**)으로 압축하는 **이종 아키텍처 지식 증류(Cross-Architecture Knowledge Distillation)** 연구·배포 파이프라인입니다.
 
-모든 분할(`train 2,529 / validation 446 / locked_eval 500`), 모델 선택, INT8 배포 게이트, 사후 온도 보정(`Temperature Scaling`)은 `validation` 전용으로 고정하고, `locked_eval`과 **KITTI Semantics Zero-Shot**(`200장`)은 SHA-256 해시 동결(`evaluation-freeze`) 후 단 한 번 평가했습니다. 특히 **깨끗한 교사 → 열화 입력 학생(Clean Teacher → Corrupted Student)** 비대칭 강건성 증류(`v4-final`)를 통해 **`7.91 MiB` INT8 학생이 가우시안 센서 노이즈(`σ=18`) 환경에서 `59.59% mIoU`를 기록해 11.2배 큰 `84.6M` 교사(`59.19%`)를 추월**했습니다.
+모든 분할(`train 2,529 / validation 446 / locked_eval 500`), 손실 소거, INT8 배포 게이트, 사후 온도 보정(`Temperature Scaling`)은 `validation` 전용으로 고정하고, `locked_eval`과 **KITTI Semantics Zero-Shot**(`200장`)은 SHA-256 해시 동결(`evaluation-freeze`) 후 단 한 번 평가했습니다. 특히 **깨끗한 교사 → 열화 입력 학생(Clean Teacher → Corrupted Student)** 비대칭 강건성 증류(`v4-final`)를 통해 **`7.91 MiB` INT8 학생이 가우시안 센서 노이즈(`σ=18`) 환경에서 `59.59% mIoU`를 기록해 11.2배 큰 `84.6M` 교사(`59.19%`)를 추월**했습니다.
 
 ![자율주행 세그멘테이션 지식 증류 요약](./assets/figures/kd-thumbnail.svg)
+
+---
+
+## 실험 과정과 단계별 선택 이유
+
+단순히 한 모델을 학습해 수치를 보고하는 대신, **가설 수립 → 정량 진단 → 실패 원인 규명 → 구조적 개선**의 6단계 의사결정 과정으로 파이프라인을 완성했습니다(전체 상세 분석: [`docs/methodology-and-decisions.ko.md`](./docs/methodology-and-decisions.ko.md)).
+
+| 단계 | 핵심 질문 | 정량 진단 결과 | 설계 선택 및 기각 사유 |
+| :--- | :--- | :--- | :--- |
+| **1. 해상도·프로토콜** | CPU 40 FPS 엣지 예산에서 작은 안전 객체를 식별할 해상도는? | `Chris1/cityscapes` 원본 → `384×768` (`train 2,529 / val 446 / locked 500`) + KITTI 200장 Zero-Shot | **`384×768` 채택** (`128×256` 소형 객체 손실·`1024×2048` 비실시간 기각) |
+| **2. 증류 손실 소거** | 픽셀 KL vs 공간 CWD vs 4단계 특징 정렬 중 무엇이 이종 ViT→CNN 압축에 유효한가? | `pixel_kl` **`-2.41%p` 역효과** (Safety `-5.71%p`) vs **`cwd` `63.07%` (`+1.42%p`, KITTI Safety `+7.12%p`)** | **`pixel_kl` 기각**, 채널별 공간 분포를 정렬하는 **`CWD` 채택** |
+| **3. 3시드 쌍체 검증** | 단일 시드 우연이 아니며 안전 핵심 6종이 일관되게 오르는가? | 공유 초기화 3시드(`378/379/380`): **3/3 전승** (`+0.61%p`, Safety **`+1.88%p`**, **6/6 전원 상승**, SD `2.7~3.1×` 축소) | 안전 클래스 강화 및 분산 안정화 효과 입증 |
+| **4. 3-Tier Pareto · INT8 게이트** | 어떤 백본이 정적 QDQ INT8에서 붕괴 없이 실제 CPU 가속을 달성하는가? | `V3-Large` INT8 **`-6.46%p`·`0.72×` 붕괴(자동 차단)**, `V4-Small` `1.04×` 미달(기각), **`V4-Medium` 4/4 통과 (`67.95%`, `40.49 FPS`)** | SE+HardSwish 비융합 구조 기각 → 순수 `Conv-BN-ReLU` UIB **`MobileNetV4-Medium INT8` 채택** |
+| **5. 비대칭 강건성 KD (`v4`)** | `v3 Clean INT8`의 센서 노이즈 붕괴(`13.75%`)를 어떻게 해결할 것인가? | Clean 교사 → Corrupted 학생(5ep 램프) + BF16 QAT-KD → 노이즈 **`59.59%` (`+45.84%p` 회복, 교사 `59.19%` 추월)**, 안개 `66.33%` | 주간 최고 정확도(`v3`) vs 악천후 방어(`v4`) **2-프로파일 배포 확정** |
+| **6. 사후 온도 보정 (`ECE`)** | CWD의 확률 과신(`ECE 0.025~0.031`)을 정확도·지연 손실 없이 교정할 수 있는가? | Validation NLL 최적화 시 모든 CWD 모델이 `T* = 1.70~1.72` 수렴 → **ECE `-69.5~78.5%`**, mIoU 변화 `0.00%p`, 지연 `0 ms` | 단일 스칼라 `T*` 온도 보정 표준 후처리 채택 |
 
 ---
 
@@ -28,7 +43,6 @@
 | **`MobileNetV4-Medium` Robust KD (`v4-final`)** | **ONNX INT8** | **7.54M / 7.91 MiB** | **66.96%** | **57.32%** | 48.10% (30.49%) | **26.02 ms (38.44 FPS)** | **통과 (4/4 ALL PASS)** |
 
 - **주간 최고 성능(`v3-max` Clean INT8)**: 교사 대비 **11.2× 적은 파라미터 · 40.9× 작은 파일(`7.91 MiB`) · 66.0× 빠른 CPU 추론**(`40.49 FPS`)으로 교사 mIoU의 **90.8%**(`67.95% / 74.83%`)를 보존했습니다. 동일 아키텍처 무교사 FP32 베이스라인(`67.15%`, `28.71 MiB`)을 **`1/3.6` 크기 INT8 모델로 `+0.80%p` mIoU, `+2.06%p` Safety-6 mIoU, KITTI Zero-Shot `+2.23%p` (Safety `+7.46%p`) 앞섭니다.**
-- **Validation-Only INT8 자동 게이트 검증**: `MobileNetV3-Large`는 18개 Squeeze-and-Excitation(SE) + HardSwish 비융합 경로 때문에 정적 INT8에서 검증 mIoU가 **`-6.46%p`** 붕괴하고 속도가 **`0.72×`** 느려졌습니다. 자동 배포 게이트가 `locked_eval`을 열어보기 전에 이를 차단해 FP32로 안전 롤백한 반면, `Conv-BN-ReLU` UIB 블록 기반의 `MobileNetV4-Medium`은 두 버전 모두 4/4 조건(검증 mIoU 하락 `<=1.0%p`, Safety 하락 `<=1.5%p`, 용량 감소, CPU `>=1.2×` 가속)을 통과했습니다.
 
 ![Accuracy-Latency Pareto Frontier](./assets/figures/kd-pareto-frontier.png)
 
@@ -51,66 +65,29 @@
 ### 3. 3시드 쌍체 재현성 · 384×768 증류 기법 소거 · 사후 온도 보정(ECE)
 
 - **3시드 쌍체 비교(`MobileNetV4-Small 1.50M`, seeds `378, 379, 380`)**: 동일 초기 가중치에서 `baseline` `61.42% ± 0.21%` → `cwd_feat` `62.03% ± 0.08%` (**`+0.61%p`, 3/3 승, 시드 분산 2.7× 축소**), Safety-6 mIoU `49.52% ± 0.90%` → `51.40% ± 0.29%` (**`+1.88%p`, 3/3 승, 분산 3.1× 축소**). 3시드 평균 기준 **6개 안전 핵심 클래스 6/6 전원 상승**(`traffic_light +2.75%p`, `bicycle +2.44%p`, `traffic_sign +2.11%p`, `person +1.59%p`, `rider +1.51%p`, `motorcycle +0.89%p`).
-- **384×768 4종 증류 소거(`seed=378`, `1.50M`)**: 순진한 픽셀 KL(`pixel_kl`)은 `59.25%`(**`-2.41%p` 역효과**, Safety `-5.71%p`)로 무너진 반면, 채널별 공간 분포를 정렬하는 **CWD**(`cwd`)는 **`63.07%`**(`+1.42%p`, Safety `51.92%`, KITTI `47.38%` / Safety `+7.12%p`)를 달성했습니다. `56×` 극한 압축(`84.6M → 1.5M`)에서는 중간 특징 강제 정렬(`cwd_feat`, `62.00%`)보다 공간 로짓 CWD 단독이 더 큰 이득을 냅니다.
+- **384×768 4종 증류 소거(`seed=378`, `1.50M`)**: 순진한 픽셀 KL(`pixel_kl`)은 `59.25%`(**`-2.41%p` 역효과**, Safety `-5.71%p`)로 무너진 반면, 채널별 공간 분포를 정렬하는 **CWD**(`cwd`)는 **`63.07%`**(`+1.42%p`, Safety `51.92%`, KITTI `47.38%` / Safety `+7.12%p`)를 달성했습니다.
 - **Validation-Only 온도 보정(ECE)**: CWD 증류 모델 전체가 일관되게 `T* = 1.70~1.72` 범위로 수렴하며, mIoU `0.00%p` 변화·추론 지연 `0 ms`로 `locked_eval` ECE를 **69.5~78.5% 감소**시켰습니다(`v4 Robust INT8`: `0.0260 → 0.0067`, `-74.2%`; `v3 Clean INT8`: `0.0254 → 0.0073`, `-71.4%`).
 
 ![3-Seed Reproducibility and Per-Class IoU Gain](./assets/figures/kd-3seed-per-class.png)
 
 ---
 
-## 시스템 구조 및 핵심 기법
+## 원샷 검증 및 재현
 
-```text
-Cityscapes 384x768 (train 2,529 / val 446 / locked 500) + KITTI Zero-Shot (200)
-  |- Clean RGB --------> Frozen SegFormer-B5 Teacher (84.6M, MiT-B5, BF16)
-  |                        `- 4-Stage Pyramid (s4..s32) + Clean Logits (19ch)
-  `- Clean/Corrupt RGB -> MobileNetV4-Medium + FPN Student (7.54M, UIB Conv-BN)
-                           |- L_CE + 0.25*L_Dice (unweighted, ignore=255)
-                           |- L_CWD (Channel Spatial Softmax KL, T=4.0)
-                           |- L_Feat (1x1 Projector: 0.5*CWD + 0.5*Cosine)
-                           `- QAT-KD (6 ep) -> ONNX FP32/INT8 (QDQ, 128 calib)
-                                 |- Validation-Only INT8 Gate (4/4 checks)
-                                 |- Validation-Only Temp Scaling (T*~=1.70)
-                                 `- SHA-256 Frozen Locked Eval & KITTI
-```
+의미 없는 합성 데이터 데모 대신, **실제 배포 ONNX INT8/FP32 모델([GitHub Release `v4.0-models`](https://github.com/Dongmyung378/Knowledge-Distillation/releases/tag/v4.0-models))과 동결 리포트를 원샷으로 검증**하거나 L4 GPU에서 전체 실험을 재현할 수 있습니다.
 
-1. **Channel-Wise Spatial Distillation (`CWD`)**: 클래스 픽셀 불균형이 극심한 도로 장면에서 픽셀별 KL(`softmax` over `C`)은 소수 안전 클래스를 희석합니다. 채널별 공간 맵(`softmax` over `H×W`)을 정렬해 신호등·보행자·자전거 경계를 선명하게 전이합니다.
-2. **이종 아키텍처 4단계 하이브리드 특징 정렬**: Transformer(`SegFormer-B5`)와 CNN(`MobileNetV4`)의 `s4, s8, s16, s32` 피라미드 채널 차원을 학습 시에만 존재하는 `1×1 Conv-BN` 프로젝터로 정합하고(`추론 오버헤드 0`), `0.5·CWD + 0.5·Cosine` 복합 손실로 정렬합니다.
-3. **비대칭 강건성 증류 (`Asymmetric Robustness KD`)**: 5에포크 램프 스케줄(`p: 0 → 0.35`)로 학생 입력에만 GPU 배치 야간 감마·모션 블러·안개 저대비·가우시안 노이즈를 주입하고, 교사는 항상 깨끗한 원본 입력을 봐 "열화되어도 깨끗한 장면의 특징과 로짓을 복원"하도록 학습합니다.
-4. **양자화 친화 설계 감사 & 검증 전용 INT8 게이트**: `audit_quantization_friendliness()`로 `Conv-ReLU-BN` 비융합 패턴을 사전 검출하고, QAT-KD 후 정적 QDQ INT8 모델을 `validation` 기준 4개 정량 게이트로 심사해 `locked_eval` 누설 없이 배포 포맷을 자동 선택합니다.
-
-세부 수식과 모듈 설계는 [`docs/architecture.ko.md`](./docs/architecture.ko.md), 전체 실험표와 실패 분석은 [`docs/results.ko.md`](./docs/results.ko.md)를 참고하십시오.
-
----
-
-## 로컬 실행 및 재현
+1. **원샷 자립형 노트북 (추천)**: [`notebooks/colab_enterprise_l4_one_shot.ipynb`](./notebooks/colab_enterprise_l4_one_shot.ipynb)를 Colab / Jupyter에 올리고 **모두 실행**(Run All)
+   - `RUN_MODE = "verify_saved"` *(기본, CPU/GPU 1~3분)*: 내장 `seg_kd` 번들 SHA-256 검증 → 단위 테스트 12/12 → 배포 ONNX 모델 4종 자동 다운로드 & 동결 해시 100% 일치 확인 → CPU 4스레드 실시간 속도 실측 → *(옵션)* Cityscapes `locked_eval`·KITTI 라이브 재평가
+   - `RUN_MODE = "reproduce_full"` *(NVIDIA L4 24GB)*: `Chris1/cityscapes` (`384×768`) + KITTI 자동 다운로드 및 `v3-max` + `v4-final` 전체 재학습·재현
+2. **로컬 터미널 원샷 검증**:
 
 ```bash
-# 1. 환경 설치 및 진단
 pip install -e ".[export]"
-python -m seg_kd doctor
-
-# 2. 단위 테스트 및 1분 End-to-End 파이프라인 스모크 테스트
 python -m unittest discover -s tests -v
-python -m seg_kd prepare-data --dataset synthetic \
-  --data ./tmp/syn-data --output ./tmp/syn-manifest.json --image-size 128x256
-python scripts/run_l4_study.py --plan configs/l4-plan.json \
-  --manifest ./tmp/syn-manifest.json --data ./tmp/syn-data \
-  --output ./tmp/syn-out --smoke
+python scripts/verify_release_models.py --threads 4 --runs 20
 ```
 
-전체 NVIDIA L4 실험은 자립형 노트북 [`notebooks/colab_enterprise_l4_one_shot.ipynb`](./notebooks/colab_enterprise_l4_one_shot.ipynb)의 `Run All` 한 번으로 재현할 수 있습니다. 자세한 단계별 CLI와 데이터 준비 절차는 [`docs/reproduction.ko.md`](./docs/reproduction.ko.md)를 참고하십시오.
-
----
-
-## 소프트웨어 검증
-
-- **단위·통합 테스트 (`unittest`, 12/12 PASS)**:
-  - `tests/test_taxonomy_and_data.py`: Cityscapes 19클래스 `labelId → trainId` 매핑, 도시 분리 분할, SHA-256 매니페스트 변조 탐지, KITTI/BDD100K 레이아웃 검증
-  - `tests/test_models.py`: `Conv-ReLU-BN` 양자화 안티패턴 감사, 4단계 피라미드 정렬, `SegFormer-B4/B5` 오프라인 설정·체크포인트 SHA-256 왕복 및 TorchScript 추적
-  - `tests/test_losses.py`: `ignore_index=255` 마스킹 불변성, 자기 증류 0-KL 불변성, BF16 혼합정밀도 유한 그래디언트 (`pixel_kl`, `cwd`, `cwd_feat`, `cwd_safety`)
-  - `tests/test_pipeline_smoke.py`: 합성 도로 장면 기준 교사 → 공유 초기화 쌍체 학생 → QAT → ONNX FP32/INT8 → 동결 → `locked_eval` → 사후 온도 보정 전체 파이프라인 스모크
-- **CI 자동화**: [`.github/workflows/tests.yml`](./.github/workflows/tests.yml)에서 푸시 및 PR마다 전체 테스트 수트를 자동 검증합니다.
+자세한 단계별 절차는 [`docs/reproduction.ko.md`](./docs/reproduction.ko.md)를 참고하십시오.
 
 ---
 
@@ -119,20 +96,20 @@ python scripts/run_l4_study.py --plan configs/l4-plan.json \
 | 경로 | 설명 |
 |---|---|
 | [`seg_kd/`](./seg_kd/) | 핵심 PyTorch·ONNX 패키지 (`taxonomy`, `data`, `models`, `losses`, `training`, `export`, `evaluation`, `benchmark`, `visualize`, `cli`) |
+| [`notebooks/colab_enterprise_l4_one_shot.ipynb`](./notebooks/colab_enterprise_l4_one_shot.ipynb) | 소스·동결 리포트 내장 원샷 검증(`verify_saved`) 및 L4 전체 재현(`reproduce_full`) 노트북 |
+| [`scripts/verify_release_models.py`](./scripts/verify_release_models.py) | GitHub Release `v4.0-models` ONNX 모델 SHA-256 동결 검증 및 CPU 속도 실측 스크립트 |
+| [`scripts/run_l4_study.py`](./scripts/run_l4_study.py) | 재개 가능한 단계별 학습 오케스트레이터 (`teacher → ablation → pareto → export → freeze → eval → plots`) |
 | [`configs/l4-plan.json`](./configs/l4-plan.json) | `SegFormer-B5` → `MobileNetV4` 3시드·Pareto·비대칭 강건성 KD·INT8 게이트 고정 실험 계획 |
-| [`scripts/run_l4_study.py`](./scripts/run_l4_study.py) | 재개 가능한 단계별 오케스트레이터 (`teacher → ablation → pareto → export → freeze → eval → plots`) |
-| [`scripts/generate_reports_and_figures.py`](./scripts/generate_reports_and_figures.py) | 검증 JSON 집계 및 겹침 없는 포트폴리오 차트·SVG 생성 스크립트 |
-| [`notebooks/colab_enterprise_l4_one_shot.ipynb`](./notebooks/colab_enterprise_l4_one_shot.ipynb) | 소스 코드 SHA-256 번들 내장 Vertex AI Colab Enterprise (L4) 원샷 실행 노트북 |
 | [`reports/final-summary.json`](./reports/final-summary.json) | `v3-max` + `v4-final` 전체 정량 지표·동결 해시·게이트 판정 마스터 JSON |
-| [`docs/`](./docs/results.ko.md) | 한/영 아키텍처·전체 결과·재현 가이드 (`architecture`, `results`, `reproduction`) |
-| [`assets/figures/`](./assets/figures/) | 논문·포트폴리오용 검증 차트 및 한/영 요약 SVG |
-| [`tests/`](./tests/) | 12개 단위·스모크 테스트 수트 |
+| [`docs/`](./docs/methodology-and-decisions.ko.md) | 한/영 설계 판단·아키텍처·전체 결과·원샷 검증 가이드 (`methodology-and-decisions`, `architecture`, `results`, `reproduction`) |
+| [`assets/figures/`](./assets/figures/) | 검증 차트 및 한/영 요약 SVG |
+| [`tests/`](./tests/) | 12개 단위·무결성 테스트 수트 ([GitHub Actions CI](./.github/workflows/tests.yml) 자동 통과) |
 
 ---
 
 ## 적용 범위 및 한계
 
-1. **해상도 범위 (`384×768`)**: 실시간 CPU 40 FPS 엣지 배포를 목표로 `384×768` 해상도에서 학습·평가했습니다. 공식 Cityscapes 고해상도 리더보드(`1024×2048`, 멀티스케일·TTA 포함) 수치와는 평가 조건이 다르므로 직접 1:1 비교할 수 없습니다.
-2. **합성 악천후 vs 실주행 악천후**: `v4-final` 강건성 테스트는 `locked_eval` 200프레임에 대한 결정론적 합성 열화(야간·블러·안개·가우시안 노이즈) 기준입니다. 실제 야간 우천·눈길 주행 검증(예: ACDC, Dark Zurich)은 추가 수집 후속 과제로 남아 있습니다.
+1. **해상도 범위 (`384×768`)**: 실시간 CPU 40 FPS 엣지 배포를 목표로 `384×768` 해상도에서 학습·평가했습니다. 공식 Cityscapes 고해상도 리더보드(`1024×2048`, 멀티스케일·TTA 포함) 수치와는 평가 조건이 다르므로 직접 1:1 비교하지 않습니다.
+2. **합성 악천후 vs 실주행 악천후**: `v4-final` 강건성 테스트는 `locked_eval` 200프레임에 대한 결정론적 합성 열화(야간·블러·안개·가우시안 노이즈) 기준이며, 실제 우천·야간·폭설 도메인(ACDC, Dark Zurich 등) 일반화는 별도의 실주행 데이터 검증이 필요합니다.
 3. **희소 대형 차량 트레이드오프 및 시드 범위**: 3시드 쌍체 검증은 `1.50M` 주력 모델에서 수행했으며, 6/6 안전 클래스가 모두 개선된 반면 빈도가 낮은 `truck(-7.32%p)`·`bus(-1.71%p)`에서 공간 분포 정규화 트레이드오프가 관측되었습니다. `MobileNetV4-Medium`과 `384×768` 4종 소거는 단일 시드(`seed=378`) 결과입니다.
-4. **배포 선택 트레이드오프**: 맑은 주간 정확도 우선 시 `v3-max Clean INT8`(`67.95%`, `40.49 FPS`), 야간·안개·센서 노이즈 안전성 우선 시 `v4-final Robust INT8`(`66.96%` Clean / `59.59%` Noise, `38.44 FPS`)을 선택하는 2-프로파일 구성을 권장합니다.
+4. **2-프로파일 배포 선택**: 맑은 주간 정확도 우선 시 `v3-max Clean INT8`(`67.95%`, `40.49 FPS`), 야간·안개·센서 노이즈 안전성 우선 시 `v4-final Robust INT8`(`66.96%` Clean / `59.59%` Noise, `38.44 FPS`)을 선택합니다.

@@ -1,12 +1,27 @@
 # Driving Semantic Segmentation Knowledge Distillation · `seg_kd`
 
-[한국어](./README.ko.md) · [Architecture](./docs/architecture.md) · [Results](./docs/results.md) · [Reproduction](./docs/reproduction.md) · [Summary JSON](./reports/final-summary.json)
+[한국어](./README.ko.md) · [Methodology & Decisions](./docs/methodology-and-decisions.md) · [Architecture](./docs/architecture.md) · [Results](./docs/results.md) · [Verification Guide](./docs/reproduction.md) · [Summary JSON](./reports/final-summary.json)
 
-A cross-architecture knowledge distillation pipeline that compresses an **84.6M Vision Transformer teacher** (`SegFormer-B5`, `323.14 MiB`, `0.61 FPS` CPU) into a **7.54M Edge CNN student** (`MobileNetV4-Medium + FPN`, **ONNX INT8 `7.91 MiB`**, **`40.49 FPS`** CPU, **`57.20 FPS`** NVIDIA L4 BF16) for autonomous driving road-scene segmentation.
+A cross-architecture knowledge distillation research & deployment pipeline compressing an **84.6M Vision Transformer teacher** (`SegFormer-B5`, `323.14 MiB`, `0.61 FPS` CPU) into a **7.54M Edge CNN student** (`MobileNetV4-Medium + FPN`, **ONNX INT8 `7.91 MiB`**, **`40.49 FPS`** CPU, **`57.20 FPS`** NVIDIA L4 BF16) for autonomous driving road-scene segmentation.
 
-All dataset splits (`train 2,529 / validation 446 / locked_eval 500`), model selection, INT8 deployment gating, and post-hoc temperature scaling are strictly fit on `validation` only, while `locked_eval` and **KITTI Semantics Zero-Shot (`200` images)** are evaluated once after SHA-256 cryptographic freezing. Using **Asymmetric Robustness KD (`v4-final`: Clean Teacher → Corrupted Student)**, the **`7.91 MiB` INT8 student achieves `59.59% mIoU` under Gaussian sensor noise (`σ=18`), surpassing the `11.2×` larger `84.6M` teacher (`59.19%`)**.
+All dataset splits (`train 2,529 / validation 446 / locked_eval 500`), loss ablations, INT8 deployment gating, and post-hoc temperature scaling are strictly fit on `validation` only, while `locked_eval` and **KITTI Semantics Zero-Shot (`200` images)** are evaluated once after SHA-256 cryptographic freezing. Using **Asymmetric Robustness KD (`v4-final`: Clean Teacher → Corrupted Student)**, the **`7.91 MiB` INT8 student achieves `59.59% mIoU` under Gaussian sensor noise (`σ=18`), surpassing the `11.2×` larger `84.6M` teacher (`59.19%`)**.
 
 ![Driving Semantic Segmentation KD Overview](./assets/figures/en/kd-thumbnail.svg)
+
+---
+
+## Experimental Progression & Design Rationale
+
+Every architectural, loss, quantization, and calibration choice was derived from staged diagnostics rather than guesswork (full analysis in [`docs/methodology-and-decisions.md`](./docs/methodology-and-decisions.md)):
+
+| Stage | Core Question | Measured Evidence | Decision |
+| :--- | :--- | :--- | :--- |
+| **1. Resolution & Protocol** | Minimum resolution preserving small safety classes within a 40 FPS CPU edge budget? | `Chris1/cityscapes` full-res → `384×768` (`2,529 / 446 / 500`) + KITTI 200 zero-shot | **Adopt `384×768`** + SHA-256 freeze |
+| **2. Loss Ablation (`1.50M`)** | Pixel KL vs Spatial CWD vs 4-Stage Feature KD under `56×` ViT→CNN compression? | `pixel_kl` **`-2.41%p`** (Safety `-5.71%p`) vs **`cwd` `63.07%` (`+1.42%p`, KITTI Safety `+7.12%p`)** | **Reject `pixel_kl`**; adopt spatial `CWD` |
+| **3. 3-Seed Paired Study** | Are gains reproducible across seeds and across all 6 vulnerable road-user classes? | Shared-init 3-seed (`378/379/380`): **3/3 wins** (`+0.61%p`, Safety **`+1.88%p`**, **6/6 positive**, `2.7–3.1×` lower SD) | Reproducibility confirmed |
+| **4. 3-Tier Pareto & INT8 Gate** | Which backbone delivers real CPU speedup in static QDQ INT8 without accuracy collapse? | `V3-Large` **`-6.46%p` / `0.72×` (blocked)**; `V4-Small` `1.04× < 1.20×` (rejected); **`V4-Medium` 4/4 PASS (`67.95%`, `40.49 FPS`)** | **Adopt `MobileNetV4-Medium INT8`** (pure UIB `Conv-BN-ReLU`) |
+| **5. Asymmetric Robust KD (`v4`)** | How to fix clean INT8's collapse (`13.75%`) under Gaussian sensor noise? | Clean Teacher → Corrupted Student + BF16 QAT-KD → **`59.59%` noise (`+45.84%p`, beats 84.6M teacher `59.19%`)**, Fog `66.33%` | **Two-profile deployment** (`v3 Clean` vs `v4 Robust`) |
+| **6. Temperature Scaling (`ECE`)** | Can CWD confidence over-sharpening (`ECE 0.025–0.031`) be fixed at zero latency/mIoU cost? | Validation-only fit converges to `T* = 1.70–1.72` → **ECE `-69.5–78.5%`**, `0.00%p` mIoU delta, `0 ms` overhead | Adopt scalar `T*` post-processing |
 
 ---
 
@@ -27,9 +42,6 @@ All dataset splits (`train 2,529 / validation 446 / locked_eval 500`), model sel
 | **`MobileNetV4-Medium` Robust KD (`v4-final`)** | ONNX FP32 | 7.54M / 28.71 MiB | 67.35% | 58.14% | 50.04% (31.96%) | 40.28 ms (24.83 FPS) | — |
 | **`MobileNetV4-Medium` Robust KD (`v4-final`)** | **ONNX INT8** | **7.54M / 7.91 MiB** | **66.96%** | **57.32%** | 48.10% (30.49%) | **26.02 ms (38.44 FPS)** | **PASS (4/4 Checks)** |
 
-- **Clean Peak Deployment (`v3-max` Clean INT8)**: Retains **90.8% of the 84.6M teacher's mIoU** (`67.95%` vs `74.83%`) at **`11.2×` fewer parameters, `40.9×` smaller artifact size (`7.91 MiB`), and `66.0×` faster CPU latency (`40.49 FPS`)**. Even after INT8 quantization, it beats the same-architecture `28.71 MiB` FP32 no-teacher baseline by **`+0.80%p` mIoU, `+2.06%p` Safety-6 mIoU, and `+2.23%p` KITTI Zero-Shot (`+7.46%p` Safety)**.
-- **Validation-Only INT8 Gate Proof**: `MobileNetV3-Large` suffered a **`-6.46%p`** validation mIoU collapse and **`0.72×`** slowdown in static QDQ INT8 due to 18 unfused Squeeze-and-Excitation (SE) + HardSwish paths. The validation-only gate caught and rejected it automatically before `locked_eval`, while `MobileNetV4-Medium` (clean `Conv-BN-ReLU` UIB blocks) passed all 4/4 criteria in both `v3-max` and `v4-final`.
-
 ![Accuracy-Latency Pareto Frontier](./assets/figures/kd-pareto-frontier.png)
 
 ### 2. Asymmetric Robustness KD (`v4-final`) 4-Corruption Stress Test (200 Frames)
@@ -42,70 +54,28 @@ All dataset splits (`train 2,529 / validation 446 / locked_eval 500`), model sel
 | **`MobileNetV4-Medium` Robust FP32 (`v4-final`)** | 67.19% | **66.07%** | **60.56%** | **66.98%** | **60.61%** *(+1.42%p vs Teacher)* | **48.00%** |
 | **`MobileNetV4-Medium` Robust INT8 (`v4-final`)** | 66.89% | 64.71% | 59.37% | **66.33%** | **59.59%** *(+0.40%p vs Teacher)* | **46.99%** |
 
-- Clean-distilled `v3-max INT8` collapsed to `13.75%` under sensor noise (`σ=18`). Feeding clean frames to the frozen teacher while corrupting only the student's inputs recovered **`+45.84%p`** under sensor noise (`13.75% → 59.59%`, surpassing the 84.6M teacher!) and boosted fog mIoU by **`+9.44%p`** over baseline (`56.89% → 66.33%`) for only a `0.50–0.99%p` clean trade-off.
-
 ![Asymmetric Robustness KD Stress Test](./assets/figures/kd-robustness-breakthrough.png)
 
 ![Noisy Road Scene Overlays](./assets/figures/kd-road-overlays-noise.png)
 
-### 3. 3-Seed Reproducibility · 384×768 Ablation · Post-Hoc Temperature Scaling
-
-- **3-Seed Paired Study (`MobileNetV4-Small 1.50M`, seeds `378, 379, 380`)**: From identical shared initial weights, `cwd_feat` improves mIoU from `61.42% ± 0.21%` to **`62.03% ± 0.08%` (`+0.61%p`, 3/3 wins, 2.7× lower seed SD)** and Safety-6 mIoU from `49.52% ± 0.90%` to **`51.40% ± 0.29%` (`+1.88%p`, 3/3 wins, 3.1× lower SD)**, with **6/6 safety classes positive** on 3-seed mean (`traffic_light +2.75%p`, `bicycle +2.44%p`, `traffic_sign +2.11%p`, `person +1.59%p`, `rider +1.51%p`, `motorcycle +0.89%p`).
-- **384×768 4-Method Ablation (`seed=378`, `1.50M`)**: Naive `pixel_kl` degrades accuracy to `59.25%` (**`-2.41%p`**, Safety `-5.71%p`), whereas pure **Channel-Wise Spatial Distillation (`cwd`)** reaches **`63.07%` (`+1.42%p`, Safety `51.92%`, KITTI `47.38%` / Safety `+7.12%p`)**, proving that extreme `56×` ViT-to-CNN compression benefits more from spatial logit transfer than hard intermediate feature mimicry (`cwd_feat`, `62.00%`).
-- **Validation-Only Temperature Scaling (ECE)**: All CWD-distilled models converge to **`T* = 1.70–1.72`**, cutting `locked_eval` ECE by **69.5–78.5%** with **exact `0.00%p` mIoU change** and `0 ms` inference overhead (`v4 Robust INT8`: `0.0260 → 0.0067`, `-74.2%`).
-
-![3-Seed Reproducibility and Per-Class IoU Gain](./assets/figures/kd-3seed-per-class.png)
-
 ---
 
-## Architecture & Core Techniques
+## One-Shot Verification & Reproduction
 
-```text
-Cityscapes 384x768 (train 2,529 / val 446 / locked 500) + KITTI Zero-Shot (200)
-  |- Clean RGB --------> Frozen SegFormer-B5 Teacher (84.6M, MiT-B5, BF16)
-  |                        `- 4-Stage Pyramid (s4..s32) + Clean Logits (19ch)
-  `- Clean/Corrupt RGB -> MobileNetV4-Medium + FPN Student (7.54M, UIB Conv-BN)
-                           |- L_CE + 0.25*L_Dice (unweighted, ignore=255)
-                           |- L_CWD (Channel Spatial Softmax KL, T=4.0)
-                           |- L_Feat (1x1 Projector: 0.5*CWD + 0.5*Cosine)
-                           `- QAT-KD (6 ep) -> ONNX FP32/INT8 (QDQ, 128 calib)
-                                 |- Validation-Only INT8 Gate (4/4 checks)
-                                 |- Validation-Only Temp Scaling (T*~=1.70)
-                                 `- SHA-256 Frozen Locked Eval & KITTI
-```
+Instead of toy synthetic demos, verify the **published SHA-256 frozen ONNX FP32/INT8 models ([GitHub Release `v4.0-models`](https://github.com/Dongmyung378/Knowledge-Distillation/releases/tag/v4.0-models))** directly or retrain on an NVIDIA L4:
 
-See [`docs/architecture.md`](./docs/architecture.md) for equations and module details, and [`docs/results.md`](./docs/results.md) for complete ablation tables and failure analysis.
-
----
-
-## Local Verification & Reproduction
+1. **One-Shot Self-Contained Notebook (Recommended)**: Open [`notebooks/colab_enterprise_l4_one_shot.ipynb`](./notebooks/colab_enterprise_l4_one_shot.ipynb) in Colab or Jupyter and click **Run All**:
+   - `RUN_MODE = "verify_saved"` *(default, CPU/GPU 1–3 min)*: Verifies embedded `seg_kd` SHA-256 bundle → passes 12/12 unit tests → downloads & SHA-256-verifies all 4 frozen ONNX models → runs live 4-thread CPU latency benchmarks → *(optional)* runs live Cityscapes `locked_eval` & KITTI re-evaluation.
+   - `RUN_MODE = "reproduce_full"` *(NVIDIA L4 24GB)*: Downloads `Chris1/cityscapes` (`384×768`) + KITTI and retrains the complete `v3-max` + `v4-final` study end-to-end.
+2. **Local Terminal One-Shot Verification**:
 
 ```bash
-# 1. Install package & inspect environment
 pip install -e ".[export]"
-python -m seg_kd doctor
-
-# 2. Run unit tests & end-to-end synthetic smoke pipeline
 python -m unittest discover -s tests -v
-python -m seg_kd prepare-data --dataset synthetic \
-  --data ./tmp/syn-data --output ./tmp/syn-manifest.json --image-size 128x256
-python scripts/run_l4_study.py --plan configs/l4-plan.json \
-  --manifest ./tmp/syn-manifest.json --data ./tmp/syn-data \
-  --output ./tmp/syn-out --smoke
+python scripts/verify_release_models.py --threads 4 --runs 20
 ```
 
-The complete NVIDIA L4 study is reproducible in one click via the self-contained notebook [`notebooks/colab_enterprise_l4_one_shot.ipynb`](./notebooks/colab_enterprise_l4_one_shot.ipynb). Step-by-step instructions are in [`docs/reproduction.md`](./docs/reproduction.md).
-
----
-
-## Software Verification
-
-- **Unit & Integration Tests (`unittest`, 12/12 PASS)**:
-  - `tests/test_taxonomy_and_data.py`: Cityscapes 19-class `labelId → trainId` mapping, city-disjoint splits, SHA-256 manifest tamper rejection, KITTI/BDD100K layouts
-  - `tests/test_models.py`: `Conv-ReLU-BN` quantization audit, 4-stage pyramid alignment, offline `SegFormer-B4/B5` config, SHA-256 checkpoint roundtrip & TorchScript tracing
-  - `tests/test_losses.py`: `ignore_index=255` invariance, zero-KL identity, BF16 finite gradients across all KD objectives
-  - `tests/test_pipeline_smoke.py`: End-to-end teacher → paired students → QAT → ONNX FP32/INT8 → freeze → `locked_eval` → temperature scaling smoke test
-- **CI Workflow**: Automated test execution on push/PR via [`.github/workflows/tests.yml`](./.github/workflows/tests.yml).
+See [`docs/reproduction.md`](./docs/reproduction.md) for full artifact checksums and details.
 
 ---
 
@@ -114,14 +84,14 @@ The complete NVIDIA L4 study is reproducible in one click via the self-contained
 | Path | Description |
 |---|---|
 | [`seg_kd/`](./seg_kd/) | Core PyTorch & ONNX package (`taxonomy`, `data`, `models`, `losses`, `training`, `export`, `evaluation`, `benchmark`, `visualize`, `cli`) |
-| [`configs/l4-plan.json`](./configs/l4-plan.json) | Frozen L4 experimental plan (`SegFormer-B5` → `MobileNetV4`, 3-seed, Pareto, Asymmetric Robust KD, INT8 gate) |
+| [`notebooks/colab_enterprise_l4_one_shot.ipynb`](./notebooks/colab_enterprise_l4_one_shot.ipynb) | Self-contained one-shot verification (`verify_saved`) & L4 reproduction (`reproduce_full`) notebook |
+| [`scripts/verify_release_models.py`](./scripts/verify_release_models.py) | SHA-256 freeze verification & live CPU ONNXRuntime benchmark script for `v4.0-models` |
 | [`scripts/run_l4_study.py`](./scripts/run_l4_study.py) | Resumable staged orchestrator (`teacher → ablation → pareto → export → freeze → eval → plots`) |
-| [`scripts/generate_reports_and_figures.py`](./scripts/generate_reports_and_figures.py) | Verified report aggregator & zero-overlap figure/SVG renderer |
-| [`notebooks/colab_enterprise_l4_one_shot.ipynb`](./notebooks/colab_enterprise_l4_one_shot.ipynb) | Self-contained Vertex AI Colab Enterprise (L4) one-shot notebook with SHA-256 embedded code bundle |
+| [`configs/l4-plan.json`](./configs/l4-plan.json) | Frozen L4 experimental plan (`SegFormer-B5` → `MobileNetV4`, 3-seed, Pareto, Asymmetric Robust KD, INT8 gate) |
 | [`reports/final-summary.json`](./reports/final-summary.json) | Canonical master JSON combining `v3-max` + `v4-final` metrics, freeze hashes, and INT8 gates |
-| [`docs/`](./docs/results.md) | Bilingual technical documentation (`architecture`, `results`, `reproduction`) |
+| [`docs/`](./docs/methodology-and-decisions.md) | Bilingual technical docs (`methodology-and-decisions`, `architecture`, `results`, `reproduction`) |
 | [`assets/figures/`](./assets/figures/) | Verified publication charts & bilingual hero SVGs |
-| [`tests/`](./tests/) | 12-test unit & smoke verification suite |
+| [`tests/`](./tests/) | 12-test unit & integrity suite (automated via [GitHub Actions CI](./.github/workflows/tests.yml)) |
 
 ---
 

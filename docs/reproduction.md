@@ -1,89 +1,41 @@
-# Reproduction & Execution Guide
+# One-Shot Verification & L4 Reproduction Guide
 
-[English README](../README.md) · [한국어](./reproduction.ko.md) · [Architecture](./architecture.md) · [Results](./results.md)
+[English README](../README.md) · [한국어](./reproduction.ko.md) · [Methodology & Decisions](./methodology-and-decisions.md) · [Results](./results.md)
 
-## 1. Fast Local CPU Verification (~2 Minutes)
+Instead of toy synthetic demos, this repository provides a single self-contained notebook to **verify the exact SHA-256 frozen ONNX FP32/INT8 deployment artifacts (`v4.0-models`) and reports in one shot**, or **retrain the complete `v3-max` + `v4-final` study on an NVIDIA L4**.
 
-Verify mathematical invariance, quantization-friendliness audits, ONNX FP32/INT8 export, SHA-256 evaluation freezing, and post-hoc temperature scaling locally without a GPU or external datasets:
+---
+
+## 1. One-Shot Verification Notebook (Recommended · CPU or GPU)
+
+Upload [`notebooks/colab_enterprise_l4_one_shot.ipynb`](../notebooks/colab_enterprise_l4_one_shot.ipynb) to Google Colab, Vertex AI Colab Enterprise, or local Jupyter and click **Runtime → Run All**. All 23 source, test, and frozen report files are embedded inside a SHA-256-verified bundle.
+
+### Mode A: `RUN_MODE = "verify_saved"` *(Default · 1–3 min One-Shot Verification)*
+1. **Integrity & Unit Tests**: Unpacks and SHA-256-verifies the embedded `seg_kd` bundle, runs `seg_kd doctor`, and passes all `12/12` `unittest` checks.
+2. **Frozen ONNX SHA-256 Check**: Downloads all 4 release ONNX artifacts from GitHub Release [`v4.0-models`](https://github.com/Dongmyung378/Knowledge-Distillation/releases/tag/v4.0-models) and verifies byte-for-byte SHA-256 equality against `evaluation-freeze*.json`.
+3. **Live CPU ONNXRuntime Benchmark**: Measures live `384×768` single-frame 4-thread CPU latency (p50 ms, FPS), FP32→INT8 speedup, size reduction (`-72.5%`), and re-verifies the validation-only INT8 gate logic.
+4. ***(Optional) Live Dataset Re-Evaluation (`EVALUATE_LIVE_DATASETS = True`)***: Automatically downloads `Chris1/cityscapes` (`locked_eval` 500 imgs) and KITTI Semantics (`200` imgs) without login to re-measure `67.95% / 66.96%` mIoU, KITTI Zero-Shot, and temperature-scaled ECE (`T*=1.70`) live against `reports/final-summary.json`.
+
+### Mode B: `RUN_MODE = "reproduce_full"` *(NVIDIA L4 24GB · End-to-End Retraining)*
+Retrains the complete `v3-max` (`SegFormer-B5` + 3-seed paired + 3-tier Pareto + QAT + ONNX INT8 gates) and `v4-final` (Medium Baseline + `384×768` 4-method ablation + Asymmetric Robust KD + BF16 QAT-KD + validation temperature scaling) study from scratch with automatic resumability.
+
+---
+
+## 2. Local CLI One-Shot Verification
 
 ```bash
-# 1. Create virtual environment & install package
-python -m venv .venv
-# Windows: .venv\Scripts\activate  |  Linux/macOS: source .venv/bin/activate
 pip install -e ".[export]"
-
-# 2. Diagnostics & unit/integration test suite (12 tests)
-python -m seg_kd doctor
 python -m unittest discover -s tests -v
-
-# 3. End-to-end synthetic driving smoke pipeline
-python -m seg_kd prepare-data --dataset synthetic \
-  --data ./tmp/syn-data --output ./tmp/syn-manifest.json --image-size 128x256
-python scripts/run_l4_study.py \
-  --plan configs/l4-plan.json \
-  --manifest ./tmp/syn-manifest.json \
-  --data ./tmp/syn-data \
-  --output ./tmp/syn-out \
-  --smoke
+python scripts/verify_release_models.py --threads 4 --runs 20
 ```
 
 ---
 
-## 2. One-Shot Vertex AI Colab Enterprise (NVIDIA L4) Reproduction
+## 3. Published Frozen ONNX Artifacts ([GitHub Release `v4.0-models`](https://github.com/Dongmyung378/Knowledge-Distillation/releases/tag/v4.0-models))
 
-To reproduce the full `384×768` Cityscapes + KITTI Zero-Shot `SegFormer-B5 → MobileNetV4` study:
-
-1. Upload [`notebooks/colab_enterprise_l4_one_shot.ipynb`](../notebooks/colab_enterprise_l4_one_shot.ipynb) to Colab Enterprise (`g2-standard-4` + NVIDIA L4 24GB, `100GB+` disk).
-2. In Cell 1, select `DATA_SOURCE="hf_cityscapes"`, `ENABLE_KITTI_ZEROSHOT=True`, and `RUN_MODE="full"` (or `"pilot"` for a fast 1.5h sweep).
-3. Click **Runtime → Run All**. The notebook verifies its embedded SHA-256 source bundle, installs missing dependencies, runs the 12 unit tests, downloads Cityscapes & KITTI, and executes every stage end-to-end with automatic resumability.
-
----
-
-## 3. Manual Staged CLI Execution
-
-```bash
-# 1. Build city-disjoint Cityscapes manifest
-python -m seg_kd prepare-data \
-  --dataset cityscapes \
-  --data /data/cityscapes \
-  --output ./manifests/cityscapes-manifest.json \
-  --seed 378
-
-# 2. Build KITTI Semantics zero-shot manifest
-python -m seg_kd prepare-data \
-  --dataset kitti \
-  --data /data/kitti \
-  --output ./manifests/kitti-manifest.json
-
-# 3. Run all resumable stages
-python scripts/run_l4_study.py \
-  --plan configs/l4-plan.json \
-  --manifest ./manifests/cityscapes-manifest.json \
-  --data /data/cityscapes \
-  --kitti-manifest ./manifests/kitti-manifest.json \
-  --kitti-data /data/kitti \
-  --output ./runs/driving-seg-kd-l4 \
-  --stage all \
-  --device auto
-```
-
----
-
-## 4. Regenerating Reports & Publication Figures
-
-With `outputs/v3-max/` and `outputs/v4-final/` present locally, regenerate `reports/final-summary.json` and all PNG/SVG figures deterministically via:
-
-```bash
-python scripts/generate_reports_and_figures.py
-```
-
----
-
-## 5. Verified Runtime Specification
-
-| Item | Verified Configuration |
-|---|---|
-| GPU Training Runtime | NVIDIA L4 (`22.03 GiB` VRAM), CUDA `12.8`, PyTorch `2.11.0+cu128`, Python `3.13.15`, Linux |
-| CPU Benchmark Runtime | 4-thread ONNXRuntime Static QDQ INT8 / FP32 (`384×768`, `batch=1`) |
-| Local Verification | Windows 11, Python `3.12`, `unittest` 12/12 PASS |
-| Random Seeds | Paired study `378, 379, 380`; deployment reference seed `378` |
+| Artifact | Size | Freeze SHA-256 (prefix) | Role |
+|---|---:|---|---|
+| `v3-max-mobilenetv4-medium-int8.onnx` | 7.90 MiB | `8cda8dff653f4561` | Clean-peak INT8 (`67.95%`, `40.49 FPS`, Gate PASS) |
+| `v3-max-mobilenetv4-medium-fp32.onnx` | 28.71 MiB | `434c8e4243a55f35` | `v3-max` FP32 reference (`68.51%`, `26.24 FPS`) |
+| `v4-final-robust-medium-int8.onnx` | 7.90 MiB | `fac9853786e9bb35` | Adverse-weather INT8 (`59.59%` noise > teacher, Gate PASS) |
+| `v4-final-robust-medium-fp32.onnx` | 28.71 MiB | `1cb99d88e685d1f6` | `v4-final` FP32 reference (`60.61%` noise) |
