@@ -1,225 +1,131 @@
-<div align="right">
-  <strong>English</strong> | <a href="./README.ko.md">한국어</a>
-</div>
+# Driving Semantic Segmentation Knowledge Distillation · `seg_kd`
 
-# Knowledge Distillation for Traffic Sign Recognition
+[한국어](./README.ko.md) · [Architecture](./docs/architecture.md) · [Results](./docs/results.md) · [Reproduction](./docs/reproduction.md) · [Summary JSON](./reports/final-summary.json)
 
-Given a cropped traffic-sign image, the model predicts which sign category it belongs to. The project asks whether a small model can learn from a larger model while retaining useful recognition quality and reducing the memory and CPU time needed to run it. It classifies an image already containing a sign; it does not locate signs in a full road scene.
+A cross-architecture knowledge distillation pipeline that compresses an **84.6M Vision Transformer teacher** (`SegFormer-B5`, `323.14 MiB`, `0.61 FPS` CPU) into a **7.54M Edge CNN student** (`MobileNetV4-Medium + FPN`, **ONNX INT8 `7.91 MiB`**, **`40.49 FPS`** CPU, **`57.20 FPS`** NVIDIA L4 BF16) for autonomous driving road-scene segmentation.
 
-A TensorFlow model-compression project for GTSRB's 43 traffic-sign classes. A MobileNetV2 teacher guides a compact CNN with **34,406 parameters**. Matched supervised baselines, a complete nine-recipe study and pure-soft controls distinguish measured training effects from deployment decisions.
+All dataset splits (`train 2,529 / validation 446 / locked_eval 500`), model selection, INT8 deployment gating, and post-hoc temperature scaling are strictly fit on `validation` only, while `locked_eval` and **KITTI Semantics Zero-Shot (`200` images)** are evaluated once after SHA-256 cryptographic freezing. Using **Asymmetric Robustness KD (`v4-final`: Clean Teacher → Corrupted Student)**, the **`7.91 MiB` INT8 student achieves `59.59% mIoU` under Gaussian sensor noise (`σ=18`), surpassing the `11.2×` larger `84.6M` teacher (`59.19%`)**.
 
-**Original development period: February-April 2026.** Later engineering improvements retain this period and add controlled experiments, CPU deployment measurements and reproducible saved-model evaluation.
+![Driving Semantic Segmentation KD Overview](./assets/figures/en/kd-thumbnail.svg)
 
-[Deployment and project outcome](./docs/deployment.md) | [Complete nine-recipe study](./docs/full-grid.md) | [Why students outperform the teacher](./docs/teacher-student-analysis.md) | [Architecture](./docs/architecture.md) | [Historical notebook](./notebooks/knowledge_distillation_gtsrb.ipynb)
+---
 
-## Understanding the experiment
+## Verified Headline Results
 
-| Term used in the results | Meaning here |
-| --- | --- |
-| Teacher, student and distillation | The larger teacher supplies probabilities for the sign classes. The smaller student learns from that distribution rather than merely copying the teacher's single predicted class. |
-| Matched supervised baseline | The same small student architecture learns from the correct labels without the teacher's guidance. Shared starting conditions make it a more useful comparison for the effect of the training procedure. |
-| Temperature and alpha | Temperature softens the teacher/student probability distributions used for distillation. Alpha sets the coefficient of the correct-label loss relative to the teacher-matching loss; it is not a measured fraction of the resulting gradient. |
-| Seed and paired seeds | A seed controls pseudorandom choices such as initial weights and data order. The three seeds repeat training under different starting conditions, with baseline and distilled models matched within each seed. They are not three datasets. |
-| Validation and reference evaluation | Validation guides recipe and checkpoint selection. The reference set reports the chosen models' outcomes afterward; its previously observed status and limits are retained below. |
-| FP32 TFLite and INT8 | TFLite is the saved format used by the lightweight inference runtime. FP32 retains floating-point parameters; INT8 quantization reduces numerical precision to seek a smaller, faster artifact, which must be checked for quality loss. |
+### 1. Cityscapes 384×768 `locked_eval` (500 imgs) · KITTI Zero-Shot (200 imgs) · INT8 Gate
 
-A physical-sign track groups photographs of the same sign; keeping a track in one split prevents those related photographs from crossing the evaluation boundary. An epoch is a pass through the training data, and a checkpoint stores model weights at a point during training.
+| Model | Format | Params / Size | Locked mIoU | Safety-6 mIoU | KITTI Zero-Shot (Safety) | CPU p50 (4T) | INT8 Gate |
+|---|---|---:|---:|---:|---:|---:|:---:|
+| **Teacher `SegFormer-B5`** | PyTorch BF16 | 84.6M / 323.14 MiB | **74.83%** | **65.57%** | 67.94% (54.62%) | 1631.33 ms (0.61 FPS) | Teacher |
+| `MobileNetV4-Medium` Baseline (no KD) | PyTorch FP32 | 7.54M / 29.19 MiB | 67.15% | 55.88% | 49.09% (25.63%) | — | Baseline |
+| `MobileNetV4-Small` CWD+Feat | ONNX FP32 | 1.50M / 5.72 MiB | 61.95% | 51.80% | 45.97% (26.08%) | 16.77 ms (59.63 FPS) | — |
+| `MobileNetV4-Small` CWD+Feat | ONNX INT8 | 1.50M / 1.76 MiB | 61.43% | 51.42% | 46.44% (26.71%) | 15.85 ms (63.10 FPS) | Rejected (1.04× < 1.20×) |
+| `MobileNetV3-Large` CWD+Feat | ONNX FP32 | 3.30M / 12.59 MiB | 64.84% | 55.29% | — | 24.24 ms (41.25 FPS) | — |
+| `MobileNetV3-Large` CWD+Feat | ONNX INT8 | 3.30M / 3.68 MiB | 59.32% | 49.99% | — | 33.18 ms (30.14 FPS) | **Blocked (-6.46%p, 0.72×)** |
+| **`MobileNetV4-Medium` Clean KD (`v3-max`)** | ONNX FP32 | 7.54M / 28.71 MiB | **68.51%** | **58.23%** | — | 38.11 ms (26.24 FPS) | — |
+| **`MobileNetV4-Medium` Clean KD (`v3-max`)** | **ONNX INT8** | **7.54M / 7.91 MiB** | **67.95%** | **57.94%** | **51.32% (33.09%)** | **24.70 ms (40.49 FPS)** | **PASS (4/4 Checks)** |
+| **`MobileNetV4-Medium` Robust KD (`v4-final`)** | ONNX FP32 | 7.54M / 28.71 MiB | 67.35% | 58.14% | 50.04% (31.96%) | 40.28 ms (24.83 FPS) | — |
+| **`MobileNetV4-Medium` Robust KD (`v4-final`)** | **ONNX INT8** | **7.54M / 7.91 MiB** | **66.96%** | **57.32%** | 48.10% (30.49%) | **26.02 ms (38.44 FPS)** | **PASS (4/4 Checks)** |
 
-The recipe label T5-a05 means temperature 5 with alpha 0.5; T5-a01 uses alpha 0.1. The experiment-selected recipe and the model offered for deployment are described separately so their different decisions remain visible.
+- **Clean Peak Deployment (`v3-max` Clean INT8)**: Retains **90.8% of the 84.6M teacher's mIoU** (`67.95%` vs `74.83%`) at **`11.2×` fewer parameters, `40.9×` smaller artifact size (`7.91 MiB`), and `66.0×` faster CPU latency (`40.49 FPS`)**. Even after INT8 quantization, it beats the same-architecture `28.71 MiB` FP32 no-teacher baseline by **`+0.80%p` mIoU, `+2.06%p` Safety-6 mIoU, and `+2.23%p` KITTI Zero-Shot (`+7.46%p` Safety)**.
+- **Validation-Only INT8 Gate Proof**: `MobileNetV3-Large` suffered a **`-6.46%p`** validation mIoU collapse and **`0.72×`** slowdown in static QDQ INT8 due to 18 unfused Squeeze-and-Excitation (SE) + HardSwish paths. The validation-only gate caught and rejected it automatically before `locked_eval`, while `MobileNetV4-Medium` (clean `Conv-BN-ReLU` UIB blocks) passed all 4/4 criteria in both `v3-max` and `v4-final`.
 
-**Reading the tables:** accuracy counts correct images. For each class, precision asks how often a prediction of that class is correct, and recall asks how many actual examples of that class were found. Macro F1 balances these two measures and gives every class equal weight; balanced accuracy averages class recall. A percentage-point gain is a direct subtraction of percentages. The ± sample SD describes variability across training seeds, not a confidence interval. CPU p50 is median latency, while p95 describes the slower end of the measured requests. Parameter count, file size and runtime measure different deployment costs.
+![Accuracy-Latency Pareto Frontier](./assets/figures/kd-pareto-frontier.png)
 
-## Representative deployment: retain the released 87.06% model
+### 2. Asymmetric Robustness KD (`v4-final`) 4-Corruption Stress Test (200 Frames)
 
-The representative model remains **T5-a05, seed 378, FP32 TFLite**. This is the previously released checkpoint, without retraining or a change to its weights. The complete nine-recipe study remains intact: its validation-selected recipe is **T5-a01**. The experiment winner and the representative deployment have different roles.
+| Model | Clean | Night Low-Light | Motion Blur (k=9) | Fog Low-Contrast | Sensor Noise (σ=18) | Noise Safety-6 |
+|---|---:|---:|---:|---:|---:|---:|
+| Teacher `SegFormer-B5` (84.6M, 323 MiB) | 73.41% | 73.04% | 65.40% | 72.30% | 59.19% | 47.51% |
+| `MobileNetV4-Medium` Baseline (7.5M, FP32) | 65.25% | 63.44% | 55.80% | 56.89% | 23.46% | 18.45% |
+| `MobileNetV4-Medium` Clean INT8 (`v3-max`) | 67.40% | 64.14% | 58.45% | 59.76% | 13.75% | 10.10% |
+| **`MobileNetV4-Medium` Robust FP32 (`v4-final`)** | 67.19% | **66.07%** | **60.56%** | **66.98%** | **60.61%** *(+1.42%p vs Teacher)* | **48.00%** |
+| **`MobileNetV4-Medium` Robust INT8 (`v4-final`)** | 66.89% | 64.71% | 59.37% | **66.33%** | **59.59%** *(+0.40%p vs Teacher)* | **46.99%** |
 
-| Seed-378 model, same 5,850 reference images | Correct / count | Accuracy | macro F1 | Balanced accuracy |
-| --- | --- | --- | --- | --- |
-| Teacher | 4,887 / 5,850 | 83.54% | 0.7465 | 0.7548 |
-| Matched supervised baseline | 4,303 / 5,850 | 73.56% | 0.6253 | 0.6329 |
-| **Retained deployment, T5-a05 FP32** | **5,093 / 5,850** | **87.06%** | **0.7903** | **0.7817** |
-| Nine-recipe study winner, T5-a01 | 5,013 / 5,850 | 85.69% | 0.7719 | 0.7620 |
+- Clean-distilled `v3-max INT8` collapsed to `13.75%` under sensor noise (`σ=18`). Feeding clean frames to the frozen teacher while corrupting only the student's inputs recovered **`+45.84%p`** under sensor noise (`13.75% → 59.59%`, surpassing the 84.6M teacher!) and boosted fog mIoU by **`+9.44%p`** over baseline (`56.89% → 66.33%`) for only a `0.50–0.99%p` clean trade-off.
 
-| Selection or evaluation scope | Retained T5-a05 recipe | Study-selected T5-a01 recipe |
-| --- | --- | --- |
-| Three-seed validation accuracy mean | 86.65% | 87.08% |
-| Three-seed reference accuracy mean ± sample SD | 87.51% ± 2.18 pp | 87.81% ± 2.08 pp |
-| Seed-378 reference accuracy | 87.06% | 85.69% |
+![Asymmetric Robustness KD Stress Test](./assets/figures/kd-robustness-breakthrough.png)
 
-The study selects a recipe by mean validation accuracy, with seed 378 fixed beforehand. Its 0.30 pp higher mean reference accuracy does not establish a reliable deployment improvement, while the fixed seed-378 checkpoint scores 1.37 pp lower. Retaining the prior release prioritizes continuity and its observed reference performance. This is an explicit, later deployment decision informed by already observed outcomes; it does not rewrite the study selection or create an untouched benchmark. The policy is recorded in [`reports/deployment/deployment-policy.json`](./reports/deployment/deployment-policy.json).
+![Noisy Road Scene Overlays](./assets/figures/kd-road-overlays-noise.png)
 
-![Retained T5-a05 model quality and its measured CPU deployment costs](./assets/figures/knowledge-distillation-release.png)
+### 3. 3-Seed Reproducibility · 384×768 Ablation · Post-Hoc Temperature Scaling
 
-## Overall result and teacher/student conclusion
+- **3-Seed Paired Study (`MobileNetV4-Small 1.50M`, seeds `378, 379, 380`)**: From identical shared initial weights, `cwd_feat` improves mIoU from `61.42% ± 0.21%` to **`62.03% ± 0.08%` (`+0.61%p`, 3/3 wins, 2.7× lower seed SD)** and Safety-6 mIoU from `49.52% ± 0.90%` to **`51.40% ± 0.29%` (`+1.88%p`, 3/3 wins, 3.1× lower SD)**, with **6/6 safety classes positive** on 3-seed mean (`traffic_light +2.75%p`, `bicycle +2.44%p`, `traffic_sign +2.11%p`, `person +1.59%p`, `rider +1.51%p`, `motorcycle +0.89%p`).
+- **384×768 4-Method Ablation (`seed=378`, `1.50M`)**: Naive `pixel_kl` degrades accuracy to `59.25%` (**`-2.41%p`**, Safety `-5.71%p`), whereas pure **Channel-Wise Spatial Distillation (`cwd`)** reaches **`63.07%` (`+1.42%p`, Safety `51.92%`, KITTI `47.38%` / Safety `+7.12%p`)**, proving that extreme `56×` ViT-to-CNN compression benefits more from spatial logit transfer than hard intermediate feature mimicry (`cwd_feat`, `62.00%`).
+- **Validation-Only Temperature Scaling (ECE)**: All CWD-distilled models converge to **`T* = 1.70–1.72`**, cutting `locked_eval` ECE by **69.5–78.5%** with **exact `0.00%p` mIoU change** and `0 ms` inference overhead (`v4 Robust INT8`: `0.0260 → 0.0067`, `-74.2%`).
 
-The retained student improves reference accuracy by **13.50 pp** over the same-seed supervised baseline and by **3.52 pp** over the teacher. Across three seeds, T5-a05 has a descriptive paired baseline gain of **+9.43 ± 3.93 pp**. Its **34,406 parameters** are approximately **98.5% fewer** than the teacher's 2,313,067. In the earlier matched CPU benchmark, Keras p50 falls from **3.823 ms** for the teacher to **1.040 ms** for this student; the retained FP32 TFLite artifact measures **0.429 ms p50**, **0.456 ms p95**, and **140.0 KiB**. These are one-host measurements, not timing guarantees for another device.
+![3-Seed Reproducibility and Per-Class IoU Gain](./assets/figures/kd-3seed-per-class.png)
 
-The retained student corrects **473** teacher errors but introduces **267** errors on images the teacher classified correctly, for **206** additional correct predictions. Pure-soft students also exceed the teacher in all three seeds, so adding ground-truth CE to the student's objective cannot be the sole explanation. Distillation fits a probability distribution rather than copying the teacher's argmax; different architecture, full student adaptation, BN policies and optimization paths can produce different decisions. Their individual causal contributions have not been isolated. Both the teacher and mixed students use training labels. [Read the saved-prediction analysis and controls](./docs/teacher-student-analysis.md).
+---
 
-The project demonstrates matched experiment design, model compression, error analysis, CPU benchmarking and artifact verification. **INT8 was rejected** because both studied exports lost substantial validation accuracy and failed the measured speedup gate. The original nine-condition notebook, both controlled studies, failed conversions and their frozen evidence remain available.
+## Architecture & Core Techniques
 
-![All nine recipes across three development seeds; selection remains T5-a01](./assets/figures/full-grid-comparison.png)
-
-All three grid seeds participate in development selection. Reference outcomes were already public, and the official test was historically used for selection. Results support this bounded traffic-sign classification comparison; they do not establish production road-scene reliability.
-
-## Run the representative saved model
-
-Windows PowerShell:
-
-```powershell
-.\launch-kd.bat doctor
-.\launch-kd.bat download --manifest reports/artifact-download.json --output artifacts/runtime
-.\launch-kd.bat download --manifest reports/artifact-download.json --output artifacts/runtime --verify-only
-.\launch-kd.bat fetch-data
-.\launch-kd.bat evaluate --model artifacts/runtime/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/evaluation-freeze.json --output .local/reproduced-representative-student
+```
+Cityscapes 384×768 (train 2,529 / val 446 / locked_eval 500) + KITTI Zero-Shot (200)
+   │
+   ├─ Clean RGB ──▶ Frozen SegFormer-B5 Teacher (84.6M, MiT-B5, BF16)
+   │                     └─ 4-Stage Features (s4, s8, s16, s32) + Clean Logits (19ch)
+   │
+   └─ Clean / Corrupted RGB ──▶ MobileNetV4-Medium + FPN Student (7.54M, UIB Conv-BN-ReLU)
+                                  ├─ L_CE (unweighted, ignore_index=255)
+                                  ├─ L_CWD (Channel-wise Spatial Softmax KL over H×W, T=4.0)
+                                  ├─ L_Feat (1×1 Projector Bank: 0.5·CWD + 0.5·Cosine across 4 stages)
+                                  └─ BF16-Teacher QAT-KD (6 ep) ─▶ ONNX FP32/INT8 (QDQ, 128-img Calib)
+                                                                       ├─ Validation-Only INT8 Gate (4/4)
+                                                                       ├─ Validation-Only Temp Scaling (T*≈1.70)
+                                                                       └─ SHA-256 Frozen Locked Eval & KITTI
 ```
 
-Linux:
+See [`docs/architecture.md`](./docs/architecture.md) for equations and module details, and [`docs/results.md`](./docs/results.md) for complete ablation tables and failure analysis.
+
+---
+
+## Local Verification & Reproduction
 
 ```bash
-bash launch-kd.sh doctor
-bash launch-kd.sh download --manifest reports/artifact-download.json --output artifacts/runtime
-bash launch-kd.sh download --manifest reports/artifact-download.json --output artifacts/runtime --verify-only
-bash launch-kd.sh fetch-data
-bash launch-kd.sh evaluate --model artifacts/runtime/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/evaluation-freeze.json --output .local/reproduced-representative-student
+# 1. Install package & inspect environment
+pip install -e ".[export]"
+python -m seg_kd doctor
+
+# 2. Run unit tests & end-to-end synthetic smoke pipeline
+python -m unittest discover -s tests -v
+python scripts/run_l4_study.py --plan configs/l4-plan.json --manifest /tmp/syn-manifest.json --data /tmp/syn-data --output /tmp/syn-out --smoke
 ```
 
-The [representative model bundle](https://park-dongmyung.com/downloads/knowledge-distillation-models-v2.zip) is **10.83 MiB (11,353,209 bytes)** and installs under `artifacts/runtime/models/`. Its original frozen descriptor and model hashes are retained. Saved-model CPU evaluation needs no Docker, GPU or API key. First setup and downloads need internet access; use a writable Windows or Linux x86-64 source folder.
+The complete NVIDIA L4 study is reproducible in one click via the self-contained notebook [`notebooks/colab_enterprise_l4_one_shot.ipynb`](./notebooks/colab_enterprise_l4_one_shot.ipynb). Step-by-step instructions are in [`docs/reproduction.md`](./docs/reproduction.md).
 
-The separate [nine-recipe model bundle](https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-models.zip) and [starting-evidence bundle](https://park-dongmyung.com/downloads/knowledge-distillation-full-grid-base-evidence.zip) preserve all study checkpoints and the T5-a01 export. Use the explicit descriptor and commands in the [full-grid guide](./docs/full-grid.md) to install or reproduce that experiment. Download ZIPs do not silently replace the retained deployment with the study winner.
+---
 
-<details>
-<summary>Preserved four-candidate study and historical notebook results</summary>
+## Software Verification
 
-The following measurements, commands and environment checks belong to the earlier study. They do not claim a completed new-model replay for this extension. The original notebook's nine-condition results remain historical evidence.
+- **Unit & Integration Tests (`unittest`, 12/12 PASS)**:
+  - `tests/test_taxonomy_and_data.py`: Cityscapes 19-class `labelId → trainId` mapping, city-disjoint splits, SHA-256 manifest tamper rejection, KITTI/BDD100K layouts
+  - `tests/test_models.py`: `Conv-ReLU-BN` quantization audit, 4-stage pyramid alignment, offline `SegFormer-B4/B5` config, SHA-256 checkpoint roundtrip & TorchScript tracing
+  - `tests/test_losses.py`: `ignore_index=255` invariance, zero-KL identity, BF16 finite gradients across all KD objectives
+  - `tests/test_pipeline_smoke.py`: End-to-end teacher → paired students → QAT → ONNX FP32/INT8 → freeze → `locked_eval` → temperature scaling smoke test
+- **CI Workflow**: Automated test execution on push/PR via [`.github/workflows/tests.yml`](./.github/workflows/tests.yml).
 
-### Results and evidence
+---
 
-The seed-378 checkpoints were frozen before evaluation on the same **5,850-image** locked holdout. All paired outcomes and verification evidence are in the [measured results report](./docs/results.md).
+## Repository Layout
 
-| Measured protocol result | Teacher | Matched baseline | Fixed distilled candidate |
-| --- | ---: | ---: | ---: |
-| Locked-holdout accuracy, correct / evaluated | 83.54%, 4,887 / 5,850 | 73.56%, 4,303 / 5,850 | 87.06%, 5,093 / 5,850 |
-| Locked-holdout macro F1 | 0.7465 | 0.6253 | 0.7903 |
-| Three-seed accuracy mean ± sample SD | N/A | 78.08% ± 3.94 pp | 87.51% ± 2.18 pp |
-| Three-seed paired gain mean ± sample SD | N/A | Reference | +9.43 ± 3.93 pp |
-| CPU batch-one p50 / p95 | 3.823 / 4.641 ms | 1.008 / 1.128 ms | 1.040 / 1.130 ms |
-| Standard Keras inference artifact size | 9.39 MiB (9,843,117 bytes) | 182.8 KiB (187,164 bytes) | 182.8 KiB (187,164 bytes) |
-| Parameters | 2,313,067 | 34,406 | 34,406 |
+| Path | Description |
+|---|---|
+| [`seg_kd/`](./seg_kd/) | Core PyTorch & ONNX package (`taxonomy`, `data`, `models`, `losses`, `training`, `export`, `evaluation`, `benchmark`, `visualize`, `cli`) |
+| [`configs/l4-plan.json`](./configs/l4-plan.json) | Frozen L4 experimental plan (`SegFormer-B5` → `MobileNetV4`, 3-seed, Pareto, Asymmetric Robust KD, INT8 gate) |
+| [`scripts/run_l4_study.py`](./scripts/run_l4_study.py) | Resumable staged orchestrator (`teacher → ablation → pareto → export → freeze → eval → plots`) |
+| [`scripts/generate_reports_and_figures.py`](./scripts/generate_reports_and_figures.py) | Verified report aggregator & zero-overlap figure/SVG renderer |
+| [`notebooks/colab_enterprise_l4_one_shot.ipynb`](./notebooks/colab_enterprise_l4_one_shot.ipynb) | Self-contained Vertex AI Colab Enterprise (L4) one-shot notebook with SHA-256 embedded code bundle |
+| [`reports/final-summary.json`](./reports/final-summary.json) | Canonical master JSON combining `v3-max` + `v4-final` metrics, freeze hashes, and INT8 gates |
+| [`docs/`](./docs/results.md) | Bilingual technical documentation (`architecture`, `results`, `reproduction`) |
+| [`assets/figures/`](./assets/figures/) | Verified publication charts & bilingual hero SVGs |
+| [`tests/`](./tests/) | 12-test unit & smoke verification suite |
 
-Means and sample standard deviations describe seeds 378, 379 and 380; they are not confidence intervals. CPU entries above measure matched Keras calls on validation images and are separate from TFLite deployment costs.
+---
 
-CPU measurement: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz (Microsoft Windows 11 Pro), 1 thread(s), 128 matched images, 10 warmup calls and 3 repetitions. These timings do not guarantee latency on another device.
+## Scope & Limitations
 
-**Validation selection:** `T5-a05`, mean paired accuracy gain +9.16 pp, 3/3 positive pairs, declared gate passed. The holdout gain is reported separately above and does not reopen selection.
-
-**Release decision:** seed-378 distilled, **FP32 TFLite**. INT8 was rejected with validation accuracy loss +61.863 pp and measured CPU p50 speed ratio 0.771x.
-Failed criteria: validation accuracy loss, CPU p50 speedup.
-The selected deployment artifact records **87.06% (5,093/5,850)** locked-holdout accuracy, **0.7903** macro F1, **0.429 / 0.456 ms** CPU p50 / p95 and **140.0 KiB (143,316 bytes)** size.
-Final outcomes do not reselect the seed, checkpoint or quantization format.
-
-![Measured holdout quality and CPU deployment costs](./assets/figures/four-candidate-release.png)
-
-#### Historical development results
-
-| Historical measurement | Recorded value |
-| --- | ---: |
-| Teacher best selected-epoch accuracy | 88.37% |
-| Compact baseline best selected-epoch accuracy | 54.61% |
-| Best distilled selected-epoch accuracy | 80.97% |
-| Student parameters / teacher parameters | 34,406 / 2,313,067 |
-| Best historical setting | `temperature=10`, `alpha=0.3` |
-
-These values come from the original single-seed, nine-condition notebook. Its official GTSRB test split was used for checkpoint and hyperparameter selection. They are historical development results, not untouched-test scores. The baseline's final in-memory model scored 54.12%, whereas the table reports its best history epoch, 54.61%. Historical `model.predict()` timing includes framework overhead and did not measure a teacher-to-student deployment speedup. Parameter reduction of approximately 67.2 times is not a measured speedup.
-
-The new split and selection procedure differ from the historical experiment. Old and new percentages must not be treated as a controlled before/after comparison on the same untouched evaluation population.
-
-### What the improved implementation demonstrates
-
-1. **Evaluation by physical sign.** Class-stratified train, validation and locked-holdout sets keep every traffic-sign track in one split. Relative paths, class labels, track IDs, image bytes and SHA-256 hashes bind the exact inventory. Official-test inference is a separate audit after freezing.
-2. **Matched Baseline/KD controls.** Both students share the 34,406-parameter architecture, initial weights within each seed, deterministic data order, augmentation, class weights and maximum training budget. Seeds 378, 379 and 380 measure paired variation. The deployment seed is declared as 378 before final evaluation.
-3. **Correct teacher adaptation.** `[0,1]` RGB inputs are augmented and rescaled inside the teacher to MobileNetV2's `[-1,1]` input range. Head training precedes low-learning-rate fine-tuning with frozen batch normalization. The teacher's weights and saved artifact are checked for immutability during distillation.
-4. **Bounded, testable distillation.** Four declared KD recipes use class-weighted hard-label CE plus unweighted Teacher-to-Student KL with temperature-squared compensation. Validation records real, unweighted CE. Best plain `.keras` checkpoints are saved and reloaded. A 0.2 percentage-point validation improvement gate and three-seed confirmation stop ineffective candidates.
-5. **Measured deployment tradeoffs.** Standard `.keras` models support inference without the training wrapper. FP32 TFLite conversion and full INT8 quantization are evaluated separately. INT8 calibration uses training records only. CPU benchmarks compare the same images, thread policy and warmed invocation path, reporting latency, throughput and file size; validation controls quantization acceptance.
-6. **Portable, auditable delivery.** Isolated CPU launchers, pinned dependencies, source snapshots, exact artifact inventories and SHA-256 checks support saved-model verification without retraining. Correctness tests exercise loss gradients, immutable teachers, real optimizer updates, split isolation, checkpoint reloads and tampering rejection.
-
-These are implemented capabilities. Completed training, export and environment checks are separately identified in the release evidence rather than inferred from the presence of code.
-
-### Run without retraining
-
-If you use a source ZIP from the portfolio project page, extract it to a writable folder and run the same commands.
-
-The default local runtime uses CPU. Docker, a GPU and an API key are unnecessary for public saved-model inference. First setup and downloads need internet access. Use a writable source folder on supported Windows or Linux x86-64 with Python 3.12; the launcher can obtain the pinned Python runtime when it is missing.
-
-Windows PowerShell:
-
-```powershell
-.\launch-kd.bat doctor
-.\launch-kd.bat download --manifest reports/artifact-download.json --output artifacts/runtime
-.\launch-kd.bat download --manifest reports/artifact-download.json --output artifacts/runtime --verify-only
-.\launch-kd.bat fetch-data
-.\launch-kd.bat fetch-data --verify-only
-.\launch-kd.bat predict --model artifacts/runtime/models/student-fp32.tflite --image .local/data/gtsrb-v1/Train/20/00020_00000_00000.png
-```
-
-Linux:
-
-```bash
-bash launch-kd.sh doctor
-bash launch-kd.sh download --manifest reports/artifact-download.json --output artifacts/runtime
-bash launch-kd.sh download --manifest reports/artifact-download.json --output artifacts/runtime --verify-only
-bash launch-kd.sh fetch-data
-bash launch-kd.sh fetch-data --verify-only
-bash launch-kd.sh predict --model artifacts/runtime/models/student-fp32.tflite --image .local/data/gtsrb-v1/Train/20/00020_00000_00000.png
-```
-
-The example image is a training-collection input for checking the inference path, not a quality benchmark. The model descriptor extracts checkpoints under `artifacts/runtime/models/`; the published inventory identifies the exact filenames. The model bundle was downloaded in full without authentication from the [verified endpoint](https://park-dongmyung.com/downloads/knowledge-distillation-models-v2.zip) and matched its SHA-256 and byte count (10.83 MiB (11,353,209 bytes)). `reports/artifact-download.json` installs its exact declared inventory.
-
-#### Repeat the frozen evaluation
-
-Use the published `reports/split-manifest.json` and pre-evaluation freeze. Keep the original freeze when repeating a released model's evaluation.
-
-```powershell
-.\launch-kd.bat evaluate --model artifacts/runtime/models/student-fp32.tflite --manifest reports/split-manifest.json --data .local/data/gtsrb-v1 --split locked_holdout --freeze reports/evaluation-freeze.json --output .local/reproduced-student
-```
-
-On Linux, replace `.\launch-kd.bat` with `bash launch-kd.sh`. Use a new output directory for each run. Published manifests and freeze files identify the exact model, denominator, configuration and source. Evaluation produces aggregate metrics, an all-class confusion matrix and image-ID predictions.
-
-#### Run correctness tests
-
-After `doctor` has prepared `.venv`:
-
-```powershell
-$env:CUDA_VISIBLE_DEVICES = "-1"
-.venv\Scripts\python.exe -m unittest discover -s tests -v
-```
-
-```bash
-CUDA_VISIBLE_DEVICES=-1 .venv/bin/python -m unittest discover -s tests -v
-```
-
-**Runtime and saved-model verification:** Windows, Python 3.12.15: 62/63 correctness tests passed, 1 skipped, 0 failures. Full 5,850-image saved-model holdout reruns matched reference accuracy and macro F1 (`baseline` 4,303/5,850, `distilled` 5,093/5,850, `fp32` 5,093/5,850). Linux (WSL2), Python 3.12.15: 63/63 correctness tests passed, 0 skipped, 0 failures. Full 5,850-image saved-model holdout reruns matched reference accuracy and macro F1 (`baseline` 4,303/5,850, `distilled` 5,093/5,850, `fp32` 5,093/5,850). The operating-system checks use the same physical computer and are not an independent external review. Synthetic correctness checks and full saved-model evaluation are reported as separate scopes.
-
-### Training and reproduction limits
-
-Full project training runs only in a GPU-enabled Kaggle kernel. The [declared plan](./configs/experiment-plan.json) bounds teacher variants and KD candidates, separates pilot selection from paired confirmation, and freezes model, source and configuration hashes before final inference. See the [training guide](./docs/training.md) for commands and saved outputs. The original notebook is historical evidence rather than the current training entry point.
-
-The locked holdout is excluded from training and selection in the new experiment, but those images belonged to the historical notebook's full training collection. New models start from fresh ImageNet teacher weights and fresh student initialization. This does not establish that the public data were unseen by every historical or upstream pretrained model. The official test was historically exposed and remains labelled as an audit.
-
-Same source, model and data hashes support repeated saved-model evaluation. Hardware, drivers and floating-point implementations can affect timing and small numerical differences. Checks in another operating-system environment on the same computer are environment verification, not an independent external review. GTSRB classification is a bounded research task and does not demonstrate production road-scene perception.
-
-### Repository guide
-
-| Location | Purpose |
-| --- | --- |
-| `knowledge_distillation/` | Track splits, models, training, evaluation, export and CPU inference |
-| `configs/experiment-plan.json` | Declared search budget, paired seeds and stopping policy |
-| `scripts/` and `launch-kd.*` | Isolated runtime setup and verified downloads |
-| `tests/` | Synthetic correctness, integrity and portability checks |
-| `reports/` | Published results, manifests, freezes and verification evidence |
-| `docs/` | English documentation with corresponding Korean versions |
-| `notebooks/knowledge_distillation_gtsrb.ipynb` | Labelled historical experiment |
-
-Method references: [GTSRB dataset](https://benchmark.ini.rub.de/gtsrb_dataset.html), [knowledge distillation](https://arxiv.org/abs/1503.02531), [MobileNetV2 preprocessing](https://keras.io/api/applications/mobilenet/mobilenet_models/), [Keras transfer learning](https://keras.io/guides/transfer_learning/).
-
-</details>
+1. **Resolution (`384×768`)**: Models are trained and evaluated at `384×768` for real-time 40 FPS CPU edge deployment; numbers are not directly comparable to full-resolution `1024×2048` multi-scale TTA Cityscapes leaderboard entries.
+2. **Synthetic vs. Real Adverse Weather**: The 4-corruption stress test evaluates deterministic corruptions on 200 `locked_eval` frames; real adverse-weather driving benchmarks (e.g., ACDC, Dark Zurich) remain future work.
+3. **Rare Large-Vehicle Trade-Off & Seed Coverage**: 3-seed paired verification covers the `1.50M` student (6/6 safety classes improved, rare `truck -7.32%p` / `bus -1.71%p` trade-off); `MobileNetV4-Medium` and the `384×768` 4-method ablation are single-seed (`seed=378`).
+4. **Two-Profile Deployment Choice**: Choose `v3-max Clean INT8` (`67.95%`, `40.49 FPS`) for clean-daylight peak mIoU or `v4-final Robust INT8` (`66.96%` clean / `59.59%` noise, `38.44 FPS`) when night, fog, and sensor-noise resilience are prioritized.

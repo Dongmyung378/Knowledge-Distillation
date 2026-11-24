@@ -1,0 +1,41 @@
+{
+  "schema_version": 2,
+  "dataset": "bdd100k_sem_seg",
+  "manifest_sha256": "e93018834b7e1e6b3facd8eaab3efad4dca9cde17856ba6935359207d83072e5",
+  "inventory_sha256": "cd61c67b76571ed7c40d4d1943fb2d98e03c6c27e6616feca2143a9b91032c9b",
+  "plan_sha256": null,
+  "models": {
+    "medium_baseline": {
+      "filename": "student.pt",
+      "bytes": 30610329,
+      "sha256": "4de41ba0f7943d4cb2cfd0f99edf4257c42ccac3970e0fd6496ca838a10c3b5e"
+    },
+    "s378_cwd": {
+      "filename": "student.pt",
+      "bytes": 6197215,
+      "sha256": "d579593b5a9f40aca193bfa0255f154f81bd5b8bd863b312dcc2d448f4df29f3"
+    },
+    "s378_pixel_kl": {
+      "filename": "student.pt",
+      "bytes": 6197215,
+      "sha256": "3f2c0fd18ebaf3d18647617ad98e1aabd318099b7df2f328ddd5f2526260a619"
+    },
+    "v4_robust_medium_fp32": {
+      "filename": "student-fp32.onnx",
+      "bytes": 30103143,
+      "sha256": "1cb99d88e685d1f637f9a93e9164e0541794e0f9101d4da3bf32ef30c609afc8"
+    },
+    "v4_robust_medium_int8": {
+      "filename": "student-int8.onnx",
+      "bytes": 8288496,
+      "sha256": "fac9853786e9bb3510836d024a6212e4cdea4580c175e57f71f0405c0e2292f8"
+    },
+    "v4_robust_medium_pt": {
+      "filename": "student.pt",
+      "bytes": 30610329,
+      "sha256": "c0aafd51ce9e36d7adf9d9404f3a19a5a2d5ea8ea319ec2b5b244776316ac099"
+    }
+  },
+  "note": "v4-final Option C frozen evaluation",
+  "freeze_sha256": "8f235db63d5a427af10c11bc35f61a8823e043e6a9f55302b66185d21217f41f"
+}

@@ -1,47 +1,67 @@
-<div align="right"><strong>English</strong> | <a href="./architecture.ko.md">한국어</a></div>
+# Architecture & Core Algorithmic Design
 
-# Architecture
+[English README](../README.md) · [한국어](./architecture.ko.md) · [Results](./results.md) · [Reproduction](./reproduction.md)
 
-The runtime takes a cropped sign image and predicts a sign class. Training additionally uses a larger teacher to guide a smaller student with its class-probability distribution. The supervised baseline uses the same small architecture without teacher guidance. A seed fixes pseudorandom starting choices so the two small-model training paths can be matched. Model export then packages the saved student for CPU inference; exporting, evaluating accuracy and measuring latency are separate steps.
+## 1. Problem Formulation & Design Goals
 
-The project compares a MobileNetV2 teacher, an independently trained compact student and a distilled student on GTSRB's 43 classes. Baseline and distilled students share the same 34,406-parameter architecture. Their inference graphs are the same; distillation changes the training objective, not the deployment model.
+In autonomous driving semantic segmentation (19 Cityscapes classes), a high-capacity Vision Transformer teacher (`SegFormer-B5`, `84.6M` parameters) takes `1,631 ms` per frame (`0.61 FPS`) on CPU—far too slow for real-time edge deployment. `seg_kd` is engineered to satisfy four simultaneous constraints:
 
-## Input and model boundary
+1. **Cross-Architecture Knowledge Transfer**: Transfer global self-attention spatial context from `MiT-B5` to lightweight quantization-ready Edge CNNs (`MobileNetV4 + FPN`).
+2. **Safety-Critical Class Preservation**: Prevent minority vulnerable road-user classes (`traffic_light`, `traffic_sign`, `person`, `rider`, `motorcycle`, `bicycle`) from being drowned out by majority background classes (`road`, `building`, `sky`).
+3. **Adverse-Weather & Sensor-Noise Resilience**: Transfer clean-scene teacher representations to corrupted-input students so deployment models stay reliable under night, fog, motion blur, and camera sensor noise.
+4. **Leakage-Free Deployment & Calibration**: Fit model selection, static QDQ INT8 acceptance gating, and post-hoc temperature scaling exclusively on `validation`, freezing all artifacts via SHA-256 before touching `locked_eval` or KITTI Zero-Shot.
 
-Every model accepts 96 by 96 RGB images normalized to `[0,1]` and returns 43 unnormalized class logits. The teacher contains its own `Rescaling(2.0, offset=-1.0)` before ImageNet-pretrained MobileNetV2, so its backbone receives the required `[-1,1]` range. This avoids a separate teacher-only normalization in data loaders or the public inference CLI.
+---
 
-The compact student uses three depthwise-separable convolution blocks, global average pooling and a small dense classifier. Model files use standard Keras layers and can be loaded without a custom distillation wrapper. The inference path applies softmax once to produce class probabilities. TFLite inference reads tensor quantization metadata and applies the correct input quantization and output dequantization.
+## 2. Teacher & Student Architectures (`seg_kd/models.py`)
 
-## Training objective
+### Teacher (`SegFormerTeacher`)
+- **Backbone**: `nvidia/segformer-b5-finetuned-cityscapes-1024-1024` (`MiT-B5`, `84,607,955` params, `323.14 MiB`)
+- **Outputs**: 19-class logits `(B, 19, H, W)` and 4-stage hierarchical feature pyramid (`s4, s8, s16, s32` with channels `[64, 128, 320, 512]`).
+- **Role**: Frozen in `eval()` + CUDA BF16 during student distillation, always consuming clean inputs.
 
-```text
-hard_loss = cross_entropy(labels, student_logits)
-soft_loss = KL(softmax(teacher_logits / T), softmax(student_logits / T))
-loss = alpha * hard_loss + (1 - alpha) * T**2 * soft_loss
-```
+### Student (`EdgeFPNSegmenter`)
+- **Decoder**: Quantization-friendly `Conv2d(bias=False) → BatchNorm2d → ReLU` lightweight FPN with ONNX Opset 17 compatible bilinear upsampling.
+- **3-Tier Pareto Backbones**:
+  - `MobileNetV4-Small` (`1.50M` params, `fpn_dim=96`, 57 Conv / 55 BN): ultra-light UIB blocks (`FP32 5.72 MiB`, `INT8 1.76 MiB`).
+  - `MobileNetV3-Large` (`3.30M` params, `fpn_dim=128`, 74 Conv / 56 BN): includes 18 Squeeze-and-Excitation (SE) + HardSwish paths (quantization-sensitivity control).
+  - `MobileNetV4-Medium` (`7.54M` params, `fpn_dim=128`, 88 Conv / 86 BN): pure `Conv-BN-ReLU` UIB blocks (`FP32 28.71 MiB`, `INT8 7.91 MiB`).
+- **Quantization Friendliness Audit (`audit_quantization_friendliness`)**: Programmatically rejects `Conv → ReLU → BN` non-fusible antipatterns prior to training.
+- **Training-Only Projector Bank (`FeatureProjectorBank`)**: `1×1 Conv-BN` projections align student and teacher pyramid channels during training and are completely discarded at export (**zero inference overhead**).
 
-The teacher is called with `training=False`, and its weights remain unchanged during student training. Class weights, augmentation, training budget and initialization policy are matched between baseline and distillation comparisons. Validation reports a real classification loss and accuracy rather than a placeholder zero. The best validation checkpoint is saved and reloaded for final evaluation.
+---
 
-## Data boundary
+## 3. Distillation Objectives (`seg_kd/losses.py`)
 
-The official training collection is divided by traffic-sign track, stratified within class, into training, validation and locked holdout. Images from the same track cannot cross those boundaries. Relative paths, labels, track IDs, sizes and SHA-256 digests are recorded in the manifest. Data loading checks records against that inventory.
+### 3.1 Channel-Wise Spatial Distillation (`CWD`)
+Pixel-wise KL (`softmax` across `C` channels) is dominated by frequent background classes. `CWD` instead normalizes each channel $c$ spatially over valid pixels $\Omega = \{(h, w) : y_{h,w} \neq 255\}$:
 
-Training and model selection can use training and validation only. Final holdout inference is permitted after model, data, source and configuration hashes have been frozen. The official test collection is kept as a separate audit because the original notebook already used it for model selection. Neither audit scores nor locked-holdout outcomes are used to retune the published configuration.
+$$p_c^{T}(i) = \frac{\exp(z_{c,i}^{T} / \tau)}{\sum_{j \in \Omega} \exp(z_{c,j}^{T} / \tau)}, \qquad \mathcal{L}_{\mathrm{CWD}} = \frac{\tau^2}{C} \sum_{c=1}^{C} \sum_{i \in \Omega} p_c^{T}(i) \log \frac{p_c^{T}(i)}{p_c^{S}(i)}$$
 
-## Modules
+Every class channel receives equal spatial gradient weight regardless of pixel area (`T = 4.0`).
 
-| Module | Responsibility |
-| --- | --- |
-| `data.py` | Dataset inventory, track-disjoint splits and deterministic evaluation inputs |
-| `models.py` | Standard teacher and compact-student models |
-| `training.py` | Supervised and distilled optimization, checkpoints and validation |
-| `experiments.py` | Bounded Kaggle experiment stages and stop decisions |
-| `evaluation.py` | Frozen-model evaluation, confusion matrices and prediction records |
-| `benchmark.py` | Warmed CPU measurements using the same input images |
-| `export.py` | FP32 and INT8 TFLite conversion with training-only calibration |
-| `runtime.py` | Safe saved-model loading and local image inference |
-| `__main__.py` | Explicit command-line entry points |
+### 3.2 4-Stage Hybrid Feature Alignment (`cwd_feat`)
+Across stages `s4, s8, s16, s32`, projected student features match frozen teacher features via a 50/50 hybrid of spatial CWD and channel-wise cosine distance:
 
-Actual file names and public results are listed in the repository. A diagram or module interface alone does not prove that a training run or deployment verification succeeded; the results and verification reports provide that evidence.
+$$\mathcal{L}_{\mathrm{feat}} = \frac{1}{|S|} \sum_{s \in \{s4, s8, s16, s32\}} \Big( 0.5 \cdot \mathcal{L}_{\mathrm{CWD}}(\hat{F}_s^{S}, F_s^{T}) + 0.5 \cdot (1 - \cos(\hat{F}_s^{S}, F_s^{T})) \Big)$$
 
-Sources: [MobileNetV2 preprocessing](https://keras.io/api/applications/mobilenet/), [knowledge distillation paper](https://arxiv.org/abs/1503.02531), [GTSRB](https://benchmark.ini.rub.de/gtsrb_dataset.html).
+The total loss is $\mathcal{L} = \mathcal{L}_{\mathrm{CE}} + \alpha_{\mathrm{kd}} \mathcal{L}_{\mathrm{CWD}} + \beta_{\mathrm{feat}} \mathcal{L}_{\mathrm{feat}}$ (`α=1.0`, `β=0.5`, unweighted CE).
+
+---
+
+## 4. Asymmetric Robustness KD (`v4-final`, `seg_kd/training.py`)
+
+Clean-distilled students (`v3-max`) match `90.8%` of teacher mIoU on clean frames but collapse to `13.75%` under high-frequency sensor noise (`σ=18`). Asymmetric Robustness KD resolves this cleanly:
+
+1. **5-Epoch Ramp Schedule**: Linearly increases corruption probability $p$ from `0.07` to `0.35` over epochs 1–5 to stabilize early convergence.
+2. **GPU-Batch Corrupted Student Stream (`apply_gpu_adverse_corruption`)**: Injects night gamma darkening, motion blur, fog low-contrast haze, and Gaussian sensor noise exclusively into student inputs.
+3. **Clean Teacher Supervision**: The frozen `SegFormer-B5` always processes the uncorrupted frame, forcing the student to reconstruct clean-scene spatial logits and pyramid features directly from degraded sensor inputs.
+
+---
+
+## 5. QAT-KD, Validation-Only INT8 Gate & Temperature Scaling
+
+1. **BF16-Teacher QAT-KD (`6 epochs`)**: Quantization-aware fine-tuning keeps static INT8 accuracy loss strictly below `1.0%p`.
+2. **ONNX Export & Static QDQ INT8 (`seg_kd/export.py`)**: Verifies `100.0%` pixel argmax parity (`max_abs_logit_diff <= 3.6e-5`) between PyTorch and Opset 17 FP32 ONNX, then applies per-channel static QDQ INT8 calibration over 128 deterministic training frames.
+3. **Validation-Only INT8 Gate (`assess_int8_acceptance`)**: Accepts INT8 strictly when all 4 validation checks pass (`val_mIoU_drop <= 1.0%p`, `val_safety_drop <= 1.5%p`, `size_ratio < 1.0`, `CPU_p50_speedup >= 1.20×`).
+4. **Post-Hoc Validation Temperature Scaling (`seg_kd/evaluation.py`)**: Fits a single scalar temperature $T^*$ on `validation` NLL (`T* ≈ 1.70` across all CWD students), cutting `locked_eval` ECE by `69.5–78.5%` with mathematically zero mIoU change (`0.00%p`) and `0 ms` inference overhead.

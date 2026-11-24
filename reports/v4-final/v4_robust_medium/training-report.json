@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "status": "completed",
+  "role": "student",
+  "arch": "mobilenetv4_medium",
+  "method": "asymmetric_robust_cwd_feat",
+  "seed": 378,
+  "robust_prob": 0.35,
+  "epochs": 45,
+  "fpn_dim": 128,
+  "manifest_sha256": "e93018834b7e1e6b3facd8eaab3efad4dca9cde17856ba6935359207d83072e5",
+  "initial_weights_sha256": "2b7c033d017bf0b9f625b9ec7e00aa404a7144d50e7cd8b7d9e562230bb435a0",
+  "teacher_file_sha256": "9f13d0b18d3a594f72527da1074c7aa8d7050bf82dc2c1eb2d324ba4913377f2",
+  "teacher_immutable": true,
+  "quantization_audit": {
+    "passed": true,
+    "conv_count": 88,
+    "bn_count": 86,
+    "violations": []
+  },
+  "best_epoch": 38,
+  "validation_miou": 0.699066,
+  "validation_safety_miou": 0.592128,
+  "validation_pixel_accuracy": 0.944519,
+  "validation_ece": 0.024811,
+  "parameter_count": 7543523,
+  "model_filename": "student.pt",
+  "model_sha256": "c0aafd51ce9e36d7adf9d9404f3a19a5a2d5ea8ea319ec2b5b244776316ac099",
+  "weights_sha256": "5f2051a14d4887bfd17394360a0b84a37d0ebe123be34a7d868fb2cdd61d2ae8",
+  "seconds": 6589.928,
+  "runtime": {
+    "python": "3.13.15",
+    "torch": "2.11.0+cu128",
+    "platform": "Linux",
+    "device": "cuda",
+    "precision": "bf16",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA L4",
+    "gpu_vram_gib": 22.03,
+    "cuda_version": "12.8",
+    "bf16_supported": true
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "s378_baseline": {
+    "label": "s378_baseline",
+    "model_path": "student.pt",
+    "optimal_temperature_val": 1.2,
+    "locked_eval_miou_before": 0.616121,
+    "locked_eval_miou_after": 0.616121,
+    "locked_eval_ece_before": 0.01509,
+    "locked_eval_ece_after": 0.00084,
+    "ece_reduction_pct": 94.43
+  },
+  "s378_cwd_feat": {
+    "label": "s378_cwd_feat",
+    "model_path": "student.pt",
+    "optimal_temperature_val": 1.71,
+    "locked_eval_miou_before": 0.620244,
+    "locked_eval_miou_after": 0.620244,
+    "locked_eval_ece_before": 0.030524,
+    "locked_eval_ece_after": 0.006565,
+    "ece_reduction_pct": 78.49
+  },
+  "medium_baseline": {
+    "label": "medium_baseline",
+    "model_path": "student.pt",
+    "optimal_temperature_val": 1.25,
+    "locked_eval_miou_before": 0.671246,
+    "locked_eval_miou_after": 0.671246,
+    "locked_eval_ece_before": 0.014588,
+    "locked_eval_ece_after": 0.001601,
+    "ece_reduction_pct": 89.03
+  },
+  "v3_medium_int8": {
+    "label": "v3_medium_int8",
+    "model_path": "student-int8.onnx",
+    "optimal_temperature_val": 1.7,
+    "locked_eval_miou_before": 0.679543,
+    "locked_eval_miou_after": 0.679543,
+    "locked_eval_ece_before": 0.025432,
+    "locked_eval_ece_after": 0.007266,
+    "ece_reduction_pct": 71.43
+  },
+  "v4_robust_medium_fp32": {
+    "label": "v4_robust_medium_fp32",
+    "model_path": "student-fp32.onnx",
+    "optimal_temperature_val": 1.72,
+    "locked_eval_miou_before": 0.673462,
+    "locked_eval_miou_after": 0.673462,
+    "locked_eval_ece_before": 0.025267,
+    "locked_eval_ece_after": 0.007712,
+    "ece_reduction_pct": 69.48
+  },
+  "v4_robust_medium_int8": {
+    "label": "v4_robust_medium_int8",
+    "model_path": "student-int8.onnx",
+    "optimal_temperature_val": 1.7,
+    "locked_eval_miou_before": 0.66956,
+    "locked_eval_miou_after": 0.66956,
+    "locked_eval_ece_before": 0.02595,
+    "locked_eval_ece_after": 0.006694,
+    "ece_reduction_pct": 74.2
+  }
+}

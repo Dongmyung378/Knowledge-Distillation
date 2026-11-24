@@ -1,0 +1,32 @@
+{
+  "schema_version": 2,
+  "backend": "pytorch",
+  "device": "cuda",
+  "precision": "bf16",
+  "threads": null,
+  "host": "x86_64",
+  "platform": "Linux",
+  "model_filename": "student.pt",
+  "model_sha256": "57061faf22e4f36074fcc244efdfc63ca02b79465de4707bd87fce34e4da4a36",
+  "model_bytes": 6197215,
+  "model_mib": 5.91,
+  "arch": "mobilenetv4_small",
+  "role": "student",
+  "parameter_count": 1498515,
+  "image_size": [
+    384,
+    768
+  ],
+  "batch_size": 1,
+  "warmup": 10,
+  "runs": 50,
+  "latency_ms": {
+    "mean": 10.6528,
+    "p50": 10.6375,
+    "p95": 10.9756,
+    "min": 10.3206,
+    "max": 11.0714,
+    "fps_p50": 94.01,
+    "fps_mean": 93.87
+  }
+}

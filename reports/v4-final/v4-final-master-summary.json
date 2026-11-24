@@ -1,0 +1,250 @@
+{
+  "schema_version": 2,
+  "study": "driving-seg-kd-l4-v4-final-option-c",
+  "image_size": [
+    384,
+    768
+  ],
+  "medium_baseline_vs_kd_locked_eval": {
+    "medium_baseline_miou": 0.671457,
+    "medium_baseline_safety": 0.558845,
+    "v3_medium_fp32_miou": 0.68506,
+    "v3_medium_int8_miou": 0.679543,
+    "v4_robust_medium_fp32_miou": 0.673462,
+    "v4_robust_medium_int8_miou": 0.66956,
+    "v4_robust_medium_int8_safety": 0.573244
+  },
+  "ablation_384_seed378_locked_eval": {
+    "baseline": {
+      "miou": 0.616509,
+      "safety": 0.502528
+    },
+    "pixel_kl": {
+      "miou": 0.592459,
+      "safety": 0.44538
+    },
+    "cwd": {
+      "miou": 0.630694,
+      "safety": 0.519175
+    },
+    "cwd_feat": {
+      "miou": 0.620029,
+      "safety": 0.515004
+    }
+  },
+  "v4_robust_medium_int8_acceptance": {
+    "accepted": true,
+    "selected_format": "INT8",
+    "checks": {
+      "miou_drop_within_limit": true,
+      "safety_miou_drop_within_limit": true,
+      "file_size_smaller": true,
+      "cpu_p50_speedup_met": true
+    },
+    "miou_drop_pp": 0.6375,
+    "safety_miou_drop_pp": 0.4282,
+    "cpu_p50_speedup": 1.5483,
+    "file_size_ratio_int8_over_fp32": 0.2753,
+    "thresholds": {
+      "max_miou_drop_pp": 1.0,
+      "max_safety_miou_drop_pp": 1.5,
+      "minimum_speedup": 1.2
+    }
+  },
+  "ece_temperature_scaling": {
+    "s378_baseline": {
+      "label": "s378_baseline",
+      "model_path": "student.pt",
+      "optimal_temperature_val": 1.2,
+      "locked_eval_miou_before": 0.616121,
+      "locked_eval_miou_after": 0.616121,
+      "locked_eval_ece_before": 0.01509,
+      "locked_eval_ece_after": 0.00084,
+      "ece_reduction_pct": 94.43
+    },
+    "s378_cwd_feat": {
+      "label": "s378_cwd_feat",
+      "model_path": "student.pt",
+      "optimal_temperature_val": 1.71,
+      "locked_eval_miou_before": 0.620244,
+      "locked_eval_miou_after": 0.620244,
+      "locked_eval_ece_before": 0.030524,
+      "locked_eval_ece_after": 0.006565,
+      "ece_reduction_pct": 78.49
+    },
+    "medium_baseline": {
+      "label": "medium_baseline",
+      "model_path": "student.pt",
+      "optimal_temperature_val": 1.25,
+      "locked_eval_miou_before": 0.671246,
+      "locked_eval_miou_after": 0.671246,
+      "locked_eval_ece_before": 0.014588,
+      "locked_eval_ece_after": 0.001601,
+      "ece_reduction_pct": 89.03
+    },
+    "v3_medium_int8": {
+      "label": "v3_medium_int8",
+      "model_path": "student-int8.onnx",
+      "optimal_temperature_val": 1.7,
+      "locked_eval_miou_before": 0.679543,
+      "locked_eval_miou_after": 0.679543,
+      "locked_eval_ece_before": 0.025432,
+      "locked_eval_ece_after": 0.007266,
+      "ece_reduction_pct": 71.43
+    },
+    "v4_robust_medium_fp32": {
+      "label": "v4_robust_medium_fp32",
+      "model_path": "student-fp32.onnx",
+      "optimal_temperature_val": 1.72,
+      "locked_eval_miou_before": 0.673462,
+      "locked_eval_miou_after": 0.673462,
+      "locked_eval_ece_before": 0.025267,
+      "locked_eval_ece_after": 0.007712,
+      "ece_reduction_pct": 69.48
+    },
+    "v4_robust_medium_int8": {
+      "label": "v4_robust_medium_int8",
+      "model_path": "student-int8.onnx",
+      "optimal_temperature_val": 1.7,
+      "locked_eval_miou_before": 0.66956,
+      "locked_eval_miou_after": 0.66956,
+      "locked_eval_ece_before": 0.02595,
+      "locked_eval_ece_after": 0.006694,
+      "ece_reduction_pct": 74.2
+    }
+  },
+  "kitti_zero_shot_v4": {
+    "medium_baseline": {
+      "miou": 0.490863,
+      "safety": 0.256334
+    },
+    "s378_pixel_kl": {
+      "miou": 0.442899,
+      "safety": 0.207843
+    },
+    "s378_cwd": {
+      "miou": 0.473825,
+      "safety": 0.275304
+    },
+    "v4_robust_medium_fp32": {
+      "miou": 0.500363,
+      "safety": 0.31957
+    },
+    "v4_robust_medium_int8": {
+      "miou": 0.480968,
+      "safety": 0.30486
+    }
+  },
+  "robustness_stress_test_v4": {
+    "Teacher (SegFormer-B5)": {
+      "clean": {
+        "miou": 0.734104,
+        "safety_critical_miou": 0.650342
+      },
+      "night_lowlight": {
+        "miou": 0.730404,
+        "safety_critical_miou": 0.645167
+      },
+      "motion_blur": {
+        "miou": 0.654021,
+        "safety_critical_miou": 0.554492
+      },
+      "fog_lowcontrast": {
+        "miou": 0.72296,
+        "safety_critical_miou": 0.638837
+      },
+      "sensor_noise": {
+        "miou": 0.591923,
+        "safety_critical_miou": 0.475099
+      }
+    },
+    "Medium Baseline (7.5M)": {
+      "clean": {
+        "miou": 0.652472,
+        "safety_critical_miou": 0.552578
+      },
+      "night_lowlight": {
+        "miou": 0.634437,
+        "safety_critical_miou": 0.519083
+      },
+      "motion_blur": {
+        "miou": 0.558006,
+        "safety_critical_miou": 0.431271
+      },
+      "fog_lowcontrast": {
+        "miou": 0.568858,
+        "safety_critical_miou": 0.468284
+      },
+      "sensor_noise": {
+        "miou": 0.23455,
+        "safety_critical_miou": 0.184463
+      }
+    },
+    "Medium v3-max INT8 (7.5M)": {
+      "clean": {
+        "miou": 0.673989,
+        "safety_critical_miou": 0.57397
+      },
+      "night_lowlight": {
+        "miou": 0.641353,
+        "safety_critical_miou": 0.527961
+      },
+      "motion_blur": {
+        "miou": 0.584468,
+        "safety_critical_miou": 0.445472
+      },
+      "fog_lowcontrast": {
+        "miou": 0.597615,
+        "safety_critical_miou": 0.484605
+      },
+      "sensor_noise": {
+        "miou": 0.137497,
+        "safety_critical_miou": 0.101007
+      }
+    },
+    "Medium v4 Robust FP32 (7.5M)": {
+      "clean": {
+        "miou": 0.671893,
+        "safety_critical_miou": 0.577588
+      },
+      "night_lowlight": {
+        "miou": 0.660701,
+        "safety_critical_miou": 0.553099
+      },
+      "motion_blur": {
+        "miou": 0.605641,
+        "safety_critical_miou": 0.469788
+      },
+      "fog_lowcontrast": {
+        "miou": 0.669802,
+        "safety_critical_miou": 0.565954
+      },
+      "sensor_noise": {
+        "miou": 0.606111,
+        "safety_critical_miou": 0.480016
+      }
+    },
+    "Medium v4 Robust INT8 (7.5M)": {
+      "clean": {
+        "miou": 0.668948,
+        "safety_critical_miou": 0.567766
+      },
+      "night_lowlight": {
+        "miou": 0.647084,
+        "safety_critical_miou": 0.528893
+      },
+      "motion_blur": {
+        "miou": 0.593704,
+        "safety_critical_miou": 0.443853
+      },
+      "fog_lowcontrast": {
+        "miou": 0.663283,
+        "safety_critical_miou": 0.547799
+      },
+      "sensor_noise": {
+        "miou": 0.595945,
+        "safety_critical_miou": 0.469936
+      }
+    }
+  }
+}

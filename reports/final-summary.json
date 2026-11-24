@@ -1,0 +1,757 @@
+{
+  "schema_version": 4,
+  "study": "driving-seg-kd-l4-v3max-v4final",
+  "dataset": {
+    "primary": "Cityscapes 19-class (Chris1/cityscapes, 384x768)",
+    "splits": {
+      "train": 2529,
+      "validation": 446,
+      "locked_eval": 500
+    },
+    "zero_shot": "KITTI Semantics (200 official images, zero fine-tuning)",
+    "manifest_sha256": "e93018834b7e1e6b3facd8eaab3efad4dca9cde17856ba6935359207d83072e5",
+    "freeze_v3_sha256": "6d48a65414aa91c2fc5a3ebf9469138360772eb9f3242af4e8862135c780ebaa",
+    "freeze_v4_sha256": "8f235db63d5a427af10c11bc35f61a8823e043e6a9f55302b66185d21217f41f"
+  },
+  "teacher": {
+    "variant": "segformer_b5",
+    "parameter_count": 84607955,
+    "val_miou_pct": 82.96,
+    "val_safety_miou_pct": 71.38,
+    "runtime": {
+      "python": "3.13.15",
+      "torch": "2.11.0+cu128",
+      "platform": "Linux",
+      "device": "cuda",
+      "precision": "bf16",
+      "cuda_available": true,
+      "gpu_name": "NVIDIA L4",
+      "gpu_vram_gib": 22.03,
+      "cuda_version": "12.8",
+      "bf16_supported": true
+    },
+    "miou_pct": 74.83,
+    "safety_miou_pct": 65.57,
+    "pixel_accuracy_pct": 95.48,
+    "ece": 0.0158,
+    "cpu_p50_ms": 1631.33,
+    "cpu_fps_p50": 0.61,
+    "model_mib": 323.14,
+    "l4_bf16_p50_ms": 84.48,
+    "l4_bf16_fps_p50": 11.84
+  },
+  "three_seed_paired_small": {
+    "seeds": [
+      378,
+      379,
+      380
+    ],
+    "baseline_miou_mean_sd": [
+      61.421,
+      0.209
+    ],
+    "cwd_feat_miou_mean_sd": [
+      62.029,
+      0.076
+    ],
+    "paired_miou_gain_mean_sd": [
+      0.608,
+      0.261
+    ],
+    "positive_miou_pairs": 3,
+    "baseline_safety_mean_sd": [
+      49.517,
+      0.902
+    ],
+    "cwd_feat_safety_mean_sd": [
+      51.399,
+      0.291
+    ],
+    "paired_safety_gain_mean_sd": [
+      1.882,
+      1.068
+    ],
+    "positive_safety_pairs": 3,
+    "seeds_detail": {
+      "378": {
+        "baseline_miou_pct": 61.65,
+        "baseline_safety_pct": 50.25,
+        "cwd_feat_miou_pct": 62.0,
+        "cwd_feat_safety_pct": 51.5
+      },
+      "379": {
+        "baseline_miou_pct": 61.24,
+        "baseline_safety_pct": 49.79,
+        "cwd_feat_miou_pct": 62.11,
+        "cwd_feat_safety_pct": 51.07
+      },
+      "380": {
+        "baseline_miou_pct": 61.37,
+        "baseline_safety_pct": 48.51,
+        "cwd_feat_miou_pct": 61.97,
+        "cwd_feat_safety_pct": 51.63
+      }
+    },
+    "per_class_3seed_mean": {
+      "road": {
+        "baseline_mean_pct": 96.733,
+        "cwd_feat_mean_pct": 96.781,
+        "delta_mean_pp": 0.048,
+        "delta_sd_pp": 0.09,
+        "is_safety_critical": false
+      },
+      "sidewalk": {
+        "baseline_mean_pct": 74.837,
+        "cwd_feat_mean_pct": 75.731,
+        "delta_mean_pp": 0.894,
+        "delta_sd_pp": 0.573,
+        "is_safety_critical": false
+      },
+      "building": {
+        "baseline_mean_pct": 87.121,
+        "cwd_feat_mean_pct": 87.64,
+        "delta_mean_pp": 0.519,
+        "delta_sd_pp": 0.272,
+        "is_safety_critical": false
+      },
+      "wall": {
+        "baseline_mean_pct": 39.173,
+        "cwd_feat_mean_pct": 40.206,
+        "delta_mean_pp": 1.033,
+        "delta_sd_pp": 8.093,
+        "is_safety_critical": false
+      },
+      "fence": {
+        "baseline_mean_pct": 43.22,
+        "cwd_feat_mean_pct": 45.971,
+        "delta_mean_pp": 2.752,
+        "delta_sd_pp": 0.863,
+        "is_safety_critical": false
+      },
+      "pole": {
+        "baseline_mean_pct": 40.135,
+        "cwd_feat_mean_pct": 40.954,
+        "delta_mean_pp": 0.819,
+        "delta_sd_pp": 0.841,
+        "is_safety_critical": false
+      },
+      "traffic_light": {
+        "baseline_mean_pct": 41.529,
+        "cwd_feat_mean_pct": 44.275,
+        "delta_mean_pp": 2.745,
+        "delta_sd_pp": 0.411,
+        "is_safety_critical": true
+      },
+      "traffic_sign": {
+        "baseline_mean_pct": 53.543,
+        "cwd_feat_mean_pct": 55.655,
+        "delta_mean_pp": 2.111,
+        "delta_sd_pp": 0.134,
+        "is_safety_critical": true
+      },
+      "vegetation": {
+        "baseline_mean_pct": 88.336,
+        "cwd_feat_mean_pct": 88.324,
+        "delta_mean_pp": -0.012,
+        "delta_sd_pp": 0.08,
+        "is_safety_critical": false
+      },
+      "terrain": {
+        "baseline_mean_pct": 56.136,
+        "cwd_feat_mean_pct": 56.276,
+        "delta_mean_pp": 0.14,
+        "delta_sd_pp": 1.661,
+        "is_safety_critical": false
+      },
+      "sky": {
+        "baseline_mean_pct": 92.457,
+        "cwd_feat_mean_pct": 92.776,
+        "delta_mean_pp": 0.32,
+        "delta_sd_pp": 0.216,
+        "is_safety_critical": false
+      },
+      "person": {
+        "baseline_mean_pct": 63.518,
+        "cwd_feat_mean_pct": 65.113,
+        "delta_mean_pp": 1.595,
+        "delta_sd_pp": 0.241,
+        "is_safety_critical": true
+      },
+      "rider": {
+        "baseline_mean_pct": 43.166,
+        "cwd_feat_mean_pct": 44.678,
+        "delta_mean_pp": 1.513,
+        "delta_sd_pp": 0.743,
+        "is_safety_critical": true
+      },
+      "car": {
+        "baseline_mean_pct": 89.293,
+        "cwd_feat_mean_pct": 89.69,
+        "delta_mean_pp": 0.397,
+        "delta_sd_pp": 0.471,
+        "is_safety_critical": false
+      },
+      "truck": {
+        "baseline_mean_pct": 61.769,
+        "cwd_feat_mean_pct": 54.454,
+        "delta_mean_pp": -7.315,
+        "delta_sd_pp": 5.578,
+        "is_safety_critical": false
+      },
+      "bus": {
+        "baseline_mean_pct": 61.306,
+        "cwd_feat_mean_pct": 59.595,
+        "delta_mean_pp": -1.712,
+        "delta_sd_pp": 0.591,
+        "is_safety_critical": false
+      },
+      "train": {
+        "baseline_mean_pct": 39.381,
+        "cwd_feat_mean_pct": 41.751,
+        "delta_mean_pp": 2.371,
+        "delta_sd_pp": 5.502,
+        "is_safety_critical": false
+      },
+      "motorcycle": {
+        "baseline_mean_pct": 36.133,
+        "cwd_feat_mean_pct": 37.023,
+        "delta_mean_pp": 0.89,
+        "delta_sd_pp": 6.283,
+        "is_safety_critical": true
+      },
+      "bicycle": {
+        "baseline_mean_pct": 59.213,
+        "cwd_feat_mean_pct": 61.654,
+        "delta_mean_pp": 2.441,
+        "delta_sd_pp": 0.717,
+        "is_safety_critical": true
+      }
+    }
+  },
+  "ablation_384_seed378": {
+    "baseline": {
+      "miou": 0.616509,
+      "safety": 0.502528
+    },
+    "pixel_kl": {
+      "miou": 0.592459,
+      "safety": 0.44538
+    },
+    "cwd": {
+      "miou": 0.630694,
+      "safety": 0.519175
+    },
+    "cwd_feat": {
+      "miou": 0.620029,
+      "safety": 0.515004
+    }
+  },
+  "locked_eval_models": {
+    "teacher_segformer_b5": {
+      "miou_pct": 74.83,
+      "safety_miou_pct": 65.57,
+      "pixel_accuracy_pct": 95.48,
+      "ece": 0.0158,
+      "cpu_p50_ms": 1631.33,
+      "cpu_fps_p50": 0.61,
+      "model_mib": 323.14,
+      "parameter_count": 84607955
+    },
+    "s378_baseline": {
+      "miou_pct": 61.65,
+      "safety_miou_pct": 50.25,
+      "pixel_accuracy_pct": 93.12,
+      "ece": 0.0151,
+      "cpu_p50_ms": 44.69,
+      "cpu_fps_p50": 22.38,
+      "model_mib": 5.91,
+      "parameter_count": 1498515
+    },
+    "s378_pixel_kl": {
+      "miou_pct": 59.25,
+      "safety_miou_pct": 44.54,
+      "pixel_accuracy_pct": 92.86,
+      "ece": 0.0368,
+      "cpu_p50_ms": null,
+      "cpu_fps_p50": null,
+      "model_mib": null,
+      "parameter_count": null
+    },
+    "s378_cwd": {
+      "miou_pct": 63.07,
+      "safety_miou_pct": 51.92,
+      "pixel_accuracy_pct": 93.28,
+      "ece": 0.0296,
+      "cpu_p50_ms": null,
+      "cpu_fps_p50": null,
+      "model_mib": null,
+      "parameter_count": null
+    },
+    "s378_cwd_feat": {
+      "miou_pct": 62.0,
+      "safety_miou_pct": 51.5,
+      "pixel_accuracy_pct": 93.22,
+      "ece": 0.0306,
+      "cpu_p50_ms": 45.16,
+      "cpu_fps_p50": 22.14,
+      "model_mib": 5.91,
+      "parameter_count": 1498515
+    },
+    "mobilenetv4_small_fp32": {
+      "miou_pct": 61.95,
+      "safety_miou_pct": 51.8,
+      "pixel_accuracy_pct": 93.18,
+      "ece": 0.0315,
+      "cpu_p50_ms": 16.77,
+      "cpu_fps_p50": 59.63,
+      "model_mib": 5.72,
+      "parameter_count": null
+    },
+    "mobilenetv4_small_int8": {
+      "miou_pct": 61.43,
+      "safety_miou_pct": 51.42,
+      "pixel_accuracy_pct": 93.08,
+      "ece": 0.0327,
+      "cpu_p50_ms": 15.85,
+      "cpu_fps_p50": 63.1,
+      "model_mib": 1.76,
+      "parameter_count": null
+    },
+    "mobilenetv3_large_fp32": {
+      "miou_pct": 64.84,
+      "safety_miou_pct": 55.29,
+      "pixel_accuracy_pct": 93.74,
+      "ece": 0.03,
+      "cpu_p50_ms": 24.24,
+      "cpu_fps_p50": 41.25,
+      "model_mib": 12.59,
+      "parameter_count": null
+    },
+    "mobilenetv3_large_int8": {
+      "miou_pct": 59.32,
+      "safety_miou_pct": 49.99,
+      "pixel_accuracy_pct": 92.48,
+      "ece": 0.0383,
+      "cpu_p50_ms": 33.18,
+      "cpu_fps_p50": 30.14,
+      "model_mib": 3.68,
+      "parameter_count": null
+    },
+    "medium_baseline": {
+      "miou_pct": 67.15,
+      "safety_miou_pct": 55.88,
+      "pixel_accuracy_pct": 94.02,
+      "ece": 0.0145,
+      "cpu_p50_ms": null,
+      "cpu_fps_p50": null,
+      "model_mib": null,
+      "parameter_count": null
+    },
+    "mobilenetv4_medium_fp32": {
+      "miou_pct": 68.51,
+      "safety_miou_pct": 58.23,
+      "pixel_accuracy_pct": 94.23,
+      "ece": 0.0248,
+      "cpu_p50_ms": 38.11,
+      "cpu_fps_p50": 26.24,
+      "model_mib": 28.71,
+      "parameter_count": null
+    },
+    "mobilenetv4_medium_int8": {
+      "miou_pct": 67.95,
+      "safety_miou_pct": 57.94,
+      "pixel_accuracy_pct": 94.1,
+      "ece": 0.0254,
+      "cpu_p50_ms": 24.7,
+      "cpu_fps_p50": 40.49,
+      "model_mib": 7.91,
+      "parameter_count": null
+    },
+    "v4_robust_medium_fp32": {
+      "miou_pct": 67.35,
+      "safety_miou_pct": 58.14,
+      "pixel_accuracy_pct": 94.11,
+      "ece": 0.0253,
+      "cpu_p50_ms": 40.28,
+      "cpu_fps_p50": 24.83,
+      "model_mib": 28.71,
+      "parameter_count": null
+    },
+    "v4_robust_medium_int8": {
+      "miou_pct": 66.96,
+      "safety_miou_pct": 57.32,
+      "pixel_accuracy_pct": 93.96,
+      "ece": 0.026,
+      "cpu_p50_ms": 26.02,
+      "cpu_fps_p50": 38.44,
+      "model_mib": 7.91,
+      "parameter_count": null
+    }
+  },
+  "l4_cuda_bf16_benchmarks": {
+    "teacher_segformer_b5": {
+      "l4_bf16_p50_ms": 84.48,
+      "l4_bf16_fps_p50": 11.84,
+      "parameter_count": 84607955
+    },
+    "s378_baseline": {
+      "l4_bf16_p50_ms": 10.64,
+      "l4_bf16_fps_p50": 94.01,
+      "parameter_count": 1498515
+    },
+    "s378_cwd_feat": {
+      "l4_bf16_p50_ms": 11.07,
+      "l4_bf16_fps_p50": 90.29,
+      "parameter_count": 1498515
+    },
+    "v4_robust_medium": {
+      "l4_bf16_p50_ms": 17.48,
+      "l4_bf16_fps_p50": 57.2,
+      "parameter_count": 7543523
+    }
+  },
+  "export_and_int8_gates": {
+    "mobilenetv4_small": {
+      "parameter_count": 1498515,
+      "conv_count": 57,
+      "bn_count": 55,
+      "fp32_mib": 5.72,
+      "int8_mib": 1.76,
+      "size_reduction_pct": 69.3,
+      "fp32_parity_argmax": 1.0,
+      "fp32_max_abs_logit_diff": 1.9e-05,
+      "gate": {
+        "accepted": false,
+        "selected_format": "FP32",
+        "checks": {
+          "miou_drop_within_limit": true,
+          "safety_miou_drop_within_limit": true,
+          "file_size_smaller": true,
+          "cpu_p50_speedup_met": false
+        },
+        "miou_drop_pp": 0.5476,
+        "safety_miou_drop_pp": 0.4217,
+        "cpu_p50_speedup": 1.0356,
+        "file_size_ratio_int8_over_fp32": 0.3071,
+        "thresholds": {
+          "max_miou_drop_pp": 1.0,
+          "max_safety_miou_drop_pp": 1.5,
+          "minimum_speedup": 1.2
+        }
+      }
+    },
+    "mobilenetv3_large": {
+      "parameter_count": 3297987,
+      "conv_count": 74,
+      "bn_count": 56,
+      "fp32_mib": 12.59,
+      "int8_mib": 3.68,
+      "size_reduction_pct": 70.8,
+      "fp32_parity_argmax": 1.0,
+      "fp32_max_abs_logit_diff": 2.4e-05,
+      "gate": {
+        "accepted": false,
+        "selected_format": "FP32",
+        "checks": {
+          "miou_drop_within_limit": false,
+          "safety_miou_drop_within_limit": false,
+          "file_size_smaller": true,
+          "cpu_p50_speedup_met": false
+        },
+        "miou_drop_pp": 6.459,
+        "safety_miou_drop_pp": 6.0645,
+        "cpu_p50_speedup": 0.721,
+        "file_size_ratio_int8_over_fp32": 0.292,
+        "thresholds": {
+          "max_miou_drop_pp": 1.0,
+          "max_safety_miou_drop_pp": 1.5,
+          "minimum_speedup": 1.2
+        }
+      }
+    },
+    "mobilenetv4_medium_v3": {
+      "parameter_count": 7543523,
+      "conv_count": 88,
+      "bn_count": 86,
+      "fp32_mib": 28.71,
+      "int8_mib": 7.9,
+      "size_reduction_pct": 72.5,
+      "fp32_parity_argmax": 1.0,
+      "fp32_max_abs_logit_diff": 1.7e-05,
+      "gate": {
+        "accepted": true,
+        "selected_format": "INT8",
+        "checks": {
+          "miou_drop_within_limit": true,
+          "safety_miou_drop_within_limit": true,
+          "file_size_smaller": true,
+          "cpu_p50_speedup_met": true
+        },
+        "miou_drop_pp": 0.9549,
+        "safety_miou_drop_pp": 0.7739,
+        "cpu_p50_speedup": 1.5507,
+        "file_size_ratio_int8_over_fp32": 0.2753,
+        "thresholds": {
+          "max_miou_drop_pp": 1.0,
+          "max_safety_miou_drop_pp": 1.5,
+          "minimum_speedup": 1.2
+        }
+      }
+    },
+    "mobilenetv4_medium_v4_robust": {
+      "parameter_count": 7543523,
+      "conv_count": 88,
+      "bn_count": 86,
+      "fp32_mib": 28.71,
+      "int8_mib": 7.9,
+      "size_reduction_pct": 72.5,
+      "fp32_parity_argmax": 1.0,
+      "fp32_max_abs_logit_diff": 3.6e-05,
+      "gate": {
+        "accepted": true,
+        "selected_format": "INT8",
+        "checks": {
+          "miou_drop_within_limit": true,
+          "safety_miou_drop_within_limit": true,
+          "file_size_smaller": true,
+          "cpu_p50_speedup_met": true
+        },
+        "miou_drop_pp": 0.6375,
+        "safety_miou_drop_pp": 0.4282,
+        "cpu_p50_speedup": 1.5483,
+        "file_size_ratio_int8_over_fp32": 0.2753,
+        "thresholds": {
+          "max_miou_drop_pp": 1.0,
+          "max_safety_miou_drop_pp": 1.5,
+          "minimum_speedup": 1.2
+        }
+      }
+    }
+  },
+  "kitti_zero_shot": {
+    "teacher_segformer_b5": {
+      "miou_pct": 67.94,
+      "safety_miou_pct": 54.62,
+      "ece": 0.0373
+    },
+    "s378_baseline": {
+      "miou_pct": 46.71,
+      "safety_miou_pct": 20.41,
+      "ece": 0.0421
+    },
+    "s378_cwd_feat": {
+      "miou_pct": 45.97,
+      "safety_miou_pct": 26.08,
+      "ece": 0.0797
+    },
+    "mobilenetv4_small_int8": {
+      "miou_pct": 46.44,
+      "safety_miou_pct": 26.71,
+      "ece": 0.0823
+    },
+    "mobilenetv4_medium_int8": {
+      "miou_pct": 51.32,
+      "safety_miou_pct": 33.09,
+      "ece": 0.0824
+    },
+    "medium_baseline": {
+      "miou_pct": 49.09,
+      "safety_miou_pct": 25.63,
+      "ece": 0.0482
+    },
+    "s378_pixel_kl": {
+      "miou_pct": 44.29,
+      "safety_miou_pct": 20.78,
+      "ece": 0.0845
+    },
+    "s378_cwd": {
+      "miou_pct": 47.38,
+      "safety_miou_pct": 27.53,
+      "ece": 0.0744
+    },
+    "v4_robust_medium_fp32": {
+      "miou_pct": 50.04,
+      "safety_miou_pct": 31.96,
+      "ece": 0.0791
+    },
+    "v4_robust_medium_int8": {
+      "miou_pct": 48.1,
+      "safety_miou_pct": 30.49,
+      "ece": 0.0851
+    }
+  },
+  "robustness_stress_test_200f": {
+    "Teacher (SegFormer-B5)": {
+      "clean": {
+        "miou": 0.734104,
+        "safety_critical_miou": 0.650342
+      },
+      "night_lowlight": {
+        "miou": 0.730404,
+        "safety_critical_miou": 0.645167
+      },
+      "motion_blur": {
+        "miou": 0.654021,
+        "safety_critical_miou": 0.554492
+      },
+      "fog_lowcontrast": {
+        "miou": 0.72296,
+        "safety_critical_miou": 0.638837
+      },
+      "sensor_noise": {
+        "miou": 0.591923,
+        "safety_critical_miou": 0.475099
+      }
+    },
+    "Medium Baseline (7.5M)": {
+      "clean": {
+        "miou": 0.652472,
+        "safety_critical_miou": 0.552578
+      },
+      "night_lowlight": {
+        "miou": 0.634437,
+        "safety_critical_miou": 0.519083
+      },
+      "motion_blur": {
+        "miou": 0.558006,
+        "safety_critical_miou": 0.431271
+      },
+      "fog_lowcontrast": {
+        "miou": 0.568858,
+        "safety_critical_miou": 0.468284
+      },
+      "sensor_noise": {
+        "miou": 0.23455,
+        "safety_critical_miou": 0.184463
+      }
+    },
+    "Medium v3-max INT8 (7.5M)": {
+      "clean": {
+        "miou": 0.673989,
+        "safety_critical_miou": 0.57397
+      },
+      "night_lowlight": {
+        "miou": 0.641353,
+        "safety_critical_miou": 0.527961
+      },
+      "motion_blur": {
+        "miou": 0.584468,
+        "safety_critical_miou": 0.445472
+      },
+      "fog_lowcontrast": {
+        "miou": 0.597615,
+        "safety_critical_miou": 0.484605
+      },
+      "sensor_noise": {
+        "miou": 0.137497,
+        "safety_critical_miou": 0.101007
+      }
+    },
+    "Medium v4 Robust FP32 (7.5M)": {
+      "clean": {
+        "miou": 0.671893,
+        "safety_critical_miou": 0.577588
+      },
+      "night_lowlight": {
+        "miou": 0.660701,
+        "safety_critical_miou": 0.553099
+      },
+      "motion_blur": {
+        "miou": 0.605641,
+        "safety_critical_miou": 0.469788
+      },
+      "fog_lowcontrast": {
+        "miou": 0.669802,
+        "safety_critical_miou": 0.565954
+      },
+      "sensor_noise": {
+        "miou": 0.606111,
+        "safety_critical_miou": 0.480016
+      }
+    },
+    "Medium v4 Robust INT8 (7.5M)": {
+      "clean": {
+        "miou": 0.668948,
+        "safety_critical_miou": 0.567766
+      },
+      "night_lowlight": {
+        "miou": 0.647084,
+        "safety_critical_miou": 0.528893
+      },
+      "motion_blur": {
+        "miou": 0.593704,
+        "safety_critical_miou": 0.443853
+      },
+      "fog_lowcontrast": {
+        "miou": 0.663283,
+        "safety_critical_miou": 0.547799
+      },
+      "sensor_noise": {
+        "miou": 0.595945,
+        "safety_critical_miou": 0.469936
+      }
+    }
+  },
+  "ece_temperature_scaling": {
+    "s378_baseline": {
+      "label": "s378_baseline",
+      "model_path": "student.pt",
+      "optimal_temperature_val": 1.2,
+      "locked_eval_miou_before": 0.616121,
+      "locked_eval_miou_after": 0.616121,
+      "locked_eval_ece_before": 0.01509,
+      "locked_eval_ece_after": 0.00084,
+      "ece_reduction_pct": 94.43
+    },
+    "s378_cwd_feat": {
+      "label": "s378_cwd_feat",
+      "model_path": "student.pt",
+      "optimal_temperature_val": 1.71,
+      "locked_eval_miou_before": 0.620244,
+      "locked_eval_miou_after": 0.620244,
+      "locked_eval_ece_before": 0.030524,
+      "locked_eval_ece_after": 0.006565,
+      "ece_reduction_pct": 78.49
+    },
+    "medium_baseline": {
+      "label": "medium_baseline",
+      "model_path": "student.pt",
+      "optimal_temperature_val": 1.25,
+      "locked_eval_miou_before": 0.671246,
+      "locked_eval_miou_after": 0.671246,
+      "locked_eval_ece_before": 0.014588,
+      "locked_eval_ece_after": 0.001601,
+      "ece_reduction_pct": 89.03
+    },
+    "v3_medium_int8": {
+      "label": "v3_medium_int8",
+      "model_path": "student-int8.onnx",
+      "optimal_temperature_val": 1.7,
+      "locked_eval_miou_before": 0.679543,
+      "locked_eval_miou_after": 0.679543,
+      "locked_eval_ece_before": 0.025432,
+      "locked_eval_ece_after": 0.007266,
+      "ece_reduction_pct": 71.43
+    },
+    "v4_robust_medium_fp32": {
+      "label": "v4_robust_medium_fp32",
+      "model_path": "student-fp32.onnx",
+      "optimal_temperature_val": 1.72,
+      "locked_eval_miou_before": 0.673462,
+      "locked_eval_miou_after": 0.673462,
+      "locked_eval_ece_before": 0.025267,
+      "locked_eval_ece_after": 0.007712,
+      "ece_reduction_pct": 69.48
+    },
+    "v4_robust_medium_int8": {
+      "label": "v4_robust_medium_int8",
+      "model_path": "student-int8.onnx",
+      "optimal_temperature_val": 1.7,
+      "locked_eval_miou_before": 0.66956,
+      "locked_eval_miou_after": 0.66956,
+      "locked_eval_ece_before": 0.02595,
+      "locked_eval_ece_after": 0.006694,
+      "ece_reduction_pct": 74.2
+    }
+  }
+}

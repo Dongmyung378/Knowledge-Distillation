@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "split": "validation",
+  "image_count": 446,
+  "miou": 0.699066,
+  "miou_percent": 69.907,
+  "safety_critical_classes": [
+    "traffic_light",
+    "traffic_sign",
+    "person",
+    "rider",
+    "motorcycle",
+    "bicycle"
+  ],
+  "safety_critical_miou": 0.592128,
+  "safety_critical_miou_percent": 59.213,
+  "pixel_accuracy": 0.944519,
+  "mean_class_accuracy": 0.796594,
+  "ece": 0.024811,
+  "valid_pixels": 116991531,
+  "present_classes": 19,
+  "per_class_iou": {
+    "road": 0.970333,
+    "sidewalk": 0.808348,
+    "building": 0.899893,
+    "wall": 0.431245,
+    "fence": 0.565855,
+    "pole": 0.456506,
+    "traffic_light": 0.5372,
+    "traffic_sign": 0.62151,
+    "vegetation": 0.892356,
+    "terrain": 0.63993,
+    "sky": 0.937044,
+    "person": 0.733741,
+    "rider": 0.528705,
+    "car": 0.922425,
+    "truck": 0.619205,
+    "bus": 0.793075,
+    "train": 0.79326,
+    "motorcycle": 0.480889,
+    "bicycle": 0.650726
+  },
+  "slices": {
+    "timeofday:unknown": {
+      "miou": 0.699066,
+      "safety_critical_miou": 0.592128,
+      "pixel_accuracy": 0.944519,
+      "valid_pixels": 116991531
+    },
+    "weather:unknown": {
+      "miou": 0.699066,
+      "safety_critical_miou": 0.592128,
+      "pixel_accuracy": 0.944519,
+      "valid_pixels": 116991531
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "backend": "onnxruntime:CPUExecutionProvider",
+  "device": "cpu",
+  "precision": "int8",
+  "threads": 4,
+  "host": "x86_64",
+  "platform": "Linux",
+  "model_filename": "student-int8.onnx",
+  "model_sha256": "8cda8dff653f4561cebf96e1e4139c4b51c5bf43e69bb54362536d9497be927c",
+  "model_bytes": 8288492,
+  "model_mib": 7.905,
+  "image_size": [
+    384,
+    768
+  ],
+  "batch_size": 1,
+  "warmup": 8,
+  "runs": 40,
+  "latency_ms": {
+    "mean": 24.6869,
+    "p50": 24.6957,
+    "p95": 25.1469,
+    "min": 24.0553,
+    "max": 26.758,
+    "fps_p50": 40.49,
+    "fps_mean": 40.51
+  }
+}

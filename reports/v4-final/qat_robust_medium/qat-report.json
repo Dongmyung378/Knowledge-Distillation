@@ -1,0 +1,53 @@
+{
+  "epochs": 6,
+  "best_epoch": 5,
+  "best_val_miou": 0.700505,
+  "robust_prob": 0.25,
+  "model_filename": "student-qat.pt",
+  "model_sha256": "e86c4d443f1fac49cb64a58685e8915d370326cb0a0af94a073eb383feddda56",
+  "seconds": 930.87,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.6902,
+      "val_miou": 0.69222,
+      "val_safety_miou": 0.590955,
+      "epoch_seconds": 189.93
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.6924,
+      "val_miou": 0.690189,
+      "val_safety_miou": 0.591987,
+      "epoch_seconds": 147.97
+    },
+    {
+      "epoch": 3,
+      "train_loss": 1.6734,
+      "val_miou": 0.695912,
+      "val_safety_miou": 0.59348,
+      "epoch_seconds": 148.36
+    },
+    {
+      "epoch": 4,
+      "train_loss": 1.6736,
+      "val_miou": 0.69774,
+      "val_safety_miou": 0.593944,
+      "epoch_seconds": 147.78
+    },
+    {
+      "epoch": 5,
+      "train_loss": 1.6504,
+      "val_miou": 0.700505,
+      "val_safety_miou": 0.593774,
+      "epoch_seconds": 148.17
+    },
+    {
+      "epoch": 6,
+      "train_loss": 1.6479,
+      "val_miou": 0.697557,
+      "val_safety_miou": 0.593006,
+      "epoch_seconds": 148.55
+    }
+  ]
+}

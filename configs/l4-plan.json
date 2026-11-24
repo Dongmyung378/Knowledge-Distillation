@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "protocol": "driving-seg-kd-l4-v4",
+  "target_hardware": {
+    "training_gpu": "NVIDIA L4 (24 GiB, Ada Lovelace)",
+    "training_precision": "bf16",
+    "deployment_targets": [
+      "CPU ONNX Runtime (FP32 vs Static QDQ INT8, 4 threads)",
+      "L4 CUDA (BF16)"
+    ]
+  },
+  "dataset": {
+    "primary_options": ["cityscapes", "bdd100k"],
+    "zero_shot_eval": "kitti",
+    "num_classes": 19,
+    "ignore_index": 255,
+    "safety_critical_classes": [
+      "traffic_light",
+      "traffic_sign",
+      "person",
+      "rider",
+      "motorcycle",
+      "bicycle"
+    ]
+  },
+  "seeds": [378, 379, 380],
+  "deployment_seed": 378,
+  "image_size": [384, 768],
+  "teacher": {
+    "variant": "segformer_b5",
+    "hf_model_id": "nvidia/segformer-b5-finetuned-cityscapes-1024-1024",
+    "pretrained": true,
+    "epochs": 8,
+    "batch_size": 6,
+    "learning_rate": 4e-5,
+    "head_lr_multiplier": 5.0,
+    "weight_decay": 0.01,
+    "warmup_epochs": 1,
+    "lambda_dice": 0.25,
+    "precision": "bf16",
+    "num_workers": 4
+  },
+  "main_student": {
+    "arch": "mobilenetv4_small",
+    "fpn_dim": 96,
+    "pretrained_backbone": true,
+    "epochs": 35,
+    "batch_size": 16,
+    "learning_rate": 1.2e-3,
+    "weight_decay": 3e-4,
+    "warmup_epochs": 3,
+    "temperature": 4.0,
+    "lambda_dice": 0.25,
+    "lambda_logit_kd": 0.8,
+    "lambda_feat_kd": 0.4,
+    "feature_stages": ["s4", "s8", "s16", "s32"],
+    "safety_boost": 1.35,
+    "ema_decay": 0.992,
+    "precision": "bf16",
+    "channels_last": true,
+    "compile_model": false,
+    "num_workers": 4,
+    "qat_epochs": 6,
+    "qat_lr_scale": 0.1
+  },
+  "robust_asymmetric_student": {
+    "arch": "mobilenetv4_medium",
+    "fpn_dim": 128,
+    "pretrained_backbone": true,
+    "epochs": 45,
+    "batch_size": 16,
+    "learning_rate": 1.2e-3,
+    "weight_decay": 3e-4,
+    "warmup_epochs": 3,
+    "temperature": 4.0,
+    "lambda_dice": 0.25,
+    "lambda_logit_kd": 0.8,
+    "lambda_feat_kd": 0.4,
+    "feature_stages": ["s4", "s8", "s16", "s32"],
+    "asymmetric_robust_prob": 0.35,
+    "ema_decay": 0.992,
+    "precision": "bf16",
+    "channels_last": true,
+    "qat_epochs": 6,
+    "qat_lr_scale": 0.1
+  },
+  "ablation_methods": [
+    "baseline",
+    "pixel_kl",
+    "cwd",
+    "cwd_feat"
+  ],
+  "pareto_students": [
+    {"arch": "mobilenetv4_small", "fpn_dim": 96},
+    {"arch": "mobilenetv3_large", "fpn_dim": 128},
+    {"arch": "mobilenetv4_medium", "fpn_dim": 128}
+  ],
+  "selection": {
+    "split": "validation",
+    "primary_metric": "mean_miou_over_seeds",
+    "tie_breakers": ["mean_safety_critical_miou", "lower_mean_ece"],
+    "minimum_miou_gain_over_baseline_pp": 0.5,
+    "minimum_positive_seed_pairs": 2,
+    "locked_eval_never_used_for_selection": true
+  },
+  "deployment_gate": {
+    "calibration_split": "train",
+    "calibration_count": 128,
+    "selection_split": "validation",
+    "max_miou_drop_pp": 1.0,
+    "max_safety_miou_drop_pp": 1.5,
+    "minimum_cpu_p50_speedup": 1.20,
+    "requires_smaller_file_than_fp32": true
+  },
+  "benchmark": {
+    "batch_size": 1,
+    "warmup": 8,
+    "runs": 40,
+    "cpu_threads": 4
+  }
+}

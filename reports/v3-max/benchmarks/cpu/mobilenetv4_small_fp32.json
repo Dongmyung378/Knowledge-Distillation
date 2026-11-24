@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "backend": "onnxruntime:CPUExecutionProvider",
+  "device": "cpu",
+  "precision": "fp32",
+  "threads": 4,
+  "host": "x86_64",
+  "platform": "Linux",
+  "model_filename": "student-fp32.onnx",
+  "model_sha256": "0fdb11ac2f566cbe08a9ca2ee951e16a708336370560958fc703b434c4d91b53",
+  "model_bytes": 5994547,
+  "model_mib": 5.717,
+  "image_size": [
+    384,
+    768
+  ],
+  "batch_size": 1,
+  "warmup": 8,
+  "runs": 40,
+  "latency_ms": {
+    "mean": 16.8402,
+    "p50": 16.7695,
+    "p95": 17.5628,
+    "min": 16.4263,
+    "max": 18.0751,
+    "fps_p50": 59.63,
+    "fps_mean": 59.38
+  }
+}

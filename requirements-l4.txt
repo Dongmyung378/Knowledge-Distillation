@@ -1,0 +1,11 @@
+# L4 GPU training + ONNX Runtime FP32/INT8 export & benchmarking
+# Install PyTorch CUDA 12.4+ first if not preinstalled on your L4 host:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+numpy>=1.26,<3.0
+pillow>=10.0
+timm>=1.0.9
+transformers>=4.44.0
+matplotlib>=3.8
+onnx>=1.16.0
+onnxruntime>=1.18.0
+pytest>=8.0

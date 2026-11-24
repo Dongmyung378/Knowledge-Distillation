@@ -12,6 +12,6 @@
 *.png binary
 *.pdf binary
 /reports/** -text whitespace=cr-at-eol
-*.keras binary
-*.tflite binary
+*.pt binary
+*.onnx binary
 *.zip binary

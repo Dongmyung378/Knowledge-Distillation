@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "dataset": "bdd100k_sem_seg",
+  "manifest_sha256": "e93018834b7e1e6b3facd8eaab3efad4dca9cde17856ba6935359207d83072e5",
+  "inventory_sha256": "cd61c67b76571ed7c40d4d1943fb2d98e03c6c27e6616feca2143a9b91032c9b",
+  "plan_sha256": null,
+  "models": {
+    "mobilenetv3_large_fp32": {
+      "filename": "student-fp32.onnx",
+      "bytes": 13202729,
+      "sha256": "b76a93807549c2f485216407818d760a0371190cd5e3bc13af4fcb24b8cb13ff"
+    },
+    "mobilenetv3_large_int8": {
+      "filename": "student-int8.onnx",
+      "bytes": 3854613,
+      "sha256": "e93e418b64e2ec8a657ea7ba4b19fbb1420f5f0838815d57367aeb6bf7114efa"
+    },
+    "mobilenetv4_medium_fp32": {
+      "filename": "student-fp32.onnx",
+      "bytes": 30103143,
+      "sha256": "434c8e4243a55f3550f3e4f6b0b928b2664feb5028f1e1f31fa2858c5a45eb99"
+    },
+    "mobilenetv4_medium_int8": {
+      "filename": "student-int8.onnx",
+      "bytes": 8288492,
+      "sha256": "8cda8dff653f4561cebf96e1e4139c4b51c5bf43e69bb54362536d9497be927c"
+    },
+    "mobilenetv4_small_fp32": {
+      "filename": "student-fp32.onnx",
+      "bytes": 5994547,
+      "sha256": "0fdb11ac2f566cbe08a9ca2ee951e16a708336370560958fc703b434c4d91b53"
+    },
+    "mobilenetv4_small_int8": {
+      "filename": "student-int8.onnx",
+      "bytes": 1840854,
+      "sha256": "46ac75bb4fe929c06d3938656620da9225d3c15ed73659ac2dcdbc2dabdb74a9"
+    },
+    "s378_baseline": {
+      "filename": "student.pt",
+      "bytes": 6197215,
+      "sha256": "57061faf22e4f36074fcc244efdfc63ca02b79465de4707bd87fce34e4da4a36"
+    },
+    "s378_cwd_feat": {
+      "filename": "student.pt",
+      "bytes": 6197215,
+      "sha256": "9b5656f1bc4c3a1cea6dfcaccf57fb55ccb77490a5657e12e067bafb15f2ef9a"
+    },
+    "s379_baseline": {
+      "filename": "student.pt",
+      "bytes": 6197215,
+      "sha256": "b0e8e360f058e6a9456d6b55f35e2651ef20f825c530827f1119eb05fb761c0d"
+    },
+    "s379_cwd_feat": {
+      "filename": "student.pt",
+      "bytes": 6197215,
+      "sha256": "7908eef1e72bb3b46d70e3d87a5be0cd542d0076a0224c5d3b78dc639dbaf4bd"
+    },
+    "s380_baseline": {
+      "filename": "student.pt",
+      "bytes": 6197215,
+      "sha256": "35e0aa9d10fdcfe880218251be8f9aa3934808024831b16c55d26336f5533c92"
+    },
+    "s380_cwd_feat": {
+      "filename": "student.pt",
+      "bytes": 6197215,
+      "sha256": "40c8473c3279223a9f5558b83f1b745b7692725aee98fb5a1d0eba3c6341f451"
+    },
+    "teacher_segformer_b5": {
+      "filename": "teacher.pt",
+      "bytes": 338838801,
+      "sha256": "9f13d0b18d3a594f72527da1074c7aa8d7050bf82dc2c1eb2d324ba4913377f2"
+    }
+  },
+  "note": "Frozen before locked_eval or zero_shot_eval inference.",
+  "freeze_sha256": "6d48a65414aa91c2fc5a3ebf9469138360772eb9f3242af4e8862135c780ebaa"
+}

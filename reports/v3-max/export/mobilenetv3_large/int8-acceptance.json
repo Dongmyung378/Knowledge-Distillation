@@ -1,0 +1,19 @@
+{
+  "accepted": false,
+  "selected_format": "FP32",
+  "checks": {
+    "miou_drop_within_limit": false,
+    "safety_miou_drop_within_limit": false,
+    "file_size_smaller": true,
+    "cpu_p50_speedup_met": false
+  },
+  "miou_drop_pp": 6.459,
+  "safety_miou_drop_pp": 6.0645,
+  "cpu_p50_speedup": 0.721,
+  "file_size_ratio_int8_over_fp32": 0.292,
+  "thresholds": {
+    "max_miou_drop_pp": 1.0,
+    "max_safety_miou_drop_pp": 1.5,
+    "minimum_speedup": 1.2
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "Teacher (SegFormer-B5)": {
+    "clean": {
+      "miou": 0.734104,
+      "safety_critical_miou": 0.650342
+    },
+    "night_lowlight": {
+      "miou": 0.730404,
+      "safety_critical_miou": 0.645167
+    },
+    "motion_blur": {
+      "miou": 0.654021,
+      "safety_critical_miou": 0.554492
+    },
+    "fog_lowcontrast": {
+      "miou": 0.72296,
+      "safety_critical_miou": 0.638837
+    },
+    "sensor_noise": {
+      "miou": 0.591923,
+      "safety_critical_miou": 0.475099
+    }
+  },
+  "Medium Baseline (7.5M)": {
+    "clean": {
+      "miou": 0.652472,
+      "safety_critical_miou": 0.552578
+    },
+    "night_lowlight": {
+      "miou": 0.634437,
+      "safety_critical_miou": 0.519083
+    },
+    "motion_blur": {
+      "miou": 0.558006,
+      "safety_critical_miou": 0.431271
+    },
+    "fog_lowcontrast": {
+      "miou": 0.568858,
+      "safety_critical_miou": 0.468284
+    },
+    "sensor_noise": {
+      "miou": 0.23455,
+      "safety_critical_miou": 0.184463
+    }
+  },
+  "Medium v3-max INT8 (7.5M)": {
+    "clean": {
+      "miou": 0.673989,
+      "safety_critical_miou": 0.57397
+    },
+    "night_lowlight": {
+      "miou": 0.641353,
+      "safety_critical_miou": 0.527961
+    },
+    "motion_blur": {
+      "miou": 0.584468,
+      "safety_critical_miou": 0.445472
+    },
+    "fog_lowcontrast": {
+      "miou": 0.597615,
+      "safety_critical_miou": 0.484605
+    },
+    "sensor_noise": {
+      "miou": 0.137497,
+      "safety_critical_miou": 0.101007
+    }
+  },
+  "Medium v4 Robust FP32 (7.5M)": {
+    "clean": {
+      "miou": 0.671893,
+      "safety_critical_miou": 0.577588
+    },
+    "night_lowlight": {
+      "miou": 0.660701,
+      "safety_critical_miou": 0.553099
+    },
+    "motion_blur": {
+      "miou": 0.605641,
+      "safety_critical_miou": 0.469788
+    },
+    "fog_lowcontrast": {
+      "miou": 0.669802,
+      "safety_critical_miou": 0.565954
+    },
+    "sensor_noise": {
+      "miou": 0.606111,
+      "safety_critical_miou": 0.480016
+    }
+  },
+  "Medium v4 Robust INT8 (7.5M)": {
+    "clean": {
+      "miou": 0.668948,
+      "safety_critical_miou": 0.567766
+    },
+    "night_lowlight": {
+      "miou": 0.647084,
+      "safety_critical_miou": 0.528893
+    },
+    "motion_blur": {
+      "miou": 0.593704,
+      "safety_critical_miou": 0.443853
+    },
+    "fog_lowcontrast": {
+      "miou": 0.663283,
+      "safety_critical_miou": 0.547799
+    },
+    "sensor_noise": {
+      "miou": 0.595945,
+      "safety_critical_miou": 0.469936
+    }
+  }
+}

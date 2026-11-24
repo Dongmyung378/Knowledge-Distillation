@@ -1,0 +1,33 @@
+{
+  "seeds": [
+    378,
+    379,
+    380
+  ],
+  "baseline_miou_mean_sd": [
+    61.421,
+    0.209
+  ],
+  "cwd_feat_miou_mean_sd": [
+    62.029,
+    0.076
+  ],
+  "paired_miou_gain_mean_sd": [
+    0.608,
+    0.261
+  ],
+  "positive_miou_pairs": 3,
+  "baseline_safety_mean_sd": [
+    49.517,
+    0.902
+  ],
+  "cwd_feat_safety_mean_sd": [
+    51.399,
+    0.291
+  ],
+  "paired_safety_gain_mean_sd": [
+    1.882,
+    1.068
+  ],
+  "positive_safety_pairs": 3
+}

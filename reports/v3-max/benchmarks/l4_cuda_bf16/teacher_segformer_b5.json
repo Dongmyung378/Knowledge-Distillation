@@ -1,0 +1,32 @@
+{
+  "schema_version": 2,
+  "backend": "pytorch",
+  "device": "cuda",
+  "precision": "bf16",
+  "threads": null,
+  "host": "x86_64",
+  "platform": "Linux",
+  "model_filename": "teacher.pt",
+  "model_sha256": "9f13d0b18d3a594f72527da1074c7aa8d7050bf82dc2c1eb2d324ba4913377f2",
+  "model_bytes": 338838801,
+  "model_mib": 323.142,
+  "arch": "segformer_b5",
+  "role": "teacher",
+  "parameter_count": 84607955,
+  "image_size": [
+    384,
+    768
+  ],
+  "batch_size": 1,
+  "warmup": 10,
+  "runs": 50,
+  "latency_ms": {
+    "mean": 84.8662,
+    "p50": 84.4765,
+    "p95": 86.6967,
+    "min": 83.2105,
+    "max": 96.5174,
+    "fps_p50": 11.84,
+    "fps_mean": 11.78
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": 2,
+  "source_checkpoint_sha256": "5b10e6bb7cfb288d2c4750c1c8bf64d85101109d45d4ddb310642b1571bf8b91",
+  "arch": "mobilenetv4_small",
+  "parameter_count": 1498515,
+  "image_size": [
+    384,
+    768
+  ],
+  "opset_version": 17,
+  "quantization_audit": {
+    "passed": true,
+    "conv_count": 57,
+    "bn_count": 55,
+    "violations": []
+  },
+  "fp32": {
+    "filename": "student-fp32.onnx",
+    "bytes": 5994547,
+    "sha256": "0fdb11ac2f566cbe08a9ca2ee951e16a708336370560958fc703b434c4d91b53",
+    "parity": {
+      "checked": true,
+      "max_abs_logit_diff": 1.9e-05,
+      "pixel_argmax_agreement": 1.0
+    }
+  },
+  "int8": {
+    "exported": true,
+    "filename": "student-int8.onnx",
+    "bytes": 1840854,
+    "sha256": "46ac75bb4fe929c06d3938656620da9225d3c15ed73659ac2dcdbc2dabdb74a9",
+    "quant_format": "QDQ",
+    "per_channel": true,
+    "calibration_count": 128,
+    "calibration_manifest_sha256": "d404f6aa769e6572f2996310b89272f0e0e6800af63900764d3ae1aac4f65a33"
+  },
+  "acceptance_policy": {
+    "max_miou_drop_pp": 1.0,
+    "max_safety_miou_drop_pp": 1.5,
+    "minimum_cpu_p50_speedup": 1.2,
+    "requires_smaller_file_than_fp32": true,
+    "selection_split": "validation"
+  }
+}
