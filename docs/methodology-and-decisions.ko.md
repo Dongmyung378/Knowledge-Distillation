@@ -61,4 +61,4 @@ CWD의 `T=4.0` 공간 정규화로 학습된 학생은 정확도는 높지만 �
 
 1. **초기 `cwd_safety` 클래스 가중 CE 과보정 문제**: 소수 안전 클래스에 고정 CE 가중치를 과도하게 부여했을 때 배경 오분류(false positive)가 늘어 전체 mIoU가 하락했습니다. CE는 무가중(unweighted)으로 유지하고 소수 클래스 강화는 `CWD` 공간 정규화가 담당하도록 분리해 6/6 안전 클래스 상승과 전체 mIoU 개선을 동시에 달성했습니다.
 2. **QAT-KD 학습 속도 및 `channels_last` 호환성**: PyTorch QAT 중 `FakeQuantize` 그래프와 `channels_last` 메모리 포맷 충돌 위험을 제거하기 위해 `cfg.get("channels_last", False)` 안전 분기를 적용하고, 동결된 `SegFormer-B5` 교사 추론만 `torch.amp.autocast("cuda", dtype=torch.bfloat16)`으로 가속해 QAT-KD 6에포크를 에포크당 ~148초로 안정화했습니다.
-3. **ONNX FP32 수치 일치 검증 (`100.0%` argmax parity)**: `EdgeFPNSegmenter` 내보내기 시 학습 전용 프로젝터와 딕셔너리 반환 경로를 `_PlainLogitsExportWrapper`로 분리하고, 모든 내보내기 모델에 대해 PyTorch vs ONNXRuntime 픽셀 argmax 일치율 `100.0%`(`max_abs_logit_diff <= 3.6e-5`)를 자동 검증했습니다.
+3. **ONNX FP32 수치 일치 검증 (`100.0%` argmax parity)**: `EdgeSegStudent` 내보내기 시 학습 전용 프로젝터와 딕셔너리 반환 경로를 `_PlainLogitsExportWrapper`로 분리하고, 모든 내보내기 모델에 대해 PyTorch vs ONNXRuntime 픽셀 argmax 일치율 `100.0%`(`max_abs_logit_diff <= 3.6e-5`)를 자동 검증했습니다.
