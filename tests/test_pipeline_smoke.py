@@ -10,10 +10,14 @@ from pathlib import Path
 from seg_kd.benchmark import benchmark_model
 from seg_kd.data import create_synthetic_dataset, load_manifest, make_dataloader, records_for_split
 from seg_kd.evaluation import (
+    corrupt_pil_deterministic,
     create_evaluation_freeze,
     evaluate_artifact,
+    evaluate_robustness_stress_test,
+    evaluate_temperature_scaled_artifact,
     evaluate_temperature_scaled_model,
     fit_temperature_scaling,
+    fit_temperature_scaling_artifact,
     validate_evaluation_freeze,
 )
 from seg_kd.export import assess_int8_acceptance
@@ -211,6 +215,30 @@ class EndToEndPipelineSmokeTests(unittest.TestCase):
                 dist_model, eval_loader, temperature=t_star, device=torch.device("cpu"), split="locked_eval"
             )
             self.assertAlmostEqual(cal_res["miou_before"], cal_res["miou_after"], places=6)
+
+            # 8. Verify artifact-level temperature scaling & deterministic 4-corruption stress test
+            t_art = fit_temperature_scaling_artifact(
+                dist_res["model_path"], manifest, data_dir, image_size=(64, 128), coarse_steps=9
+            )
+            self.assertAlmostEqual(t_art, t_star, places=3)
+            cal_art = evaluate_temperature_scaled_artifact(
+                dist_res["model_path"], manifest, data_dir, temperature=t_art, image_size=(64, 128)
+            )
+            self.assertAlmostEqual(cal_art["miou_before"], cal_art["miou_after"], places=6)
+
+            rob_res = evaluate_robustness_stress_test(
+                dist_res["model_path"], manifest, data_dir, max_frames=2, image_size=(64, 128), seed=378
+            )
+            self.assertEqual(
+                set(rob_res.keys()),
+                {"clean", "night_lowlight", "motion_blur", "fog_lowcontrast", "sensor_noise"},
+            )
+            import numpy as np
+            from PIL import Image
+            img_sample = Image.fromarray(np.full((32, 64, 3), 128, dtype=np.uint8))
+            n1 = np.asarray(corrupt_pil_deterministic(img_sample, "sensor_noise", np.random.default_rng(378)))
+            n2 = np.asarray(corrupt_pil_deterministic(img_sample, "sensor_noise", np.random.default_rng(378)))
+            np.testing.assert_array_equal(n1, n2)
 
 
 if __name__ == "__main__":

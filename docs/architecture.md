@@ -25,7 +25,7 @@ In autonomous driving semantic segmentation (19 Cityscapes classes), a high-capa
 - **3-Tier Pareto Backbones**:
   - `MobileNetV4-Small` (`1.50M` params, `fpn_dim=96`, 57 Conv / 55 BN): ultra-light UIB blocks (`FP32 5.72 MiB`, `INT8 1.76 MiB`).
   - `MobileNetV3-Large` (`3.30M` params, `fpn_dim=128`, 74 Conv / 56 BN): includes 18 Squeeze-and-Excitation (SE) + HardSwish paths (quantization-sensitivity control).
-  - `MobileNetV4-Medium` (`7.54M` params, `fpn_dim=128`, 88 Conv / 86 BN): pure `Conv-BN-ReLU` UIB blocks (`FP32 28.71 MiB`, `INT8 7.91 MiB`).
+  - `MobileNetV4-Medium` (`7.54M` params, `fpn_dim=128`, 88 Conv / 86 BN): pure `Conv-BN-ReLU` UIB blocks (`FP32 28.71 MiB`, `INT8 7.90 MiB`).
 - **Quantization Friendliness Audit (`audit_quantization_friendliness`)**: Programmatically rejects `Conv → ReLU → BN` non-fusible antipatterns prior to training.
 - **Training-Only Projector Bank (`FeatureProjectorBank`)**: `1×1 Conv-BN` projections align student and teacher pyramid channels during training and are completely discarded at export (**zero inference overhead**).
 
@@ -63,7 +63,7 @@ Clean-distilled students (`v3-max`) match `90.8%` of teacher mIoU on clean frame
 
 ## 5. QAT-KD, Validation-Only INT8 Gate & Temperature Scaling
 
-1. **BF16-Teacher QAT-KD (`6 epochs`)**: Quantization-aware fine-tuning keeps static INT8 accuracy loss strictly below `1.0%p`.
+1. **QAT-KD (`v3-max` 8 ep / `v4-final` BF16-Teacher 6 ep)**: Quantization-aware fine-tuning keeps static INT8 accuracy loss strictly below `1.0%p`.
 2. **ONNX Export & Static QDQ INT8 (`seg_kd/export.py`)**: Verifies `100.0%` pixel argmax parity (`max_abs_logit_diff <= 3.6e-5`) between PyTorch and Opset 17 FP32 ONNX, then applies per-channel static QDQ INT8 calibration over 128 deterministic training frames.
 3. **Validation-Only INT8 Gate (`assess_int8_acceptance`)**: Accepts INT8 strictly when all 4 validation checks pass (`val_mIoU_drop <= 1.0%p`, `val_safety_drop <= 1.5%p`, `size_ratio < 1.0`, `CPU_p50_speedup >= 1.20×`).
 4. **Post-Hoc Validation Temperature Scaling (`seg_kd/evaluation.py`)**: Fits a single scalar temperature $`T^*`$ on `validation` NLL (`T* ≈ 1.70` across all CWD students), cutting `locked_eval` ECE by `69.5–78.5%` with mathematically zero mIoU change (`0.00%p`) and `0 ms` inference overhead.

@@ -364,7 +364,7 @@
       "ece": 0.0254,
       "cpu_p50_ms": 24.7,
       "cpu_fps_p50": 40.49,
-      "model_mib": 7.91,
+      "model_mib": 7.9,
       "parameter_count": null
     },
     "v4_robust_medium_fp32": {
@@ -384,7 +384,7 @@
       "ece": 0.026,
       "cpu_p50_ms": 26.02,
       "cpu_fps_p50": 38.44,
-      "model_mib": 7.91,
+      "model_mib": 7.9,
       "parameter_count": null
     }
   },

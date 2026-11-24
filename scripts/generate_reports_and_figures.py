@@ -119,7 +119,7 @@ def curate_reports() -> dict[str, Any]:
             "ece": round(ev["ece"], 4),
             "cpu_p50_ms": round(cpu["latency_ms"]["p50"], 2) if cpu else None,
             "cpu_fps_p50": round(cpu["latency_ms"]["fps_p50"], 2) if cpu else None,
-            "model_mib": round(cpu["model_mib"], 2) if cpu else None,
+            "model_mib": round(cpu["model_bytes"] / (1024**2), 2) if cpu and "model_bytes" in cpu else (round(cpu["model_mib"], 2) if cpu else None),
             "parameter_count": cpu.get("parameter_count") if cpu else None,
         }
 
@@ -252,10 +252,10 @@ def plot_pareto_frontier(summary: dict[str, Any]) -> None:
         ("mobilenetv4_small_fp32", "V4-Small FP32\n61.95% · 16.8 ms · 5.72 MiB", "#0D9488", "o", 120, 38.0, 61.8, "left", -0.08),
         ("mobilenetv3_large_fp32", "V3-Large FP32\n64.84% · 24.2 ms · 12.6 MiB", "#D97706", "o", 145, 9.2, 66.0, "left", -0.10),
         ("mobilenetv3_large_int8", "V3-Large INT8 (REJECTED)\n59.32% · 33.2 ms (-5.52%p)", "#DC2626", "X", 150, 64.0, 58.1, "left", 0.08),
-        ("mobilenetv4_medium_int8", f"V4-Med v3 Clean INT8 ★\n67.95% · 24.7 ms · 7.91 MiB\n({m['teacher_segformer_b5']['cpu_p50_ms'] / m['mobilenetv4_medium_int8']['cpu_p50_ms']:.1f}× faster · Gate PASS)", "#15803D", "*", 360, 9.2, 71.7, "left", -0.12),
+        ("mobilenetv4_medium_int8", f"V4-Med v3 Clean INT8 ★\n67.95% · 24.7 ms · 7.90 MiB\n({m['teacher_segformer_b5']['cpu_p50_ms'] / m['mobilenetv4_medium_int8']['cpu_p50_ms']:.1f}× faster · Gate PASS)", "#15803D", "*", 360, 9.2, 71.7, "left", -0.12),
         ("mobilenetv4_medium_fp32", "V4-Med v3 FP32\n68.51% · 38.1 ms · 28.7 MiB", "#2563EB", "o", 190, 74.0, 73.1, "left", 0.10),
         ("v4_robust_medium_fp32", "V4-Med v4 Robust FP32\n67.35% · 40.3 ms · 28.7 MiB", "#3B82F6", "s", 160, 145.0, 69.0, "left", -0.08),
-        ("v4_robust_medium_int8", "V4-Med v4 Robust INT8 ★\n66.96% · 26.0 ms · 7.91 MiB\n(Noise 59.59% > Teacher!)", "#047857", "P", 220, 145.0, 63.7, "left", 0.12),
+        ("v4_robust_medium_int8", "V4-Med v4 Robust INT8 ★\n66.96% · 26.0 ms · 7.90 MiB\n(Noise 59.59% > Teacher!)", "#047857", "P", 220, 145.0, 63.7, "left", 0.12),
         ("teacher_segformer_b5", "Teacher SegFormer-B5\n74.83% · 1631 ms · 323 MiB", "#475569", "^", 240, 1420.0, 72.1, "right", -0.10),
     ]
 
@@ -330,13 +330,13 @@ def plot_robustness_breakthrough(summary: dict[str, Any]) -> None:
     rob = summary["robustness_stress_test_200f"]
 
     conditions = ["clean", "night_lowlight", "motion_blur", "fog_lowcontrast", "sensor_noise"]
-    cond_labels = ["Clean\n(Daylight)", "Night\n(Low-Light)", "Motion Blur\n(k=9)", "Fog\n(Low-Contrast)", "Sensor Noise\n(Gaussian σ=18)"]
+    cond_labels = ["Clean\n(Daylight)", "Night\n(Low-Light 0.35x)", "Blur\n(Gaussian r=2.0)", "Fog\n(Low-Contrast)", "Sensor Noise\n(Gaussian σ=18)"]
     models = [
         ("Teacher (SegFormer-B5)", "Teacher SegFormer-B5 (84.6M, 323 MiB)", "#475569"),
         ("Medium Baseline (7.5M)", "V4-Med Baseline (7.5M, FP32)", "#94A3B8"),
-        ("Medium v3-max INT8 (7.5M)", "V4-Med v3 Clean INT8 (7.91 MiB)", "#D97706"),
+        ("Medium v3-max INT8 (7.5M)", "V4-Med v3 Clean INT8 (7.90 MiB)", "#D97706"),
         ("Medium v4 Robust FP32 (7.5M)", "V4-Med v4 Robust FP32 (28.7 MiB)", "#2563EB"),
-        ("Medium v4 Robust INT8 (7.5M)", "V4-Med v4 Robust INT8 (7.91 MiB ★)", "#15803D"),
+        ("Medium v4 Robust INT8 (7.5M)", "V4-Med v4 Robust INT8 (7.90 MiB ★)", "#15803D"),
     ]
 
     x = np.arange(len(conditions))
@@ -362,7 +362,7 @@ def plot_robustness_breakthrough(summary: dict[str, Any]) -> None:
 
     # Highlight the sensor noise breakthrough in completely clean upper-right space
     ax.annotate(
-        "7.91 MiB INT8 (59.59%) surpasses 84.6M Teacher (59.19%)!\n+45.84%p recovery vs v3 Clean INT8 (13.75%)",
+        "7.90 MiB INT8 (59.59%) surpasses 84.6M Teacher (59.19%)!\n+45.84%p recovery vs v3 Clean INT8 (13.75%)",
         xy=(4 + 2 * width, 64.4),
         xytext=(3.52, 81.5),
         ha="center",
@@ -396,7 +396,7 @@ def plot_method_ablation_384(summary: dict[str, Any]) -> None:
     kitti = summary["kitti_zero_shot"]
 
     methods = ["baseline", "pixel_kl", "cwd", "cwd_feat"]
-    labels = ["Baseline\n(CE Only)", "Pixel KL\n(Naive Softmax)", "CWD\n(Channel Spatial)", "CWD + 4-Stage\nHybrid Feat"]
+    labels = ["Baseline\n(CE+Dice)", "Pixel KL\n(Naive Softmax)", "CWD\n(Channel Spatial)", "CWD + 4-Stage\nHybrid Feat"]
     overall = [ab[k]["miou"] * 100.0 for k in methods]
     safety = [ab[k]["safety"] * 100.0 for k in methods]
     kitti_vals = [
@@ -630,7 +630,7 @@ def render_thumbnail_svg(summary: dict[str, Any], *, lang: str) -> Path:
     if lang == "ko":
         svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
 <title id="title">자율주행 도로 세그멘테이션 지식 증류: SegFormer-B5 → MobileNetV4 INT8</title>
-<desc id="desc">84.6M SegFormer-B5 ViT 교사를 7.5M MobileNetV4-Medium ONNX INT8(7.91 MiB, CPU 40.5 FPS)로 이종 아키텍처 지식 증류하고, 비대칭 강건성 증류로 센서 노이즈 환경에서 교사(59.19%)를 추월(59.59%)한 결과 요약입니다.</desc>
+<desc id="desc">84.6M SegFormer-B5 ViT 교사를 7.5M MobileNetV4-Medium ONNX INT8(7.90 MiB, CPU 40.5 FPS)로 이종 아키텍처 지식 증류하고, 비대칭 강건성 증류로 센서 노이즈 환경에서 교사(59.19%)를 추월(59.59%)한 결과 요약입니다.</desc>
 <style>text{{font-family:'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo','Segoe UI',sans-serif;font-variant-numeric:tabular-nums}}</style>
 <rect width="1200" height="760" fill="#F4F7F2"/>
 <text x="48" y="76" fill="#182218" font-size="42" font-weight="750">자율주행 세그멘테이션 지식 증류</text>
@@ -654,7 +654,7 @@ def render_thumbnail_svg(summary: dict[str, Any], *, lang: str) -> Path:
 
 <rect x="74" y="408" width="382" height="96" rx="10" fill="#F0F8EE" stroke="#527D49" stroke-width="1.6"/>
 <text x="92" y="437" fill="#2B4C27" font-size="12.6" font-weight="700">STUDENT · CORRUPTED INPUT (야간·안개·블러·노이즈)</text>
-<text x="92" y="466" fill="#182218" font-size="18.2" font-weight="750">MobileNetV4-Medium INT8 (7.91 MiB)</text>
+<text x="92" y="466" fill="#182218" font-size="18.2" font-weight="750">MobileNetV4-Medium INT8 (7.90 MiB)</text>
 <text x="92" y="490" fill="#2B4C27" font-size="13" font-weight="600">11.2× 파라미터 압축 · 40.9× 용량 축소 · CPU 38~40 FPS</text>
 
 <rect x="74" y="520" width="382" height="42" rx="8" fill="#E3EFE0"/>
@@ -679,7 +679,7 @@ def render_thumbnail_svg(summary: dict[str, Any], *, lang: str) -> Path:
 <!-- Card 02 -->
 <rect x="594" y="314" width="558" height="122" rx="14" fill="#FFFFFF" stroke="#D5E0D0" stroke-width="1.3"/>
 <rect x="594" y="314" width="8" height="122" rx="4" fill="#4D6B48"/>
-<text x="624" y="351" fill="#3B5936" font-size="14" font-weight="700">TRACK 02 · CLEAN PEAK INT8 · 7.91 MiB · 40.5 FPS</text>
+<text x="624" y="351" fill="#3B5936" font-size="14" font-weight="700">TRACK 02 · CLEAN PEAK INT8 · 7.90 MiB · 40.5 FPS</text>
 <text x="624" y="385" fill="#182218" font-size="23" font-weight="750">MobileNetV4-Medium Clean INT8 (Gate PASS)</text>
 <text x="624" y="416" fill="#4D5C4C" font-size="14.2">mIoU {v3_int8['miou_pct']:.2f}% (교사 90.8%) · Safety {v3_int8['safety_miou_pct']:.2f}% · KITTI 51.32% (+2.23%p)</text>
 
@@ -688,14 +688,14 @@ def render_thumbnail_svg(summary: dict[str, Any], *, lang: str) -> Path:
 <rect x="594" y="456" width="10" height="126" rx="4" fill="#2B4C27"/>
 <rect x="1024" y="473" width="108" height="26" rx="13" fill="#E3EFE0"/>
 <text x="1078" y="491" text-anchor="middle" fill="#1F421B" font-size="12.8" font-weight="700">FINAL MODEL</text>
-<text x="624" y="492" fill="#2B4C27" font-size="13.8" font-weight="700">TRACK 03 · v4 ROBUST INT8 · 7.91 MiB · 38.4 FPS</text>
+<text x="624" y="492" fill="#2B4C27" font-size="13.8" font-weight="700">TRACK 03 · v4 ROBUST INT8 · 7.90 MiB · 38.4 FPS</text>
 <text x="624" y="529" fill="#182218" font-size="23" font-weight="750">MobileNetV4-Medium Robust INT8 + 온도 보정</text>
 <text x="624" y="559" fill="#1F421B" font-size="14.2" font-weight="600">노이즈 {v4_noise:.2f}% (교사 {t_noise:.2f}% 추월 · +{noise_gain:.2f}%p) · 안개 66.33% · ECE -74.2%</text>
 
 <!-- Bottom Forest Scorecard -->
 <rect x="48" y="606" width="1104" height="114" rx="14" fill="#2B4C27"/>
 <text x="80" y="652" fill="#FFFFFF" font-size="26" font-weight="750">Final Locked Eval (Cityscapes 384×768)</text>
-<text x="80" y="692" fill="#DDEBD9" font-size="16.2">84.6M SegFormer-B5 → 7.5M INT8 · 7.91 MiB · 4/4 게이트 통과</text>
+<text x="80" y="692" fill="#DDEBD9" font-size="16.2">84.6M SegFormer-B5 → 7.5M INT8 · 7.90 MiB · 4/4 게이트 통과</text>
 <line x1="636" y1="624" x2="636" y2="702" stroke="#85A97E" stroke-width="1.2" opacity="0.55"/>
 
 <text x="794" y="654" text-anchor="end" fill="#FFFFFF" font-size="35" font-weight="750">{v3_int8['miou_pct']:.2f}%</text>
@@ -712,7 +712,7 @@ def render_thumbnail_svg(summary: dict[str, Any], *, lang: str) -> Path:
     else:
         svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
 <title id="title">Driving Semantic Segmentation Knowledge Distillation: SegFormer-B5 to MobileNetV4 INT8</title>
-<desc id="desc">Cross-architecture knowledge distillation from 84.6M SegFormer-B5 ViT teacher to 7.5M MobileNetV4-Medium ONNX INT8 (7.91 MiB, 40.5 FPS CPU), achieving 67.95% clean mIoU and surpassing the 84.6M teacher under Gaussian sensor noise (59.59% vs 59.19%).</desc>
+<desc id="desc">Cross-architecture knowledge distillation from 84.6M SegFormer-B5 ViT teacher to 7.5M MobileNetV4-Medium ONNX INT8 (7.90 MiB, 40.5 FPS CPU), achieving 67.95% clean mIoU and surpassing the 84.6M teacher under Gaussian sensor noise (59.59% vs 59.19%).</desc>
 <style>text{{font-family:'Inter','Segoe UI','DejaVu Sans',sans-serif;font-variant-numeric:tabular-nums}}</style>
 <rect width="1200" height="760" fill="#F4F7F2"/>
 <text x="48" y="76" fill="#182218" font-size="40" font-weight="750">Driving Semantic Segmentation KD</text>
@@ -736,7 +736,7 @@ def render_thumbnail_svg(summary: dict[str, Any], *, lang: str) -> Path:
 
 <rect x="74" y="408" width="382" height="96" rx="10" fill="#F0F8EE" stroke="#527D49" stroke-width="1.6"/>
 <text x="92" y="437" fill="#2B4C27" font-size="12.2" font-weight="700">STUDENT · CORRUPTED INPUT (Night/Fog/Blur/Noise)</text>
-<text x="92" y="466" fill="#182218" font-size="18" font-weight="750">MobileNetV4-Medium INT8 (7.91 MiB)</text>
+<text x="92" y="466" fill="#182218" font-size="18" font-weight="750">MobileNetV4-Medium INT8 (7.90 MiB)</text>
 <text x="92" y="490" fill="#2B4C27" font-size="12.8" font-weight="600">11.2× Fewer Params · 40.9× Smaller File · 38–40 FPS</text>
 
 <rect x="74" y="520" width="382" height="42" rx="8" fill="#E3EFE0"/>
@@ -761,7 +761,7 @@ def render_thumbnail_svg(summary: dict[str, Any], *, lang: str) -> Path:
 <!-- Card 02 -->
 <rect x="594" y="314" width="558" height="122" rx="14" fill="#FFFFFF" stroke="#D5E0D0" stroke-width="1.3"/>
 <rect x="594" y="314" width="8" height="122" rx="4" fill="#4D6B48"/>
-<text x="624" y="351" fill="#3B5936" font-size="14" font-weight="700">TRACK 02 · CLEAN PEAK INT8 · 7.91 MiB · 40.5 FPS</text>
+<text x="624" y="351" fill="#3B5936" font-size="14" font-weight="700">TRACK 02 · CLEAN PEAK INT8 · 7.90 MiB · 40.5 FPS</text>
 <text x="624" y="385" fill="#182218" font-size="22.5" font-weight="750">MobileNetV4-Medium Clean INT8 (Gate PASS)</text>
 <text x="624" y="416" fill="#4D5C4C" font-size="14.2">mIoU {v3_int8['miou_pct']:.2f}% (90.8% of teacher) · Safety {v3_int8['safety_miou_pct']:.2f}% · KITTI 51.32%</text>
 
@@ -770,14 +770,14 @@ def render_thumbnail_svg(summary: dict[str, Any], *, lang: str) -> Path:
 <rect x="594" y="456" width="10" height="126" rx="4" fill="#2B4C27"/>
 <rect x="1024" y="473" width="108" height="26" rx="13" fill="#E3EFE0"/>
 <text x="1078" y="491" text-anchor="middle" fill="#1F421B" font-size="12.8" font-weight="700">FINAL MODEL</text>
-<text x="624" y="492" fill="#2B4C27" font-size="13.8" font-weight="700">TRACK 03 · v4 ROBUST INT8 · 7.91 MiB · 38.4 FPS</text>
+<text x="624" y="492" fill="#2B4C27" font-size="13.8" font-weight="700">TRACK 03 · v4 ROBUST INT8 · 7.90 MiB · 38.4 FPS</text>
 <text x="624" y="529" fill="#182218" font-size="19.8" font-weight="750">MobileNetV4-Medium Robust INT8 + Temp Scaling</text>
 <text x="624" y="559" fill="#1F421B" font-size="14.2" font-weight="600">Noise {v4_noise:.2f}% (beats {t_noise:.2f}% teacher · +{noise_gain:.2f}%p) · Fog 66.33% · ECE -74.2%</text>
 
 <!-- Bottom Forest Scorecard -->
 <rect x="48" y="606" width="1104" height="114" rx="14" fill="#2B4C27"/>
 <text x="80" y="652" fill="#FFFFFF" font-size="26" font-weight="750">Final Locked Eval (Cityscapes 384×768)</text>
-<text x="80" y="692" fill="#DDEBD9" font-size="16.2">84.6M SegFormer-B5 → 7.5M INT8 · 7.91 MiB · 4/4 Gate Checks Passed</text>
+<text x="80" y="692" fill="#DDEBD9" font-size="16.2">84.6M SegFormer-B5 → 7.5M INT8 · 7.90 MiB · 4/4 Gate Checks Passed</text>
 <line x1="636" y1="624" x2="636" y2="702" stroke="#85A97E" stroke-width="1.2" opacity="0.55"/>
 
 <text x="794" y="654" text-anchor="end" fill="#FFFFFF" font-size="35" font-weight="750">{v3_int8['miou_pct']:.2f}%</text>

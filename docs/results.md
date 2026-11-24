@@ -28,7 +28,7 @@ Every metric below is extracted directly from frozen NVIDIA L4 (`22.03 GiB`, CUD
 
 | Method | Locked mIoU (Δ) | Safety-6 mIoU (Δ) | Pixel Acc | Locked ECE | KITTI Zero-Shot (Δ) | KITTI Safety (Δ) |
 |---|---:|---:|---:|---:|---:|---:|
-| `baseline` (CE Only) | 61.65% | 50.25% | 93.12% | 0.0151 | 46.71% | 20.41% |
+| `baseline` (CE+Dice) | 61.65% | 50.25% | 93.12% | 0.0151 | 46.71% | 20.41% |
 | `pixel_kl` (Naive Pixel KL) | 59.25% (**-2.41%p**) | 44.54% (**-5.71%p**) | 92.86% | 0.0368 | 44.29% (-2.42%p) | 20.78% (+0.37%p) |
 | **`cwd` (Spatial CWD Only)** | **63.07% (+1.42%p)** | **51.92% (+1.66%p)** | **93.28%** | 0.0296 | **47.38% (+0.67%p)** | **27.53% (+7.12%p)** |
 | `cwd_feat` (CWD + 4-Stage Feat) | 62.00% (+0.35%p) | 51.50% (+1.25%p) | 93.22% | 0.0306 | 45.97% (-0.74%p) | 26.08% (+5.67%p) |

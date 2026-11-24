@@ -110,7 +110,7 @@ def build_notebook() -> Path:
             f"""
 # 자율주행 도로 세그멘테이션 지식 증류 (`seg_kd`) — 원샷 검증 및 L4 전체 재현 노트북
 
-**SegFormer-B5 (84.6M, ViT) → MobileNetV4-Medium ONNX INT8 (7.54M, 7.91 MiB, CPU 40.5 FPS)** 이종 아키텍처 지식 증류 및 비대칭 강건성 증류(`v3-max` + `v4-final`)의 **원샷 검증**과 **NVIDIA L4 전체 재현**을 하나의 자립형 노트북으로 통합했습니다.
+**SegFormer-B5 (84.6M, ViT) → MobileNetV4-Medium ONNX INT8 (7.54M, 7.90 MiB, CPU 40.5 FPS)** 이종 아키텍처 지식 증류 및 비대칭 강건성 증류(`v3-max` + `v4-final`)의 **원샷 검증**과 **NVIDIA L4 전체 재현**을 하나의 자립형 노트북으로 통합했습니다.
 
 ### 두 가지 실행 모드 (`Cell 1`에서 선택 후 `모두 실행 / Run All`)
 1. **`verify_saved` *(기본값, CPU/GPU 어디서나 1~3분 원샷 검증)***:
@@ -285,24 +285,33 @@ subprocess.run(cmd, check=True)
         _md(
             "sec-live-eval",
             """
-## 5. (선택) 실제 Cityscapes `locked_eval` (500장) · KITTI (200장) · 악천후 · ECE 라이브 재평가
+## 5. (선택) 실제 Cityscapes `locked_eval` (500장) · KITTI (200장) · 4종 악천후 · ECE 라이브 재평가
 
-`EVALUATE_LIVE_DATASETS = True`로 설정한 경우에만 실행됩니다. 로그인 없이 `Chris1/cityscapes`와 공식 KITTI Semantics를 내려받아, 위에서 SHA-256 검증한 **`v3-max Clean INT8` (`7.91 MiB`)**과 **`v4-final Robust INT8` (`7.91 MiB`)**의 정확도(`67.95%` / `66.96%`), 가우시안 노이즈(`σ=18` → `59.59%`), 온도 보정(`T*=1.70`, ECE `-74.2%`)을 현재 런타임에서 직접 재측정해 동결 리포트와 대조합니다.
+`EVALUATE_LIVE_DATASETS = True`로 설정한 경우에만 실행됩니다. 로그인 없이 `Chris1/cityscapes`와 공식 KITTI Semantics를 내려받아, 위에서 SHA-256 검증한 **`v3-max Clean INT8` (`7.90 MiB`)**과 **`v4-final Robust INT8` (`7.90 MiB`)**에 대해:
+1. Cityscapes `locked_eval`(500장) mIoU(`67.95%` / `66.96%`) 및 Validation 온도 보정(`T*=1.70`) ECE 감소(`-71.4%` / `-74.2%`, mIoU 변화 `0.00%p`)
+2. 공식 KITTI Semantics Zero-Shot(200장, 미세조정 0회) mIoU 및 Safety-6
+3. 결정론적 4종 악천후 스트레스 테스트(`locked_eval` 200프레임: 야간·블러 `r=2.0`·안개·가우시안 노이즈 `σ=18` → `v3 13.75%` vs `v4 59.59%`)
+를 현재 런타임에서 직접 재측정해 동결 리포트(`reports/final-summary.json`)와 대조합니다.
 """,
         ),
         _code(
             "cell-live-eval",
             """
 import json
+import subprocess
+import sys
 import urllib.request
 import zipfile
-from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image
 
-from seg_kd.data import build_bdd100k_manifest, load_manifest, records_for_split, save_manifest
-from seg_kd.evaluation import evaluate_artifact, evaluate_temperature_scaled_model
+from seg_kd.data import build_bdd100k_manifest, load_manifest, save_manifest
+from seg_kd.evaluation import (
+    evaluate_artifact,
+    evaluate_robustness_stress_test,
+    evaluate_temperature_scaled_artifact,
+)
 
 if not EVALUATE_LIVE_DATASETS:
     print("Skipped live dataset download/re-evaluation (set EVALUATE_LIVE_DATASETS = True in Cell 1 to run).")
@@ -323,41 +332,48 @@ else:
                 stem = f"{out_split}_{idx:05d}"
                 img = row["image"].convert("RGB").resize((768, 384), Image.Resampling.BILINEAR)
                 m = row["semantic_segmentation"]
-                if isinstance(m, Image.Image):
-                    m_resized = m.resize((768, 384), Image.Resampling.NEAREST)
-                    m_arr = np.asarray(m_resized)
-                else:
-                    m_arr = np.asarray(m)
+                m_arr = np.asarray(m.resize((768, 384), Image.Resampling.NEAREST) if isinstance(m, Image.Image) else m)
                 if m_arr.ndim == 3:
                     m_arr = m_arr[..., 0]
-                m_arr = m_arr.astype(np.int64)
-                m_arr = np.where((m_arr < 0) | (m_arr >= 19), 255, m_arr).astype(np.uint8)
+                m_arr = np.where((m_arr < 0) | (m_arr >= 19), 255, m_arr.astype(np.int64)).astype(np.uint8)
                 img.save(img_dir / f"{stem}.jpg", quality=95)
                 Image.fromarray(m_arr, mode="L").save(msk_dir / f"{stem}_train_id.png")
-        manifest = build_bdd100k_manifest(cs_dir, seed=378, val_ratio=0.15, hash_files=False)
-        save_manifest(manifest, cs_manifest_path)
+        save_manifest(build_bdd100k_manifest(cs_dir, seed=378, val_ratio=0.15, hash_files=False), cs_manifest_path)
 
     cs_manifest = load_manifest(cs_manifest_path, dataset_root=cs_dir, verify_files=False)
     ref = json.loads((REPO_DIR / "reports" / "final-summary.json").read_text(encoding="utf-8"))
 
+    print("\\n=== [Live 1/3] Cityscapes locked_eval (500 imgs) & Post-Hoc Temperature Scaling ===")
     for label, fname, ref_key, ref_t in [
         ("v3_medium_int8", "v3-max-mobilenetv4-medium-int8.onnx", "mobilenetv4_medium_int8", 1.70),
         ("v4_robust_medium_int8", "v4-final-robust-medium-int8.onnx", "v4_robust_medium_int8", 1.70),
     ]:
         onnx_path = CACHE_DIR / fname
-        res = evaluate_artifact(
-            onnx_path, cs_manifest, cs_dir, split="locked_eval", image_size=(384, 768), batch_size=1, threads=BENCHMARK_THREADS
-        )
-        cal = evaluate_temperature_scaled_model(
-            onnx_path, cs_manifest, cs_dir, split="locked_eval", temperature=ref_t, image_size=(384, 768), threads=BENCHMARK_THREADS
+        cal = evaluate_temperature_scaled_artifact(
+            onnx_path, cs_manifest, cs_dir, temperature=ref_t, split="locked_eval", image_size=(384, 768), threads=BENCHMARK_THREADS
         )
         expected_miou = ref["locked_eval_models"][ref_key]["miou_pct"]
         print(
-            f"[LIVE Cityscapes locked_eval] {label:24s} | mIoU={res['miou']*100:.2f}% (ref {expected_miou:.2f}%) | "
-            f"safety={res['safety_critical_miou']*100:.2f}% | ECE {res['ece']:.4f} -> {cal['ece']:.4f} (T*={ref_t:.2f})"
+            f"  {label:24s} | mIoU={cal['miou_before']*100:.2f}%->{cal['miou_after']*100:.2f}% (ref {expected_miou:.2f}%) | "
+            f"safety={cal['safety_miou_before']*100:.2f}% | ECE {cal['ece_before']:.4f}->{cal['ece_after']:.4f} (-{cal['ece_reduction_pct']:.1f}%, T*={ref_t:.2f})"
         )
 
-    # Official KITTI Semantics Zero-Shot (200 images)
+    print("\\n=== [Live 2/3] Deterministic 4-Corruption Stress Test (200 locked_eval frames) ===")
+    for label, fname, ref_rob_key in [
+        ("v3_medium_int8", "v3-max-mobilenetv4-medium-int8.onnx", "Medium v3-max INT8 (7.5M)"),
+        ("v4_robust_medium_int8", "v4-final-robust-medium-int8.onnx", "Medium v4 Robust INT8 (7.5M)"),
+    ]:
+        rob_live = evaluate_robustness_stress_test(
+            CACHE_DIR / fname, cs_manifest, cs_dir, max_frames=200, image_size=(384, 768), seed=378, threads=BENCHMARK_THREADS
+        )
+        ref_r = ref["robustness_stress_test_200f"][ref_rob_key]
+        print(
+            f"  {label:24s} | Clean={rob_live['clean']['miou']*100:.2f}% | Night={rob_live['night_lowlight']['miou']*100:.2f}% | "
+            f"Blur={rob_live['motion_blur']['miou']*100:.2f}% | Fog={rob_live['fog_lowcontrast']['miou']*100:.2f}% | "
+            f"Noise={rob_live['sensor_noise']['miou']*100:.2f}% (ref {ref_r['sensor_noise']['miou']*100:.2f}%)"
+        )
+
+    print("\\n=== [Live 3/3] Official KITTI Semantics Zero-Shot (200 imgs) ===")
     kitti_dir = DATA_ROOT / "kitti"
     kitti_manifest_path = MANIFEST_DIR / "kitti-manifest.json"
     if not (kitti_dir / "training" / "image_2").is_dir():
@@ -368,7 +384,6 @@ else:
             zf.extractall(kitti_dir)
         zp.unlink(missing_ok=True)
     if not kitti_manifest_path.is_file():
-        import subprocess, sys
         subprocess.run(
             [sys.executable, "-m", "seg_kd", "prepare-data", "--dataset", "kitti", "--data", str(kitti_dir), "--output", str(kitti_manifest_path)],
             check=True,
@@ -383,8 +398,7 @@ else:
         )
         exp_k = ref["kitti_zero_shot"][ref_key]["miou_pct"]
         print(
-            f"[LIVE KITTI Zero-Shot 200]     {label:24s} | mIoU={km['miou']*100:.2f}% (ref {exp_k:.2f}%) | "
-            f"safety={km['safety_critical_miou']*100:.2f}%"
+            f"  {label:24s} | mIoU={km['miou']*100:.2f}% (ref {exp_k:.2f}%) | safety={km['safety_critical_miou']*100:.2f}%"
         )
 """,
         ),
@@ -393,11 +407,10 @@ else:
             """
 ## 6. (`reproduce_full` 전용) NVIDIA L4 전체 재학습 파이프라인 (`v3-max` + `v4-final`)
 
-`RUN_MODE = "reproduce_full"` 선택 시에만 실행됩니다. NVIDIA L4 (`24GB`, BF16) 환경에서:
+`RUN_MODE = "reproduce_full"` 선택 시에만 실행됩니다. NVIDIA L4 (`24GB`, BF16) 환경에서 `configs/l4-plan.json`과 100% 동일한 하이퍼파라미터(`λ_dice=0.25`, `α_kd=0.8`, `β_feat=0.4`, `T=4.0`, `weight_decay=3e-4`, `EMA=0.992`)로:
 1. `Chris1/cityscapes` (`384×768`) + KITTI Zero-Shot 매니페스트 구축
-2. `SegFormer-B5` 교사 파인튜닝 → 3시드 쌍체 비교(`378, 379, 380`) + `384×768` 4종 소거(`baseline`, `pixel_kl`, `cwd`, `cwd_feat`)
-3. 3-Tier Pareto (`MobileNetV4-Small`, `MobileNetV3-Large`, `MobileNetV4-Medium`) + QAT-KD + ONNX FP32/INT8 검증 게이트
-4. `v4-final` 비대칭 강건성 KD (`Clean Teacher → Corrupted Student`, 45ep + BF16 교사 QAT-KD 6ep) + 사후 온도 보정 + 4종 악천후 스트레스 테스트 + 결과 번들 ZIP 생성
+2. `v3-max`: `SegFormer-B5` 교사(8ep) → 3시드 쌍체(`378/379/380`) + 4종 소거 → 3-Tier Pareto(`V4-Small`, `V3-Large`, `V4-Medium`) → QAT(8ep) + ONNX FP32/INT8 검증 게이트
+3. `v4-final`: `MobileNetV4-Medium` 무교사 Baseline(35ep) + 비대칭 강건성 KD(45ep, 5ep 램프 `p=0.07→0.35`, BF16 교사 QAT-KD 6ep `p=0.25`) + ONNX INT8 게이트 + Validation 온도 보정 + 4종 악천후 스트레스 테스트 전체를 일괄 재현합니다.
 """,
         ),
         _code(
@@ -408,7 +421,6 @@ import subprocess
 import sys
 import urllib.request
 import zipfile
-from pathlib import Path
 
 import numpy as np
 import torch
@@ -422,9 +434,12 @@ else:
 
     from datasets import load_dataset
     from seg_kd.data import build_bdd100k_manifest, load_manifest, save_manifest
-    from seg_kd.evaluation import fit_temperature_scaling, evaluate_temperature_scaled_model
-    from seg_kd.export import assess_int8_acceptance, export_student_onnx
-    from seg_kd.benchmark import benchmark_model
+    from seg_kd.evaluation import (
+        evaluate_robustness_stress_test,
+        evaluate_temperature_scaled_artifact,
+        fit_temperature_scaling_artifact,
+    )
+    from seg_kd.export import export_student_onnx
     from seg_kd.training import train_student, write_json
 
     cs_dir = DATA_ROOT / "cityscapes_hires_384x768"
@@ -464,45 +479,55 @@ else:
             check=True,
         )
 
-    # 1. Run canonical staged study (teacher -> 3-seed ablation -> 3-tier pareto -> export -> freeze -> eval -> plots)
     plan_path = REPO_DIR / "configs" / "l4-plan.json"
+    plan = json.loads(plan_path.read_text(encoding="utf-8"))
     v3_out = OUTPUT_ROOT / "v3-max"
-    cmd = [
-        sys.executable, "scripts/run_l4_study.py",
-        "--plan", str(plan_path),
-        "--manifest", str(cs_manifest_path),
-        "--data", str(cs_dir),
-        "--kitti-manifest", str(kitti_manifest_path),
-        "--kitti-data", str(kitti_dir),
-        "--output", str(v3_out),
-        "--stage", "all",
-        "--device", "cuda",
-    ]
-    subprocess.run(cmd, check=True)
+    subprocess.run(
+        [
+            sys.executable, "scripts/run_l4_study.py",
+            "--plan", str(plan_path),
+            "--manifest", str(cs_manifest_path),
+            "--data", str(cs_dir),
+            "--kitti-manifest", str(kitti_manifest_path),
+            "--kitti-data", str(kitti_dir),
+            "--output", str(v3_out),
+            "--stage", "all",
+            "--device", "cuda",
+        ],
+        check=True,
+    )
 
-    # 2. Run v4-final Asymmetric Robustness KD (Clean SegFormer-B5 -> Corrupted MobileNetV4-Medium + BF16 QAT-KD + Temp Scaling)
     manifest = load_manifest(cs_manifest_path, dataset_root=cs_dir, verify_files=False)
     teacher_ckpt = v3_out / "teacher" / "segformer_b5" / "teacher.pt"
     v4_out = OUTPUT_ROOT / "v4-final"
-    robust_cfg = {
-        "image_size": [384, 768],
-        "epochs": 45,
-        "batch_size": 16,
-        "learning_rate": 1.2e-3,
-        "weight_decay": 1e-4,
-        "warmup_epochs": 3,
-        "temperature": 4.0,
-        "lambda_logit_kd": 1.0,
-        "lambda_feat_kd": 0.5,
+
+    # 1. MobileNetV4-Medium no-teacher baseline (35 ep, exact v4-final config)
+    med_base_cfg = {
+        **plan["main_student"],
+        "arch": "mobilenetv4_medium",
         "fpn_dim": 128,
-        "pretrained_backbone": True,
-        "precision": "bf16",
-        "num_workers": 4,
-        "asymmetric_robust_prob": 0.35,
-        "asymmetric_ramp_epochs": 5,
-        "qat_epochs": 6,
+        "image_size": [384, 768],
+        "qat_epochs": 0,
     }
-    rob_res = train_student(
+    train_student(
+        dataset_root=cs_dir,
+        manifest=manifest,
+        output_dir=v4_out / "medium_baseline",
+        arch="mobilenetv4_medium",
+        method="baseline",
+        seed=378,
+        teacher_path=None,
+        config=med_base_cfg,
+        device_spec="cuda",
+        overwrite=True,
+    )
+
+    # 2. v4-final Asymmetric Robustness KD (45 ep + 6 ep BF16-teacher QAT-KD, exact l4-plan.json config)
+    robust_cfg = {
+        **plan["robust_asymmetric_student"],
+        "image_size": [384, 768],
+    }
+    train_student(
         dataset_root=cs_dir,
         manifest=manifest,
         output_dir=v4_out / "v4_robust_medium",
@@ -514,15 +539,21 @@ else:
         device_spec="cuda",
         overwrite=True,
     )
+
     export_src = v4_out / "v4_robust_medium" / "student-qat.pt"
     if not export_src.is_file():
         export_src = v4_out / "v4_robust_medium" / "student.pt"
     export_dir = v4_out / "export" / "v4_robust_medium"
-    export_student_onnx(export_src, export_dir, manifest=manifest, dataset_root=cs_dir, image_size=(384, 768), calibration_count=128, seed=378, export_int8=True)
+    export_student_onnx(
+        export_src, export_dir, manifest=manifest, dataset_root=cs_dir, image_size=(384, 768), calibration_count=128, seed=378, export_int8=True
+    )
     int8_path = export_dir / "student-int8.onnx"
-    t_opt = fit_temperature_scaling(int8_path, manifest, cs_dir, split="validation", image_size=(384, 768), threads=4)
-    cal_eval = evaluate_temperature_scaled_model(int8_path, manifest, cs_dir, split="locked_eval", temperature=t_opt["optimal_temperature"], image_size=(384, 768), threads=4)
-    write_json({"val_fit": t_opt, "locked_eval_calibrated": cal_eval}, v4_out / "ece-calibration.json")
+    t_opt = fit_temperature_scaling_artifact(int8_path, manifest, cs_dir, split="validation", image_size=(384, 768), threads=4)
+    cal_eval = evaluate_temperature_scaled_artifact(
+        int8_path, manifest, cs_dir, temperature=t_opt, split="locked_eval", image_size=(384, 768), threads=4
+    )
+    rob_eval = evaluate_robustness_stress_test(int8_path, manifest, cs_dir, max_frames=200, image_size=(384, 768), seed=378, threads=4)
+    write_json({"optimal_temperature_val": t_opt, "locked_eval_calibrated": cal_eval, "robustness_200f": rob_eval}, v4_out / "v4-summary.json")
     print("Full v3-max + v4-final L4 reproduction completed cleanly ->", OUTPUT_ROOT)
 """,
         ),
@@ -536,7 +567,7 @@ else:
 | **1. 해상도 & 데이터** | 40 FPS 엣지 CPU 예산에서 작은 보행자·신호등을 지킬 최소 해상도는? | `Chris1/cityscapes` 원본 → `384×768` (`train 2,529 / val 446 / locked 500`) + KITTI 200장 Zero-Shot | **`384×768` 확정** |
 | **2. 증류 손실 소거** | 픽셀 KL vs 공간 CWD vs 4단계 특징 정렬 중 무엇이 이종 ViT→CNN 압축에 유리한가? | `pixel_kl` `-2.41%p` 역효과(Safety `-5.71%p`) vs `cwd` `+1.42%p` (KITTI Safety `+7.12%p`) | **`CWD` 기반 확정** (`pixel_kl` 기각) |
 | **3. 3시드 쌍체 검증** | 단일 시드 우연이 아닌가? 소수 안전 클래스는 일관되게 오르는가? | `1.50M` 3시드 `3/3 승`, Safety `+1.88%p` (6/6 전원 상승), 시드 SD `2.7~3.1×` 축소 | **재현성 입증** |
-| **4. 3-Tier Pareto & INT8 게이트** | 어떤 백본이 정적 QDQ INT8에서 붕괴 없이 실제 CPU 가속을 내는가? | `V3-Large` `-6.46%p`·`0.72×` 차단, `V4-Small` `1.04×` 미달, **`V4-Medium` 4/4 통과 (`67.95%`, `7.91 MiB`, `40.5 FPS`)** | **`MobileNetV4-Medium INT8` 채택** |
+| **4. 3-Tier Pareto & INT8 게이트** | 어떤 백본이 정적 QDQ INT8에서 붕괴 없이 실제 CPU 가속을 내는가? | `V3-Large` `-6.46%p`·`0.72×` 차단, `V4-Small` `1.04×` 미달, **`V4-Medium` 4/4 통과 (`67.95%`, `7.90 MiB`, `40.5 FPS`)** | **`MobileNetV4-Medium INT8` 채택** |
 | **5. 비대칭 강건성 KD (`v4`)** | Clean INT8의 센서 노이즈 붕괴(`13.75%`)를 어떻게 해결할 것인가? | Clean Teacher → Corrupted Student + BF16 QAT-KD → 노이즈 **`59.59%` (`+45.84%p`, 84.6M 교사 `59.19%` 추월)**, 안개 `66.33%` | **2-프로파일 배포 체계 확정** |
 | **6. 사후 온도 보정 (`ECE`)** | CWD의 확률 과신(`ECE 0.026`)을 mIoU 손실·지연 없이 해결할 수 있는가? | Validation 전용 `T* = 1.70~1.72` 단일 나눗셈 → **ECE `-74.2%` (`0.0260 → 0.0067`), mIoU 변화 `0.00%p`, 지연 `0 ms`** | **추론 후처리 표준 채택** |
 """,

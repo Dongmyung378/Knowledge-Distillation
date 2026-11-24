@@ -25,7 +25,7 @@
 - **3단계 Pareto 백본 티어**:
   - `MobileNetV4-Small` (`1.50M` params, `fpn_dim=96`, 57 Conv / 55 BN): 초경량 UIB 블록 (`FP32 5.72 MiB`, `INT8 1.76 MiB`)
   - `MobileNetV3-Large` (`3.30M` params, `fpn_dim=128`, 74 Conv / 56 BN): 18개 Squeeze-and-Excitation(SE) + HardSwish 포함(정적 INT8 민감성 대조군)
-  - `MobileNetV4-Medium` (`7.54M` params, `fpn_dim=128`, 88 Conv / 86 BN): 순수 `Conv-BN-ReLU` UIB 구조 (`FP32 28.71 MiB`, `INT8 7.91 MiB`)
+  - `MobileNetV4-Medium` (`7.54M` params, `fpn_dim=128`, 88 Conv / 86 BN): 순수 `Conv-BN-ReLU` UIB 구조 (`FP32 28.71 MiB`, `INT8 7.90 MiB`)
 - **양자화 친화 자동 감사 (`audit_quantization_friendliness`)**: 모듈 시퀀스에서 `Conv → ReLU → BN` 비융합 안티패턴을 사전 검출하며 모든 학생은 감사 통과 후 학습됩니다.
 - **학습 전용 프로젝터 (`FeatureProjectorBank`)**: 학생과 교사의 4단계 채널 차원을 맞추는 `1×1 Conv-BN` 프로젝터 은행으로, 배포(ONNX export) 시에는 완전히 제거되어 **추론 오버헤드가 0**입니다.
 
@@ -63,7 +63,7 @@ $$\mathcal{L} = \mathcal{L}_{\mathrm{CE}} + \lambda_{\mathrm{dice}} \mathcal{L}_
 
 ## 5. QAT-KD · 정적 QDQ ONNX INT8 게이트 · 사후 온도 보정
 
-1. **BF16 교사 QAT-KD (`6 epochs`)**: 학습 완료 학생에 양자화 인식 미세조정을 6에포크 수행해 정적 INT8 전환 시의 정확도 낙폭을 `1.0%p` 이내로 억제합니다.
+1. **QAT-KD (`v3-max` 8ep / `v4-final` BF16 교사 6ep)**: 학습 완료 학생에 양자화 인식 미세조정을 6에포크 수행해 정적 INT8 전환 시의 정확도 낙폭을 `1.0%p` 이내로 억제합니다.
 2. **ONNX FP32/INT8 내보내기 (`seg_kd/export.py`)**: Opset 17로 FP32 ONNX를 추출해 PyTorch 대비 `100.0%` 픽셀 argmax 일치(`max_abs_logit_diff <= 3.6e-5`)를 검증한 뒤, 훈련 분할 128장 결정론적 캘리브레이션 세트로 per-channel 정적 QDQ INT8(`student-int8.onnx`)을 생성합니다.
 3. **Validation-Only 배포 게이트 (`assess_int8_acceptance`)**: `validation` 분할에서만 다음 4개 조건을 모두 만족해야 `INT8`을 승인합니다.
    - `val_mIoU_drop <= 1.0%p`

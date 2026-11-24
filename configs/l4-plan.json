@@ -60,7 +60,7 @@
     "channels_last": true,
     "compile_model": false,
     "num_workers": 4,
-    "qat_epochs": 6,
+    "qat_epochs": 8,
     "qat_lr_scale": 0.1
   },
   "robust_asymmetric_student": {

@@ -429,3 +429,229 @@ def evaluate_temperature_scaled_model(
         "ece_after": cal_res["ece"],
         "ece_reduction_pct": round((1.0 - cal_res["ece"] / max(raw_res["ece"], 1e-9)) * 100.0, 2),
     }
+
+
+def _iter_artifact_logits(
+    model_path: str | Path,
+    dataloader,
+    *,
+    device_spec: str = "cpu",
+    threads: int = 4,
+):
+    """Yield ``(logits_float_tensor, masks_tensor, batch)`` for either `.onnx` or `.pt` models."""
+    path = Path(model_path)
+    if path.suffix.lower() == ".onnx":
+        import onnxruntime as ort
+
+        so = ort.SessionOptions()
+        so.intra_op_num_threads = int(threads)
+        so.inter_op_num_threads = 1
+        session = ort.InferenceSession(str(path), sess_options=so, providers=["CPUExecutionProvider"])
+        in_name = session.get_inputs()[0].name
+        for batch in dataloader:
+            images_np = batch["image"].numpy().astype(np.float32)
+            logits_np = session.run(None, {in_name: images_np})[0]
+            yield torch.from_numpy(logits_np).float(), batch["mask"], batch
+    elif path.suffix.lower() in {".pt", ".pth"}:
+        device = torch.device(device_spec if (device_spec != "auto") else ("cuda" if torch.cuda.is_available() else "cpu"))
+        model, _ = load_model_checkpoint(path, map_location=device)
+        model.to(device).eval()
+        with torch.no_grad():
+            for batch in dataloader:
+                images = batch["image"].to(device, non_blocking=True)
+                out = model(images, return_features=False) if _supports_return_features(model) else model(images)
+                logits = (out["logits"] if isinstance(out, dict) else out).float().cpu()
+                yield logits, batch["mask"], batch
+    else:
+        raise ValueError(f"Unsupported model extension: {path.suffix}")
+
+
+def fit_temperature_scaling_artifact(
+    model_path: str | Path,
+    manifest: Mapping[str, Any],
+    dataset_root: str | Path,
+    *,
+    split: str = "validation",
+    image_size: tuple[int, int] = (384, 768),
+    batch_size: int = 1,
+    device_spec: str = "cpu",
+    threads: int = 4,
+    t_min: float = 0.40,
+    t_max: float = 2.60,
+    coarse_steps: int = 45,
+) -> float:
+    """Fit optimal temperature T* on `.onnx` or `.pt` artifacts strictly using ``validation``."""
+    if split != "validation":
+        raise ValueError("Temperature scaling must be fit on the validation split only")
+    records = records_for_split(manifest, split)
+    loader = make_dataloader(records, dataset_root, image_size=image_size, batch_size=batch_size, training=False, num_workers=0)
+
+    temps = torch.linspace(float(t_min), float(t_max), int(coarse_steps))
+    nll_sums = torch.zeros_like(temps)
+    total_valid = 0
+    for logits, masks, _ in _iter_artifact_logits(model_path, loader, device_spec=device_spec, threads=threads):
+        if logits.shape[-2:] != masks.shape[-2:]:
+            logits = F.interpolate(logits, size=masks.shape[-2:], mode="bilinear", align_corners=False)
+        valid_px = int((masks != IGNORE_INDEX).sum().item())
+        if valid_px == 0:
+            continue
+        total_valid += valid_px
+        for ti, t_val in enumerate(temps):
+            nll_sums[ti] += F.cross_entropy(logits / t_val, masks, ignore_index=IGNORE_INDEX, reduction="sum")
+
+    if total_valid == 0:
+        return 1.0
+    t_coarse = float(temps[int(torch.argmin(nll_sums / float(total_valid)).item())].item())
+    fine_temps = torch.linspace(max(0.15, t_coarse - 0.05), t_coarse + 0.05, 11)
+    fine_sums = torch.zeros_like(fine_temps)
+    for logits, masks, _ in _iter_artifact_logits(model_path, loader, device_spec=device_spec, threads=threads):
+        if logits.shape[-2:] != masks.shape[-2:]:
+            logits = F.interpolate(logits, size=masks.shape[-2:], mode="bilinear", align_corners=False)
+        for ti, t_val in enumerate(fine_temps):
+            fine_sums[ti] += F.cross_entropy(logits / t_val, masks, ignore_index=IGNORE_INDEX, reduction="sum")
+    return round(float(fine_temps[int(torch.argmin(fine_sums).item())].item()), 4)
+
+
+def evaluate_temperature_scaled_artifact(
+    model_path: str | Path,
+    manifest: Mapping[str, Any],
+    dataset_root: str | Path,
+    *,
+    temperature: float,
+    split: str = "locked_eval",
+    image_size: tuple[int, int] = (384, 768),
+    batch_size: int = 1,
+    device_spec: str = "cpu",
+    threads: int = 4,
+) -> dict[str, Any]:
+    """Evaluate raw vs temperature-scaled ECE and mIoU parity on `.onnx` or `.pt` artifacts."""
+    if temperature <= 0:
+        raise ValueError("temperature must be positive")
+    records = records_for_split(manifest, split)
+    loader = make_dataloader(records, dataset_root, image_size=image_size, batch_size=batch_size, training=False, num_workers=0)
+    meter_raw = SegmentationMeter()
+    meter_cal = SegmentationMeter()
+    for logits, masks, batch in _iter_artifact_logits(model_path, loader, device_spec=device_spec, threads=threads):
+        weathers = list(batch["weather"])
+        timeofdays = list(batch["timeofday"])
+        meter_raw.update(logits, masks, weathers=weathers, timeofdays=timeofdays)
+        meter_cal.update(logits / float(temperature), masks, weathers=weathers, timeofdays=timeofdays)
+    raw_res = meter_raw.compute(split=split)
+    cal_res = meter_cal.compute(split=split)
+    return {
+        "split": split,
+        "temperature": round(float(temperature), 4),
+        "miou_before": raw_res["miou"],
+        "miou_after": cal_res["miou"],
+        "safety_miou_before": raw_res["safety_critical_miou"],
+        "safety_miou_after": cal_res["safety_critical_miou"],
+        "ece_before": raw_res["ece"],
+        "ece_after": cal_res["ece"],
+        "ece_reduction_pct": round((1.0 - cal_res["ece"] / max(raw_res["ece"], 1e-9)) * 100.0, 2),
+    }
+
+
+ROBUSTNESS_MODES: tuple[str, ...] = (
+    "clean",
+    "night_lowlight",
+    "motion_blur",
+    "fog_lowcontrast",
+    "sensor_noise",
+)
+
+
+def corrupt_pil_deterministic(pil_img, mode: str, rng: np.random.Generator):
+    """Apply exact deterministic v3-max/v4-final stress-test corruption to a PIL RGB image."""
+    from PIL import Image, ImageEnhance, ImageFilter
+
+    if mode == "clean":
+        return pil_img
+    if mode == "night_lowlight":
+        return ImageEnhance.Brightness(pil_img).enhance(0.35)
+    if mode == "motion_blur":
+        return pil_img.filter(ImageFilter.GaussianBlur(radius=2.0))
+    if mode == "fog_lowcontrast":
+        arr = np.asarray(pil_img, dtype=np.float32)
+        fogged = np.clip(arr * 0.60 + 215.0 * 0.40, 0, 255).astype(np.uint8)
+        return Image.fromarray(fogged)
+    if mode == "sensor_noise":
+        arr = np.asarray(pil_img, dtype=np.float32)
+        noisy = np.clip(arr + rng.normal(0.0, 18.0, size=arr.shape), 0, 255).astype(np.uint8)
+        return Image.fromarray(noisy)
+    raise ValueError(f"Unsupported corruption mode: {mode!r}")
+
+
+def evaluate_robustness_stress_test(
+    model_path: str | Path,
+    manifest: Mapping[str, Any],
+    dataset_root: str | Path,
+    *,
+    split: str = "locked_eval",
+    max_frames: int = 200,
+    image_size: tuple[int, int] = (384, 768),
+    seed: int = 378,
+    modes: tuple[str, ...] = ROBUSTNESS_MODES,
+    device_spec: str = "cpu",
+    threads: int = 4,
+) -> dict[str, dict[str, float]]:
+    """Run the deterministic 4-corruption stress test (exact v4-final protocol) on `.onnx` or `.pt`."""
+    from PIL import Image
+    from torchvision.transforms import functional as TF
+
+    from .data import IMAGENET_MEAN, IMAGENET_STD, safe_dataset_path
+    from .taxonomy import map_mask_to_train_ids
+
+    root = Path(dataset_root)
+    records = records_for_split(manifest, split)[: int(max_frames)]
+    h, w = int(image_size[0]), int(image_size[1])
+    raw_items: list[tuple[Any, torch.Tensor]] = []
+    for rec in records:
+        img_rel = rec.get("image_path") or rec["image_relpath"]
+        mask_rel = rec.get("mask_path") or rec["mask_relpath"]
+        with Image.open(safe_dataset_path(root, img_rel)) as im:
+            img = im.convert("RGB").resize((w, h), Image.Resampling.BILINEAR)
+        with Image.open(safe_dataset_path(root, mask_rel)) as mk:
+            mask_rs = mk.resize((w, h), Image.Resampling.NEAREST)
+            mask_arr = map_mask_to_train_ids(np.asarray(mask_rs), rec.get("label_format", "train_id"))
+        raw_items.append((img, torch.from_numpy(mask_arr.astype(np.int64)).unsqueeze(0)))
+
+    path = Path(model_path)
+    is_onnx = path.suffix.lower() == ".onnx"
+    sess = None
+    in_name = None
+    model = None
+    device = torch.device(device_spec if (device_spec != "auto") else ("cuda" if torch.cuda.is_available() else "cpu"))
+    if is_onnx:
+        import onnxruntime as ort
+
+        so = ort.SessionOptions()
+        so.intra_op_num_threads = int(threads)
+        so.inter_op_num_threads = 1
+        sess = ort.InferenceSession(str(path), sess_options=so, providers=["CPUExecutionProvider"])
+        in_name = sess.get_inputs()[0].name
+    else:
+        model, _ = load_model_checkpoint(path, map_location=device)
+        model.to(device).eval()
+
+    results: dict[str, dict[str, float]] = {}
+    for mode in modes:
+        rng = np.random.default_rng(seed)
+        meter = SegmentationMeter()
+        for img, mask_t in raw_items:
+            c_img = corrupt_pil_deterministic(img, mode, rng)
+            x = TF.normalize(TF.to_tensor(c_img), mean=IMAGENET_MEAN, std=IMAGENET_STD).unsqueeze(0)
+            if is_onnx:
+                assert sess is not None and in_name is not None
+                logits = sess.run(None, {in_name: x.numpy().astype(np.float32)})[0]
+            else:
+                assert model is not None
+                with torch.no_grad():
+                    out = model(x.to(device), return_features=False) if _supports_return_features(model) else model(x.to(device))
+                logits = (out["logits"] if isinstance(out, dict) else out).float().cpu()
+            meter.update(logits, mask_t)
+        mres = meter.compute(split=split)
+        results[mode] = {
+            "miou": mres["miou"],
+            "safety_critical_miou": mres["safety_critical_miou"],
+        }
+    return results

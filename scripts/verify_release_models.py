@@ -167,8 +167,8 @@ def print_master_summary(repo_root: Path = REPO_ROOT) -> dict[str, Any]:
     )
     for key, label in [
         ("medium_baseline", "V4-Medium Baseline (FP32, no KD)"),
-        ("mobilenetv4_medium_int8", "V4-Medium v3 Clean INT8 (7.91 MiB)"),
-        ("v4_robust_medium_int8", "V4-Medium v4 Robust INT8 (7.91 MiB)"),
+        ("mobilenetv4_medium_int8", "V4-Medium v3 Clean INT8 (7.90 MiB)"),
+        ("v4_robust_medium_int8", "V4-Medium v4 Robust INT8 (7.90 MiB)"),
     ]:
         row = m[key]
         k_row = kitti[key]

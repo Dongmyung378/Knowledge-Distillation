@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
 <title id="title">Driving Semantic Segmentation Knowledge Distillation: SegFormer-B5 to MobileNetV4 INT8</title>
-<desc id="desc">Cross-architecture knowledge distillation from 84.6M SegFormer-B5 ViT teacher to 7.5M MobileNetV4-Medium ONNX INT8 (7.91 MiB, 40.5 FPS CPU), achieving 67.95% clean mIoU and surpassing the 84.6M teacher under Gaussian sensor noise (59.59% vs 59.19%).</desc>
+<desc id="desc">Cross-architecture knowledge distillation from 84.6M SegFormer-B5 ViT teacher to 7.5M MobileNetV4-Medium ONNX INT8 (7.90 MiB, 40.5 FPS CPU), achieving 67.95% clean mIoU and surpassing the 84.6M teacher under Gaussian sensor noise (59.59% vs 59.19%).</desc>
 <style>text{font-family:'Inter','Segoe UI','DejaVu Sans',sans-serif;font-variant-numeric:tabular-nums}</style>
 <rect width="1200" height="760" fill="#F4F7F2"/>
 <text x="48" y="76" fill="#182218" font-size="40" font-weight="750">Driving Semantic Segmentation KD</text>
@@ -24,7 +24,7 @@
 
 <rect x="74" y="408" width="382" height="96" rx="10" fill="#F0F8EE" stroke="#527D49" stroke-width="1.6"/>
 <text x="92" y="437" fill="#2B4C27" font-size="12.2" font-weight="700">STUDENT · CORRUPTED INPUT (Night/Fog/Blur/Noise)</text>
-<text x="92" y="466" fill="#182218" font-size="18" font-weight="750">MobileNetV4-Medium INT8 (7.91 MiB)</text>
+<text x="92" y="466" fill="#182218" font-size="18" font-weight="750">MobileNetV4-Medium INT8 (7.90 MiB)</text>
 <text x="92" y="490" fill="#2B4C27" font-size="12.8" font-weight="600">11.2× Fewer Params · 40.9× Smaller File · 38–40 FPS</text>
 
 <rect x="74" y="520" width="382" height="42" rx="8" fill="#E3EFE0"/>
@@ -49,7 +49,7 @@
 <!-- Card 02 -->
 <rect x="594" y="314" width="558" height="122" rx="14" fill="#FFFFFF" stroke="#D5E0D0" stroke-width="1.3"/>
 <rect x="594" y="314" width="8" height="122" rx="4" fill="#4D6B48"/>
-<text x="624" y="351" fill="#3B5936" font-size="14" font-weight="700">TRACK 02 · CLEAN PEAK INT8 · 7.91 MiB · 40.5 FPS</text>
+<text x="624" y="351" fill="#3B5936" font-size="14" font-weight="700">TRACK 02 · CLEAN PEAK INT8 · 7.90 MiB · 40.5 FPS</text>
 <text x="624" y="385" fill="#182218" font-size="22.5" font-weight="750">MobileNetV4-Medium Clean INT8 (Gate PASS)</text>
 <text x="624" y="416" fill="#4D5C4C" font-size="14.2">mIoU 67.95% (90.8% of teacher) · Safety 57.94% · KITTI 51.32%</text>
 
@@ -58,14 +58,14 @@
 <rect x="594" y="456" width="10" height="126" rx="4" fill="#2B4C27"/>
 <rect x="1024" y="473" width="108" height="26" rx="13" fill="#E3EFE0"/>
 <text x="1078" y="491" text-anchor="middle" fill="#1F421B" font-size="12.8" font-weight="700">FINAL MODEL</text>
-<text x="624" y="492" fill="#2B4C27" font-size="13.8" font-weight="700">TRACK 03 · v4 ROBUST INT8 · 7.91 MiB · 38.4 FPS</text>
+<text x="624" y="492" fill="#2B4C27" font-size="13.8" font-weight="700">TRACK 03 · v4 ROBUST INT8 · 7.90 MiB · 38.4 FPS</text>
 <text x="624" y="529" fill="#182218" font-size="19.8" font-weight="750">MobileNetV4-Medium Robust INT8 + Temp Scaling</text>
 <text x="624" y="559" fill="#1F421B" font-size="14.2" font-weight="600">Noise 59.59% (beats 59.19% teacher · +45.84%p) · Fog 66.33% · ECE -74.2%</text>
 
 <!-- Bottom Forest Scorecard -->
 <rect x="48" y="606" width="1104" height="114" rx="14" fill="#2B4C27"/>
 <text x="80" y="652" fill="#FFFFFF" font-size="26" font-weight="750">Final Locked Eval (Cityscapes 384×768)</text>
-<text x="80" y="692" fill="#DDEBD9" font-size="16.2">84.6M SegFormer-B5 → 7.5M INT8 · 7.91 MiB · 4/4 Gate Checks Passed</text>
+<text x="80" y="692" fill="#DDEBD9" font-size="16.2">84.6M SegFormer-B5 → 7.5M INT8 · 7.90 MiB · 4/4 Gate Checks Passed</text>
 <line x1="636" y1="624" x2="636" y2="702" stroke="#85A97E" stroke-width="1.2" opacity="0.55"/>
 
 <text x="794" y="654" text-anchor="end" fill="#FFFFFF" font-size="35" font-weight="750">67.95%</text>
