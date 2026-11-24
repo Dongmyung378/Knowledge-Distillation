@@ -17,7 +17,8 @@ python -m seg_kd doctor
 python -m unittest discover -s tests -v
 
 # 3. End-to-end synthetic driving smoke pipeline
-python -m seg_kd prepare-data --dataset synthetic --data ./tmp/syn-data --output ./tmp/syn-manifest.json --image-size 128x256
+python -m seg_kd prepare-data --dataset synthetic \
+  --data ./tmp/syn-data --output ./tmp/syn-manifest.json --image-size 128x256
 python scripts/run_l4_study.py \
   --plan configs/l4-plan.json \
   --manifest ./tmp/syn-manifest.json \

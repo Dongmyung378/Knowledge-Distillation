@@ -60,20 +60,18 @@ All dataset splits (`train 2,529 / validation 446 / locked_eval 500`), model sel
 
 ## Architecture & Core Techniques
 
-```
-Cityscapes 384×768 (train 2,529 / val 446 / locked_eval 500) + KITTI Zero-Shot (200)
-   │
-   ├─ Clean RGB ──▶ Frozen SegFormer-B5 Teacher (84.6M, MiT-B5, BF16)
-   │                     └─ 4-Stage Features (s4, s8, s16, s32) + Clean Logits (19ch)
-   │
-   └─ Clean / Corrupted RGB ──▶ MobileNetV4-Medium + FPN Student (7.54M, UIB Conv-BN-ReLU)
-                                  ├─ L_CE (unweighted, ignore_index=255)
-                                  ├─ L_CWD (Channel-wise Spatial Softmax KL over H×W, T=4.0)
-                                  ├─ L_Feat (1×1 Projector Bank: 0.5·CWD + 0.5·Cosine across 4 stages)
-                                  └─ BF16-Teacher QAT-KD (6 ep) ─▶ ONNX FP32/INT8 (QDQ, 128-img Calib)
-                                                                       ├─ Validation-Only INT8 Gate (4/4)
-                                                                       ├─ Validation-Only Temp Scaling (T*≈1.70)
-                                                                       └─ SHA-256 Frozen Locked Eval & KITTI
+```text
+Cityscapes 384x768 (train 2,529 / val 446 / locked 500) + KITTI Zero-Shot (200)
+  |- Clean RGB --------> Frozen SegFormer-B5 Teacher (84.6M, MiT-B5, BF16)
+  |                        `- 4-Stage Pyramid (s4..s32) + Clean Logits (19ch)
+  `- Clean/Corrupt RGB -> MobileNetV4-Medium + FPN Student (7.54M, UIB Conv-BN)
+                           |- L_CE + 0.25*L_Dice (unweighted, ignore=255)
+                           |- L_CWD (Channel Spatial Softmax KL, T=4.0)
+                           |- L_Feat (1x1 Projector: 0.5*CWD + 0.5*Cosine)
+                           `- QAT-KD (6 ep) -> ONNX FP32/INT8 (QDQ, 128 calib)
+                                 |- Validation-Only INT8 Gate (4/4 checks)
+                                 |- Validation-Only Temp Scaling (T*~=1.70)
+                                 `- SHA-256 Frozen Locked Eval & KITTI
 ```
 
 See [`docs/architecture.md`](./docs/architecture.md) for equations and module details, and [`docs/results.md`](./docs/results.md) for complete ablation tables and failure analysis.
@@ -89,7 +87,11 @@ python -m seg_kd doctor
 
 # 2. Run unit tests & end-to-end synthetic smoke pipeline
 python -m unittest discover -s tests -v
-python scripts/run_l4_study.py --plan configs/l4-plan.json --manifest /tmp/syn-manifest.json --data /tmp/syn-data --output /tmp/syn-out --smoke
+python -m seg_kd prepare-data --dataset synthetic \
+  --data ./tmp/syn-data --output ./tmp/syn-manifest.json --image-size 128x256
+python scripts/run_l4_study.py --plan configs/l4-plan.json \
+  --manifest ./tmp/syn-manifest.json --data ./tmp/syn-data \
+  --output ./tmp/syn-out --smoke
 ```
 
 The complete NVIDIA L4 study is reproducible in one click via the self-contained notebook [`notebooks/colab_enterprise_l4_one_shot.ipynb`](./notebooks/colab_enterprise_l4_one_shot.ipynb). Step-by-step instructions are in [`docs/reproduction.md`](./docs/reproduction.md).

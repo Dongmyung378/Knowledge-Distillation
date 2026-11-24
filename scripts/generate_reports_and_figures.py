@@ -363,8 +363,8 @@ def plot_robustness_breakthrough(summary: dict[str, Any]) -> None:
     # Highlight the sensor noise breakthrough in completely clean upper-right space
     ax.annotate(
         "7.91 MiB INT8 (59.59%) surpasses 84.6M Teacher (59.19%)!\n+45.84%p recovery vs v3 Clean INT8 (13.75%)",
-        xy=(4 + 2 * width, 61.5),
-        xytext=(3.52, 81.0),
+        xy=(4 + 2 * width, 64.4),
+        xytext=(3.52, 81.5),
         ha="center",
         va="center",
         fontsize=8.7,
@@ -409,7 +409,7 @@ def plot_method_ablation_384(summary: dict[str, Any]) -> None:
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.0, 5.1), dpi=240, gridspec_kw={"width_ratios": [1.35, 1.0]})
 
     x = np.arange(len(methods))
-    w = 0.34
+    w = 0.36
     colors_o = ["#64748B", "#DC2626", "#15803D", "#2563EB"]
     colors_s = ["#94A3B8", "#F87171", "#4ADE80", "#60A5FA"]
 
@@ -421,15 +421,15 @@ def plot_method_ablation_384(summary: dict[str, Any]) -> None:
         vo, vs = overall[i], safety[i]
         d_o = "" if i == 0 else f"\n({vo - base_o:+.2f}%p)"
         d_s = "" if i == 0 else f"\n({vs - base_s:+.2f}%p)"
-        ax1.text(bar_o.get_x() + bar_o.get_width() / 2, vo + 0.5, f"{vo:.2f}%{d_o}", ha="center", va="bottom", fontsize=8.0, fontweight="bold" if i == 2 else "normal", color="#0F172A")
-        ax1.text(bar_s.get_x() + bar_s.get_width() / 2, vs + 0.5, f"{vs:.2f}%{d_s}", ha="center", va="bottom", fontsize=7.8, color="#334155")
+        ax1.text(bar_o.get_x() + bar_o.get_width() / 2, vo + 0.5, f"{vo:.2f}%{d_o}", ha="center", va="bottom", fontsize=7.8, fontweight="bold" if i == 2 else "normal", color="#0F172A")
+        ax1.text(bar_s.get_x() + bar_s.get_width() / 2 + 0.03, vs + 0.5, f"{vs:.2f}%{d_s}", ha="center", va="bottom", fontsize=7.3, color="#334155")
 
     ax1.set_xticks(x)
     ax1.set_xticklabels(labels, fontsize=9.2)
-    ax1.set_ylim(38, 70)
+    ax1.set_ylim(38, 74.5)
     ax1.set_ylabel("Cityscapes Locked Eval mIoU (%)", fontsize=10.0)
     ax1.set_title("In-Domain Cityscapes (384x768, 1.50M Student)", fontsize=11.0, pad=10)
-    ax1.legend(loc="lower right", frameon=True, facecolor="#FFFFFF", edgecolor="#CBD5E1", fontsize=8.5)
+    ax1.legend(loc="upper center", ncol=2, frameon=True, facecolor="#FFFFFF", edgecolor="#CBD5E1", fontsize=8.3)
     ax1.spines["top"].set_visible(False)
     ax1.spines["right"].set_visible(False)
 
@@ -681,7 +681,7 @@ def render_thumbnail_svg(summary: dict[str, Any], *, lang: str) -> Path:
 <rect x="594" y="314" width="8" height="122" rx="4" fill="#4D6B48"/>
 <text x="624" y="351" fill="#3B5936" font-size="14" font-weight="700">TRACK 02 · CLEAN PEAK INT8 · 7.91 MiB · 40.5 FPS</text>
 <text x="624" y="385" fill="#182218" font-size="23" font-weight="750">MobileNetV4-Medium Clean INT8 (Gate PASS)</text>
-<text x="624" y="416" fill="#4D5C4C" font-size="14.2">mIoU {v3_int8['miou_pct']:.2f}% (교사 90.8%) · Safety {v3_int8['safety_miou_pct']:.2f}% · KITTI 51.32% (+7.46%p)</text>
+<text x="624" y="416" fill="#4D5C4C" font-size="14.2">mIoU {v3_int8['miou_pct']:.2f}% (교사 90.8%) · Safety {v3_int8['safety_miou_pct']:.2f}% · KITTI 51.32% (+2.23%p)</text>
 
 <!-- Card 03 -->
 <rect x="594" y="456" width="558" height="126" rx="14" fill="#FFFFFF" stroke="#2B4C27" stroke-width="2.2"/>

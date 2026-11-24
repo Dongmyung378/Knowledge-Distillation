@@ -15,13 +15,13 @@ In autonomous driving semantic segmentation (19 Cityscapes classes), a high-capa
 
 ## 2. Teacher & Student Architectures (`seg_kd/models.py`)
 
-### Teacher (`SegFormerTeacher`)
+### Teacher (`SegformerTeacher`)
 - **Backbone**: `nvidia/segformer-b5-finetuned-cityscapes-1024-1024` (`MiT-B5`, `84,607,955` params, `323.14 MiB`)
 - **Outputs**: 19-class logits `(B, 19, H, W)` and 4-stage hierarchical feature pyramid (`s4, s8, s16, s32` with channels `[64, 128, 320, 512]`).
 - **Role**: Frozen in `eval()` + CUDA BF16 during student distillation, always consuming clean inputs.
 
-### Student (`EdgeFPNSegmenter`)
-- **Decoder**: Quantization-friendly `Conv2d(bias=False) → BatchNorm2d → ReLU` lightweight FPN with ONNX Opset 17 compatible bilinear upsampling.
+### Student (`EdgeSegStudent` + `LiteFPNDecoder`)
+- **Decoder**: Quantization-friendly `Conv2d(bias=False) → BatchNorm2d → ReLU6` lightweight FPN with ONNX Opset 17 compatible bilinear upsampling.
 - **3-Tier Pareto Backbones**:
   - `MobileNetV4-Small` (`1.50M` params, `fpn_dim=96`, 57 Conv / 55 BN): ultra-light UIB blocks (`FP32 5.72 MiB`, `INT8 1.76 MiB`).
   - `MobileNetV3-Large` (`3.30M` params, `fpn_dim=128`, 74 Conv / 56 BN): includes 18 Squeeze-and-Excitation (SE) + HardSwish paths (quantization-sensitivity control).
@@ -34,7 +34,7 @@ In autonomous driving semantic segmentation (19 Cityscapes classes), a high-capa
 ## 3. Distillation Objectives (`seg_kd/losses.py`)
 
 ### 3.1 Channel-Wise Spatial Distillation (`CWD`)
-Pixel-wise KL (`softmax` across `C` channels) is dominated by frequent background classes. `CWD` instead normalizes each channel $c$ spatially over valid pixels $\Omega = \{(h, w) : y_{h,w} \neq 255\}$:
+Pixel-wise KL (`softmax` across `C` channels) is dominated by frequent background classes. `CWD` instead normalizes each channel $c$ spatially over valid pixels $`\Omega = \lbrace (h, w) : y_{h,w} \neq 255 \rbrace`$:
 
 $$p_c^{T}(i) = \frac{\exp(z_{c,i}^{T} / \tau)}{\sum_{j \in \Omega} \exp(z_{c,j}^{T} / \tau)}, \qquad \mathcal{L}_{\mathrm{CWD}} = \frac{\tau^2}{C} \sum_{c=1}^{C} \sum_{i \in \Omega} p_c^{T}(i) \log \frac{p_c^{T}(i)}{p_c^{S}(i)}$$
 
@@ -43,9 +43,11 @@ Every class channel receives equal spatial gradient weight regardless of pixel a
 ### 3.2 4-Stage Hybrid Feature Alignment (`cwd_feat`)
 Across stages `s4, s8, s16, s32`, projected student features match frozen teacher features via a 50/50 hybrid of spatial CWD and channel-wise cosine distance:
 
-$$\mathcal{L}_{\mathrm{feat}} = \frac{1}{|S|} \sum_{s \in \{s4, s8, s16, s32\}} \Big( 0.5 \cdot \mathcal{L}_{\mathrm{CWD}}(\hat{F}_s^{S}, F_s^{T}) + 0.5 \cdot (1 - \cos(\hat{F}_s^{S}, F_s^{T})) \Big)$$
+$$\mathcal{L}_{\mathrm{feat}} = \frac{1}{|S|} \sum_{s \in \lbrace s4, s8, s16, s32 \rbrace} \Big( 0.5 \cdot \mathcal{L}_{\mathrm{CWD}}(\hat{F}_s^{S}, F_s^{T}) + 0.5 \cdot (1 - \cos(\hat{F}_s^{S}, F_s^{T})) \Big)$$
 
-The total loss is $\mathcal{L} = \mathcal{L}_{\mathrm{CE}} + \alpha_{\mathrm{kd}} \mathcal{L}_{\mathrm{CWD}} + \beta_{\mathrm{feat}} \mathcal{L}_{\mathrm{feat}}$ (`α=1.0`, `β=0.5`, unweighted CE).
+The total student objective combines unweighted CE, multi-class Dice, spatial CWD, and 4-stage hybrid feature alignment (`λ_dice = 0.25`, `α_kd = 0.8`, `β_feat = 0.4`, `T = 4.0` in `configs/l4-plan.json`):
+
+$$\mathcal{L} = \mathcal{L}_{\mathrm{CE}} + \lambda_{\mathrm{dice}} \mathcal{L}_{\mathrm{Dice}} + \alpha_{\mathrm{kd}} \mathcal{L}_{\mathrm{CWD}} + \beta_{\mathrm{feat}} \mathcal{L}_{\mathrm{feat}}$$
 
 ---
 
@@ -64,4 +66,4 @@ Clean-distilled students (`v3-max`) match `90.8%` of teacher mIoU on clean frame
 1. **BF16-Teacher QAT-KD (`6 epochs`)**: Quantization-aware fine-tuning keeps static INT8 accuracy loss strictly below `1.0%p`.
 2. **ONNX Export & Static QDQ INT8 (`seg_kd/export.py`)**: Verifies `100.0%` pixel argmax parity (`max_abs_logit_diff <= 3.6e-5`) between PyTorch and Opset 17 FP32 ONNX, then applies per-channel static QDQ INT8 calibration over 128 deterministic training frames.
 3. **Validation-Only INT8 Gate (`assess_int8_acceptance`)**: Accepts INT8 strictly when all 4 validation checks pass (`val_mIoU_drop <= 1.0%p`, `val_safety_drop <= 1.5%p`, `size_ratio < 1.0`, `CPU_p50_speedup >= 1.20×`).
-4. **Post-Hoc Validation Temperature Scaling (`seg_kd/evaluation.py`)**: Fits a single scalar temperature $T^*$ on `validation` NLL (`T* ≈ 1.70` across all CWD students), cutting `locked_eval` ECE by `69.5–78.5%` with mathematically zero mIoU change (`0.00%p`) and `0 ms` inference overhead.
+4. **Post-Hoc Validation Temperature Scaling (`seg_kd/evaluation.py`)**: Fits a single scalar temperature $`T^*`$ on `validation` NLL (`T* ≈ 1.70` across all CWD students), cutting `locked_eval` ECE by `69.5–78.5%` with mathematically zero mIoU change (`0.00%p`) and `0 ms` inference overhead.

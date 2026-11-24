@@ -62,7 +62,7 @@
 
 ## 4. 사후 온도 보정 (Validation-Only Temperature Scaling)
 
-| 모델 | 최적 온도 $T^*$ (Val) | 보정 전 ECE | 보정 후 ECE | ECE 감소율 | Locked mIoU 변화 |
+| 모델 | 최적 온도 $`T^*`$ (Val) | 보정 전 ECE | 보정 후 ECE | ECE 감소율 | Locked mIoU 변화 |
 |---|---:|---:|---:|---:|---:|
 | `MobileNetV4-Small` Baseline | 1.20 | 0.0151 | 0.0008 | -94.4% | 0.00%p |
 | `MobileNetV4-Small` CWD+Feat | **1.71** | 0.0305 | 0.0066 | **-78.5%** | 0.00%p |

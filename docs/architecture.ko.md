@@ -15,13 +15,13 @@
 
 ## 2. 교사·학생 모델 구조 (`seg_kd/models.py`)
 
-### 교사 (`SegFormerTeacher`)
+### 교사 (`SegformerTeacher`)
 - **백본**: `nvidia/segformer-b5-finetuned-cityscapes-1024-1024` (`MiT-B5`, `84,607,955` 파라미터, 체크포인트 `323.14 MiB`)
 - **출력**: 19클래스 로짓 `(B, 19, H, W)` 및 4단계 계층 특징 맵(`s4`, `s8`, `s16`, `s32`: 채널 `[64, 128, 320, 512]`)
 - **역할**: 학생 학습 시 `eval()` + `torch.no_grad()` + CUDA BF16으로 동결(frozen)되어 깨끗한 입력 프레임의 정밀 공간 분포와 다중 스케일 특징을 제공합니다.
 
-### 학생 (`EdgeFPNSegmenter`)
-- **공통 디코더**: 양자화 융합에 친화적인 `Conv2d(bias=False) → BatchNorm2d → ReLU` 경량 FPN 디코더(모든 업샘플은 ONNX Opset 17 호환 `bilinear`)
+### 학생 (`EdgeSegStudent` + `LiteFPNDecoder`)
+- **공통 디코더**: 양자화 융합에 친화적인 `Conv2d(bias=False) → BatchNorm2d → ReLU6` 경량 FPN 디코더(모든 업샘플은 ONNX Opset 17 호환 `bilinear`)
 - **3단계 Pareto 백본 티어**:
   - `MobileNetV4-Small` (`1.50M` params, `fpn_dim=96`, 57 Conv / 55 BN): 초경량 UIB 블록 (`FP32 5.72 MiB`, `INT8 1.76 MiB`)
   - `MobileNetV3-Large` (`3.30M` params, `fpn_dim=128`, 74 Conv / 56 BN): 18개 Squeeze-and-Excitation(SE) + HardSwish 포함(정적 INT8 민감성 대조군)
@@ -43,9 +43,11 @@ $$p_c^{T}(i) = \frac{\exp(z_{c,i}^{T} / \tau)}{\sum_{j \in \Omega} \exp(z_{c,j}^
 ### 3.2 4단계 하이브리드 특징 정렬 (`cwd_feat`)
 이종 아키텍처(Transformer ↔ CNN)의 4단계(`s4, s8, s16, s32`) 특징 맵을 단일 정규화에만 의존하지 않고 공간 집중도(`CWD`)와 채널 방향성(`Cosine`)을 절반씩 결합합니다.
 
-$$\mathcal{L}_{\mathrm{feat}} = \frac{1}{|S|} \sum_{s \in \{s4, s8, s16, s32\}} \Big( 0.5 \cdot \mathcal{L}_{\mathrm{CWD}}(\hat{F}_s^{S}, F_s^{T}) + 0.5 \cdot (1 - \cos(\hat{F}_s^{S}, F_s^{T})) \Big)$$
+$$\mathcal{L}_{\mathrm{feat}} = \frac{1}{|S|} \sum_{s \in \lbrace s4, s8, s16, s32 \rbrace} \Big( 0.5 \cdot \mathcal{L}_{\mathrm{CWD}}(\hat{F}_s^{S}, F_s^{T}) + 0.5 \cdot (1 - \cos(\hat{F}_s^{S}, F_s^{T})) \Big)$$
 
-전체 학생 목적 함수는 $\mathcal{L} = \mathcal{L}_{\mathrm{CE}} + \alpha_{\mathrm{kd}} \mathcal{L}_{\mathrm{CWD}} + \beta_{\mathrm{feat}} \mathcal{L}_{\mathrm{feat}}$ (`α=1.0`, `β=0.5`, 무가중 CE)입니다.
+전체 학생 목적 함수는 무가중 CE, 다중 클래스 Dice, 공간 CWD, 4단계 하이브리드 특징 정렬의 합(`configs/l4-plan.json` 기준 `λ_dice = 0.25`, `α_kd = 0.8`, `β_feat = 0.4`, `T = 4.0`)입니다.
+
+$$\mathcal{L} = \mathcal{L}_{\mathrm{CE}} + \lambda_{\mathrm{dice}} \mathcal{L}_{\mathrm{Dice}} + \alpha_{\mathrm{kd}} \mathcal{L}_{\mathrm{CWD}} + \beta_{\mathrm{feat}} \mathcal{L}_{\mathrm{feat}}$$
 
 ---
 
@@ -68,4 +70,4 @@ $$\mathcal{L}_{\mathrm{feat}} = \frac{1}{|S|} \sum_{s \in \{s4, s8, s16, s32\}} 
    - `val_safety_mIoU_drop <= 1.5%p`
    - `INT8 file_size < FP32 file_size`
    - `CPU_p50_speedup >= 1.20×`
-4. **Validation-Only 사후 온도 보정 (`seg_kd/evaluation.py`)**: CWD 증류 학생의 로짓 샤프닝(ECE 상승)을 해소하기 위해 `validation` NLL 최소화 스칼라 온도 $T^*$를 1차원 그리드 탐색으로 추정합니다. 로짓을 $z / T^*$로 나누면 `argmax`가 수학적으로 불변(`mIoU 변화 0.00%p`)이면서 `locked_eval` ECE가 `69.5~78.5%` 감소합니다.
+4. **Validation-Only 사후 온도 보정 (`seg_kd/evaluation.py`)**: CWD 증류 학생의 로짓 샤프닝(ECE 상승)을 해소하기 위해 `validation` NLL 최소화 스칼라 온도 $`T^*`$를 1차원 그리드 탐색으로 추정합니다. 로짓을 $`z / T^*`$로 나누면 `argmax`가 수학적으로 불변(`mIoU 변화 0.00%p`)이면서 `locked_eval` ECE가 `69.5~78.5%` 감소합니다.

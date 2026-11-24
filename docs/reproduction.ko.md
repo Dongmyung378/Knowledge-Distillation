@@ -17,7 +17,8 @@ python -m seg_kd doctor
 python -m unittest discover -s tests -v
 
 # 3. 합성 도로 데이터 End-to-End 스모크 파이프라인 실행
-python -m seg_kd prepare-data --dataset synthetic --data ./tmp/syn-data --output ./tmp/syn-manifest.json --image-size 128x256
+python -m seg_kd prepare-data --dataset synthetic \
+  --data ./tmp/syn-data --output ./tmp/syn-manifest.json --image-size 128x256
 python scripts/run_l4_study.py \
   --plan configs/l4-plan.json \
   --manifest ./tmp/syn-manifest.json \

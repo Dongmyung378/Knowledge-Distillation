@@ -51,7 +51,7 @@
 <rect x="594" y="314" width="8" height="122" rx="4" fill="#4D6B48"/>
 <text x="624" y="351" fill="#3B5936" font-size="14" font-weight="700">TRACK 02 · CLEAN PEAK INT8 · 7.91 MiB · 40.5 FPS</text>
 <text x="624" y="385" fill="#182218" font-size="23" font-weight="750">MobileNetV4-Medium Clean INT8 (Gate PASS)</text>
-<text x="624" y="416" fill="#4D5C4C" font-size="14.2">mIoU 67.95% (교사 90.8%) · Safety 57.94% · KITTI 51.32% (+7.46%p)</text>
+<text x="624" y="416" fill="#4D5C4C" font-size="14.2">mIoU 67.95% (교사 90.8%) · Safety 57.94% · KITTI 51.32% (+2.23%p)</text>
 
 <!-- Card 03 -->
 <rect x="594" y="456" width="558" height="126" rx="14" fill="#FFFFFF" stroke="#2B4C27" stroke-width="2.2"/>

@@ -60,20 +60,18 @@
 
 ## 시스템 구조 및 핵심 기법
 
-```
-Cityscapes 384×768 (train 2,529 / val 446 / locked_eval 500) + KITTI Zero-Shot (200)
-   │
-   ├─ Clean RGB ──▶ Frozen SegFormer-B5 Teacher (84.6M, MiT-B5, BF16)
-   │                     └─ 4-Stage Features (s4, s8, s16, s32) + Clean Logits (19ch)
-   │
-   └─ Clean / Corrupted RGB ──▶ MobileNetV4-Medium + FPN Student (7.54M, UIB Conv-BN-ReLU)
-                                  ├─ L_CE (unweighted, ignore_index=255)
-                                  ├─ L_CWD (Channel-wise Spatial Softmax KL over H×W, T=4.0)
-                                  ├─ L_Feat (1×1 Projector Bank: 0.5·CWD + 0.5·Cosine across 4 stages)
-                                  └─ BF16-Teacher QAT-KD (6 ep) ─▶ ONNX FP32/INT8 (QDQ, 128-img Calib)
-                                                                       ├─ Validation-Only INT8 Gate (4/4)
-                                                                       ├─ Validation-Only Temp Scaling (T*≈1.70)
-                                                                       └─ SHA-256 Frozen Locked Eval & KITTI
+```text
+Cityscapes 384x768 (train 2,529 / val 446 / locked 500) + KITTI Zero-Shot (200)
+  |- Clean RGB --------> Frozen SegFormer-B5 Teacher (84.6M, MiT-B5, BF16)
+  |                        `- 4-Stage Pyramid (s4..s32) + Clean Logits (19ch)
+  `- Clean/Corrupt RGB -> MobileNetV4-Medium + FPN Student (7.54M, UIB Conv-BN)
+                           |- L_CE + 0.25*L_Dice (unweighted, ignore=255)
+                           |- L_CWD (Channel Spatial Softmax KL, T=4.0)
+                           |- L_Feat (1x1 Projector: 0.5*CWD + 0.5*Cosine)
+                           `- QAT-KD (6 ep) -> ONNX FP32/INT8 (QDQ, 128 calib)
+                                 |- Validation-Only INT8 Gate (4/4 checks)
+                                 |- Validation-Only Temp Scaling (T*~=1.70)
+                                 `- SHA-256 Frozen Locked Eval & KITTI
 ```
 
 1. **Channel-Wise Spatial Distillation (`CWD`)**: 클래스 픽셀 불균형이 극심한 도로 장면에서 픽셀별 KL(`softmax` over `C`)은 소수 안전 클래스를 희석합니다. 채널별 공간 맵(`softmax` over `H×W`)을 정렬해 신호등·보행자·자전거 경계를 선명하게 전이합니다.
@@ -94,7 +92,11 @@ python -m seg_kd doctor
 
 # 2. 단위 테스트 및 1분 End-to-End 파이프라인 스모크 테스트
 python -m unittest discover -s tests -v
-python scripts/run_l4_study.py --plan configs/l4-plan.json --manifest /tmp/syn-manifest.json --data /tmp/syn-data --output /tmp/syn-out --smoke
+python -m seg_kd prepare-data --dataset synthetic \
+  --data ./tmp/syn-data --output ./tmp/syn-manifest.json --image-size 128x256
+python scripts/run_l4_study.py --plan configs/l4-plan.json \
+  --manifest ./tmp/syn-manifest.json --data ./tmp/syn-data \
+  --output ./tmp/syn-out --smoke
 ```
 
 전체 NVIDIA L4 실험은 자립형 노트북 [`notebooks/colab_enterprise_l4_one_shot.ipynb`](./notebooks/colab_enterprise_l4_one_shot.ipynb)의 `Run All` 한 번으로 재현할 수 있습니다. 자세한 단계별 CLI와 데이터 준비 절차는 [`docs/reproduction.ko.md`](./docs/reproduction.ko.md)를 참고하십시오.

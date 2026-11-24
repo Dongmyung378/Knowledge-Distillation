@@ -54,7 +54,7 @@ Every metric below is extracted directly from frozen NVIDIA L4 (`22.03 GiB`, CUD
 
 ## 4. Validation-Only Post-Hoc Temperature Scaling
 
-| Model | Optimal $T^*$ (Val) | ECE Before | ECE After | Reduction | Locked mIoU Delta |
+| Model | Optimal $`T^*`$ (Val) | ECE Before | ECE After | Reduction | Locked mIoU Delta |
 |---|---:|---:|---:|---:|---:|
 | `MobileNetV4-Small` Baseline | 1.20 | 0.0151 | 0.0008 | -94.4% | 0.00%p |
 | `MobileNetV4-Small` CWD+Feat | **1.71** | 0.0305 | 0.0066 | **-78.5%** | 0.00%p |
